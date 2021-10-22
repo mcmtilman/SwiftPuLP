@@ -9,3 +9,5 @@ Requires PuLP to be installed, and may require PYTHON_LIBRARY environment variab
 ## Status
 
 Early work in progress.
+
+Tested with XCode 13.0 and Pulp 2.5.1.
