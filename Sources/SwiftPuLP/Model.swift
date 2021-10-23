@@ -9,7 +9,7 @@
 import PythonKit
 
 // The Python PuLP module loaded lazily.
-fileprivate var pulpModule = Python.import("pulp")
+fileprivate let pulpModule = Python.import("pulp")
 
 
 /*
@@ -122,13 +122,13 @@ public struct Variable: LinearExpression {
     /**
      A domain identifies the range of values of a variable:
      - binary (values 0 and 1).
-     - continuous (real numbers)
+     - real (real numbers)
      - integer (integer values)
      */
     public enum Domain: PythonConvertible {
 
         case binary
-        case continuous
+        case real
         case integer
 
         // MARK: Computed properties
@@ -139,7 +139,7 @@ public struct Variable: LinearExpression {
         public var pythonObject: PythonObject {
             switch self {
             case .binary: return pulpModule.LpBinary
-            case .continuous: return pulpModule.LpContinuous
+            case .real: return pulpModule.LpContinuous
             case .integer: return pulpModule.LpInteger
             }
         }
@@ -178,7 +178,7 @@ public struct Variable: LinearExpression {
      Creates a variable with given name and domain.
      The variable may optionally specify a lower and / or upper bound for its values.
      Variables come in three flavours:
-     - continuous domain (supports double values satisfying the optional lower and upper bounds)
+     - real domain (supports double values satisfying the optional lower and upper bounds)
      - integer domain (supports integer values satisfying the optional lower and upper bounds)
      - binary domain (a value is either 0 or 1).
      Creation fails if:
@@ -186,7 +186,7 @@ public struct Variable: LinearExpression {
      - a non-nil minimum value is greater than a non-nil maximum value;
      - the variable is binary with minimum != 0 and nil, or maximum != 1 and nil.
      */
-    public init?(name: String, minimum: Double? = nil, maximum: Double? = nil, domain: Domain = .continuous) {
+    public init?(name: String, minimum: Double? = nil, maximum: Double? = nil, domain: Domain = .real) {
         guard !name.isEmpty, !name.contains(" ") else { return nil }
         if let min = minimum, let max = maximum, min > max { return nil }
         if domain == .binary, minimum != nil && minimum != 0 || maximum != nil && maximum != 1 { return nil }
