@@ -35,8 +35,9 @@ public struct Model: PythonConvertible {
     /// The name of the model. May not be empty and may not contain spaces.
     public let name: String
     
-    /// The objective of the model.
-    public let objective: Objective
+    /// The optional objective of the model.
+    /// Default = nil.
+    public let objective: Objective?
     
     // MARK: Computed properties
     
@@ -44,9 +45,10 @@ public struct Model: PythonConvertible {
      Converts the model into a PuLP problem.
      */
     public var pythonObject: PythonObject {
-        let problem = pulpModule.LpProblem(name: name, sense: objective.optimization)
-
-        problem.setObjective(objective.expression)
+        let problem = pulpModule.LpProblem(name: name, sense: objective?.optimization ?? .minimize) // sense must be set, even without an objective function.
+        if let objective = objective {
+            problem.setObjective(objective.function)
+        }
         
         return problem
     }
@@ -57,7 +59,7 @@ public struct Model: PythonConvertible {
      Creates a model with given name and objective.
      Fails if the name is empty or contains spaces.
      */
-    public init?(_ name: String, objective: Objective) {
+    public init?(_ name: String, objective: Objective? = nil) {
         guard !name.isEmpty, !name.contains(" ") else { return nil }
 
         self.name = name
@@ -96,18 +98,18 @@ public struct Objective {
     
     // MARK: Stored properties
     
-    /// The linear expression to be optimized.
-    public let expression: LinearExpression
+    /// The linear function to be optimized.
+    public let function: LinearExpression
         
     /// The optimization to be performed.
-    /// Default = maximize.
+    /// Default = minimize.
     public let optimization: Optimization
         
     // MARK: Initializing
     
     /// Creates an objective to optimize given linear expression.
-    public init(_ expression: LinearExpression, optimization: Optimization = .maximize) {
-        self.expression = expression
+    public init(_ function: LinearExpression, optimization: Optimization = .minimize) {
+        self.function = function
         self.optimization = optimization
     }
     

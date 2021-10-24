@@ -93,16 +93,16 @@ final class ModelTests: XCTestCase {
     
     func testObjective() throws {
         guard let variable = Variable("X") else { return XCTFail("Nil variable") }
-        let objective = Objective(variable, optimization: .minimize)
+        let objective = Objective(variable, optimization: .maximize)
 
-        XCTAssertEqual(objective.optimization, .minimize)
+        XCTAssertEqual(objective.optimization, .maximize)
     }
     
     func testDefaultObjective() throws {
         guard let variable = Variable("X") else { return XCTFail("Nil variable") }
         let objective = Objective(variable)
 
-        XCTAssertEqual(objective.optimization, .maximize)
+        XCTAssertEqual(objective.optimization, .minimize)
     }
     
     // MARK: Model tests
@@ -112,6 +112,12 @@ final class ModelTests: XCTestCase {
         let model = Model("XYZ", objective: Objective(variable))
         
         XCTAssertNotNil(model)
+    }
+
+    func testDefaultModel() throws {
+        guard let model = Model("XYZ") else { return XCTFail("Nil variable") }
+        
+        XCTAssertNil(model.objective)
     }
 
     func testEmptyNameModel() throws {
@@ -132,23 +138,23 @@ final class ModelTests: XCTestCase {
     
     func testVariableToPuLP() throws {
         guard let variable = Variable("XYZ", minimum: 1, maximum: 10, domain: .integer) else { return XCTFail("Nil variable") }
-        let pythonObject = variable.pythonObject
+        let pythonVariable = variable.pythonObject
         
-        XCTAssertEqual(Python.type(pythonObject), pulp.LpVariable)
-        XCTAssertEqual(pythonObject.name, "XYZ")
-        XCTAssertEqual(pythonObject.lowBound, 1)
-        XCTAssertEqual(pythonObject.upBound, 10)
-        XCTAssertEqual(pythonObject.cat, pulp.LpInteger)
+        XCTAssertEqual(Python.type(pythonVariable), pulp.LpVariable)
+        XCTAssertEqual(pythonVariable.name, "XYZ")
+        XCTAssertEqual(pythonVariable.lowBound, 1)
+        XCTAssertEqual(pythonVariable.upBound, 10)
+        XCTAssertEqual(pythonVariable.cat, pulp.LpInteger)
     }
 
     func testDefaultVariableToPuLP() throws {
         guard let variable = Variable("XYZ") else { return XCTFail("Nil variable") }
-        let pythonObject = variable.pythonObject
+        let pythonVariable = variable.pythonObject
         
-        XCTAssertEqual(pythonObject.name, "XYZ")
-        XCTAssertEqual(pythonObject.lowBound, Python.None)
-        XCTAssertEqual(pythonObject.upBound, Python.None)
-        XCTAssertEqual(pythonObject.cat, pulp.LpContinuous)
+        XCTAssertEqual(pythonVariable.name, "XYZ")
+        XCTAssertEqual(pythonVariable.lowBound, Python.None)
+        XCTAssertEqual(pythonVariable.upBound, Python.None)
+        XCTAssertEqual(pythonVariable.cat, pulp.LpContinuous)
     }
 
     func testDomainToPuLP() throws {
@@ -171,11 +177,21 @@ final class ModelTests: XCTestCase {
 
     func testModelToPuLP() throws {
         guard let variable = Variable("X") else { return XCTFail("Nil variable") }
-        guard let model = Model("XYZ", objective: Objective(variable)) else { return XCTFail("Nil model") }
-        let pythonObject = model.pythonObject
+        guard let model = Model("XYZ", objective: Objective(variable, optimization: .maximize)) else { return XCTFail("Nil model") }
+        let pythonModel = model.pythonObject
         
-        XCTAssertEqual(Python.type(pythonObject), pulp.LpProblem)
-        XCTAssertEqual(pythonObject.name, "XYZ")
-        XCTAssertEqual(pythonObject.sense, pulp.LpMaximize)
+        XCTAssertEqual(Python.type(pythonModel), pulp.LpProblem)
+        XCTAssertEqual(pythonModel.name, "XYZ")
+        XCTAssertNotNil(pythonModel.objective)
+        XCTAssertEqual(pythonModel.sense, pulp.LpMaximize)
     }
+    
+    func testDefaultModelToPuLP() throws {
+        guard let model = Model("XYZ") else { return XCTFail("Nil model") }
+        let pythonModel = model.pythonObject
+        
+        XCTAssertEqual(pythonModel.objective, Python.None)
+        XCTAssertEqual(pythonModel.sense, pulp.LpMinimize)
+    }
+    
 }
