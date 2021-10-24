@@ -182,7 +182,10 @@ final class ModelTests: XCTestCase {
         
         XCTAssertEqual(Python.type(pythonModel), pulp.LpProblem)
         XCTAssertEqual(pythonModel.name, "XYZ")
-        XCTAssertNotNil(pythonModel.objective)
+        
+        // Comparison of objective with None succeeds, which is not expected.
+        XCTAssertEqual(Python.type(pythonModel.objective), pulp.LpAffineExpression)
+
         XCTAssertEqual(pythonModel.sense, pulp.LpMaximize)
     }
     
