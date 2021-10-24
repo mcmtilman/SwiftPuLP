@@ -57,7 +57,7 @@ public struct Model: PythonConvertible {
      Creates a model with given name and objective.
      Fails if the name is empty or contains spaces.
      */
-    public init?(name: String, objective: Objective) {
+    public init?(_ name: String, objective: Objective) {
         guard !name.isEmpty, !name.contains(" ") else { return nil }
 
         self.name = name
@@ -100,12 +100,13 @@ public struct Objective {
     public let expression: LinearExpression
         
     /// The optimization to be performed.
+    /// Default = maximize.
     public let optimization: Optimization
         
     // MARK: Initializing
     
     /// Creates an objective to optimize given linear expression.
-    public init(expression: LinearExpression, optimization: Optimization = .maximize) {
+    public init(_ expression: LinearExpression, optimization: Optimization = .maximize) {
         self.expression = expression
         self.optimization = optimization
     }
@@ -152,15 +153,16 @@ public struct Variable: LinearExpression {
     public let name: String
     
     /// Optional lower bound for the values (inclusive).
-    /// If present should not exceed a non-nil maximum.
-    /// Must be 0 for binary variables.
+    /// If present must not exceed a non-nil maximum.
+    /// If present must be 0 for binary variables.
     public let minimum: Double?
     
     /// Optional upper bound for the values (inclusive).
-    /// Must be be 1 for binary variables.
+    /// If present must be 1 for binary variables.
     public let maximum: Double?
     
     /// Domain  of values for this variable.
+    /// Default = real.
     public let domain: Domain
     
     // MARK: Computed properties
@@ -169,7 +171,7 @@ public struct Variable: LinearExpression {
      Converts the variable into a PuLP variable.
      */
     public var pythonObject: PythonObject {
-        pulpModule.LpVariable(name: name, lowBound: minimum ?? Python.None, upBound: maximum ?? Python.None, cat: domain.pythonObject)
+        pulpModule.LpVariable(name: name, lowBound: minimum, upBound: maximum, cat: domain.pythonObject)
     }
 
     // MARK: Initializing
@@ -186,7 +188,7 @@ public struct Variable: LinearExpression {
      - a non-nil minimum value is greater than a non-nil maximum value;
      - the variable is binary with minimum != 0 and nil, or maximum != 1 and nil.
      */
-    public init?(name: String, minimum: Double? = nil, maximum: Double? = nil, domain: Domain = .real) {
+    public init?(_ name: String, minimum: Double? = nil, maximum: Double? = nil, domain: Domain = .real) {
         guard !name.isEmpty, !name.contains(" ") else { return nil }
         if let min = minimum, let max = maximum, min > max { return nil }
         if domain == .binary, minimum != nil && minimum != 0 || maximum != nil && maximum != 1 { return nil }

@@ -15,12 +15,12 @@ import SwiftPuLP
  */
 final class ModelTests: XCTestCase {
     
-    let pulpModule = Python.import("pulp")
+    let pulp = Python.import("pulp")
     
     // MARK: Variable tests
     
     func testVariable() throws {
-        guard let variable = Variable(name: "XYZ", minimum: 1, maximum: 10, domain: .integer) else { return XCTFail("Nil variable") }
+        guard let variable = Variable("XYZ", minimum: 1, maximum: 10, domain: .integer) else { return XCTFail("Nil variable") }
         
         XCTAssertEqual(variable.name, "XYZ")
         XCTAssertEqual(variable.minimum, 1)
@@ -29,7 +29,7 @@ final class ModelTests: XCTestCase {
     }
 
     func testDefaultVariable() throws {
-        guard let variable = Variable(name: "XYZ") else { return XCTFail("Nil variable") }
+        guard let variable = Variable("XYZ") else { return XCTFail("Nil variable") }
 
         XCTAssertEqual(variable.name, "XYZ")
         XCTAssertNil(variable.minimum)
@@ -38,31 +38,31 @@ final class ModelTests: XCTestCase {
     }
 
     func testEmptyNameVariable() throws {
-        let variable = Variable(name: "")
+        let variable = Variable("")
         
         XCTAssertNil(variable)
     }
 
     func testInvalidNameVariable() throws {
-        let variable = Variable(name: "X Y Z")
+        let variable = Variable("X Y Z")
         
         XCTAssertNil(variable)
     }
 
     func testFixedVariable() throws {
-        let variable = Variable(name: "XYZ", minimum: 1, maximum: 1, domain: .integer)
+        let variable = Variable("XYZ", minimum: 1, maximum: 1, domain: .integer)
         
         XCTAssertNotNil(variable)
     }
 
     func testInvalidRangeVariable() throws {
-        let variable = Variable(name: "XYZ", minimum: 3, maximum: 2, domain: .integer)
+        let variable = Variable("XYZ", minimum: 3, maximum: 2, domain: .integer)
         
         XCTAssertNil(variable)
     }
 
     func testBinaryVariable() throws {
-        guard let variable = Variable(name: "XYZ", minimum: 0, maximum: 1, domain: .binary) else { return XCTFail("Nil variable") }
+        guard let variable = Variable("XYZ", minimum: 0, maximum: 1, domain: .binary) else { return XCTFail("Nil variable") }
 
         XCTAssertEqual(variable.minimum, 0)
         XCTAssertEqual(variable.maximum, 1)
@@ -70,7 +70,7 @@ final class ModelTests: XCTestCase {
     }
 
     func testDefaultBinaryVariable() throws {
-        guard let variable = Variable(name: "XYZ", domain: .binary) else { return XCTFail("Nil variable") }
+        guard let variable = Variable("XYZ", domain: .binary) else { return XCTFail("Nil variable") }
 
         XCTAssertEqual(variable.name, "XYZ")
         XCTAssertEqual(variable.minimum, 0)
@@ -78,13 +78,13 @@ final class ModelTests: XCTestCase {
     }
 
     func testInvalidMinimumBinaryVariable() throws {
-        let variable = Variable(name: "XYZ", minimum: -1, domain: .binary)
+        let variable = Variable("XYZ", minimum: -1, domain: .binary)
         
         XCTAssertNil(variable)
     }
 
     func testInvalidMaximumBinaryVariable() throws {
-        let variable = Variable(name: "XYZ", maximum: 2, domain: .binary)
+        let variable = Variable("XYZ", maximum: 2, domain: .binary)
         
         XCTAssertNil(variable)
     }
@@ -92,57 +92,90 @@ final class ModelTests: XCTestCase {
     // MARK: Objective tests
     
     func testObjective() throws {
-        guard let variable = Variable(name: "X") else { return XCTFail("Nil variable") }
-        let objective = Objective(expression: variable, optimization: .minimize)
+        guard let variable = Variable("X") else { return XCTFail("Nil variable") }
+        let objective = Objective(variable, optimization: .minimize)
 
         XCTAssertEqual(objective.optimization, .minimize)
     }
     
     func testDefaultObjective() throws {
-        guard let variable = Variable(name: "X") else { return XCTFail("Nil variable") }
-        let objective = Objective(expression: variable)
+        guard let variable = Variable("X") else { return XCTFail("Nil variable") }
+        let objective = Objective(variable)
 
         XCTAssertEqual(objective.optimization, .maximize)
     }
     
-    // MARK: Conversion to PuLP tests
-    
-    func testDomainToPython() throws {
-        let domains: [Variable.Domain] = [.binary, .real, .integer]
-        let pythonObjects = [pulpModule.LpBinary, pulpModule.LpContinuous, pulpModule.LpInteger]
+    // MARK: Model tests
 
-        for (domain, pythonObject) in zip(domains, pythonObjects) {
-            XCTAssertEqual(domain.pythonObject, pythonObject)
-        }
+    func testModel() throws {
+        guard let variable = Variable("X") else { return XCTFail("Nil variable") }
+        let model = Model("XYZ", objective: Objective(variable))
+        
+        XCTAssertNotNil(model)
     }
 
-    func testVariableToPython() throws {
-        guard let variable = Variable(name: "XYZ", minimum: 1, maximum: 10, domain: .integer) else { return XCTFail("Nil variable") }
+    func testEmptyNameModel() throws {
+        guard let variable = Variable("X") else { return XCTFail("Nil variable") }
+        let model = Model("", objective: Objective(variable))
+        
+        XCTAssertNil(model)
+    }
+
+    func testInvalidNameModel() throws {
+        guard let variable = Variable("X") else { return XCTFail("Nil variable") }
+        let model = Model("X Y Z", objective: Objective(variable))
+        
+        XCTAssertNil(model)
+    }
+
+    // MARK: Conversion to PuLP tests
+    
+    func testVariableToPuLP() throws {
+        guard let variable = Variable("XYZ", minimum: 1, maximum: 10, domain: .integer) else { return XCTFail("Nil variable") }
         let pythonObject = variable.pythonObject
         
+        XCTAssertEqual(Python.type(pythonObject), pulp.LpVariable)
         XCTAssertEqual(pythonObject.name, "XYZ")
         XCTAssertEqual(pythonObject.lowBound, 1)
         XCTAssertEqual(pythonObject.upBound, 10)
-        XCTAssertEqual(pythonObject.cat, pulpModule.LpInteger)
+        XCTAssertEqual(pythonObject.cat, pulp.LpInteger)
     }
 
-    func testDefaultVariableToPython() throws {
-        guard let variable = Variable(name: "XYZ") else { return XCTFail("Nil variable") }
+    func testDefaultVariableToPuLP() throws {
+        guard let variable = Variable("XYZ") else { return XCTFail("Nil variable") }
         let pythonObject = variable.pythonObject
         
         XCTAssertEqual(pythonObject.name, "XYZ")
         XCTAssertEqual(pythonObject.lowBound, Python.None)
         XCTAssertEqual(pythonObject.upBound, Python.None)
-        XCTAssertEqual(pythonObject.cat, pulpModule.LpContinuous)
+        XCTAssertEqual(pythonObject.cat, pulp.LpContinuous)
     }
 
-    func testOptimizationToPython() throws {
-        let optimizations: [Objective.Optimization] = [.maximize, .minimize]
-        let pythonObjects = [pulpModule.LpMaximize, pulpModule.LpMinimize]
+    func testDomainToPuLP() throws {
+        let domains = [Variable.Domain.binary, .real, .integer]
+        let categories = [pulp.LpBinary, pulp.LpContinuous, pulp.LpInteger]
 
-        for (optimization, pythonObject) in zip(optimizations, pythonObjects) {
-            XCTAssertEqual(optimization.pythonObject, pythonObject)
+        for (domain, category) in zip(domains, categories) {
+            XCTAssertEqual(domain.pythonObject, category)
         }
     }
 
+    func testOptimizationToPuLP() throws {
+        let optimizations = [Objective.Optimization.maximize, .minimize]
+        let senses = [pulp.LpMaximize, pulp.LpMinimize]
+
+        for (optimization, sense) in zip(optimizations, senses) {
+            XCTAssertEqual(optimization.pythonObject, sense)
+        }
+    }
+
+    func testModelToPuLP() throws {
+        guard let variable = Variable("X") else { return XCTFail("Nil variable") }
+        guard let model = Model("XYZ", objective: Objective(variable)) else { return XCTFail("Nil model") }
+        let pythonObject = model.pythonObject
+        
+        XCTAssertEqual(Python.type(pythonObject), pulp.LpProblem)
+        XCTAssertEqual(pythonObject.name, "XYZ")
+        XCTAssertEqual(pythonObject.sense, pulp.LpMaximize)
+    }
 }
