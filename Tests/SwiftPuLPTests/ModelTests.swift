@@ -199,8 +199,10 @@ final class ModelTests: XCTestCase {
 
 extension PythonObject {
     
+    // LpAffineExpression.__eq__ returns an LpConstraint.
+    // This messes up testing the presence of an objective.
     var isNone: Bool {
-        Python.type(self) == Python.type(Python.None)
+        Python.isinstance(self, Python.type(Python.None)) == true
     }
     
 }
