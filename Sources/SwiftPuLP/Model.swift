@@ -46,7 +46,7 @@ public struct Model: PythonConvertible {
      Converts the model into a PuLP problem.
      */
     public var pythonObject: PythonObject {
-        var problem = pulpModule.LpProblem(name: name, sense: objective?.optimization ?? .minimize) // sense must be set, even without an objective function.
+        var problem = pulpModule.LpProblem(name: name, sense: objective?.optimization ?? .minimize)// set sense, even without an objective.
         if let objective = objective {
             problem += objective.function.pythonObject
         }

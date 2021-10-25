@@ -205,9 +205,24 @@ final class ModelTests: XCTestCase {
     
     func testMergedConstantsLinearFunction() throws {
         guard let x = Variable("x"), let y = Variable("y") else { return XCTFail("Nil variable") }
-        let function = 2 * x + 6 + 3 * y + 10
+        let function = 2 * x - 6 + 3 * y + 10
         
-        XCTAssertEqual(function, LinearFunction(terms: [Term(variable: x, factor: 2), Term(variable: y, factor: 3)], constant: 16))
+        XCTAssertEqual(function, LinearFunction(terms: [Term(variable: x, factor: 2), Term(variable: y, factor: 3)], constant: 4))
+    }
+    
+    func testMergedFactorsLinearFunction() throws {
+        guard let x = Variable("x"), let y = Variable("y") else { return XCTFail("Nil variable") }
+        let function = 2 * x + 3 * y - x + 10
+        
+        XCTAssertEqual(function, LinearFunction(terms: [Term(variable: x, factor: 1), Term(variable: y, factor: 3)], constant: 10))
+    }
+    
+    func testMergedVariablesLinearFunction() throws {
+        guard let x = Variable("x"), let y = Variable("y") else { return XCTFail("Nil variable") }
+        let z = x
+        let function = 2 * x + 3 * y - z + 10
+        
+        XCTAssertEqual(function, LinearFunction(terms: [Term(variable: x, factor: 1), Term(variable: y, factor: 3)], constant: 10))
     }
     
 }
@@ -225,7 +240,7 @@ typealias Term = LinearFunction.Term
 extension PythonObject {
     
     // LpAffineExpression.__eq__ returns an LpConstraint.
-    // This messes up testing the presence of an objective by comparing to None.
+    // This messes up testing the presence of an objective when comparing to None.
     var isNone: Bool {
         Python.isinstance(self.pythonObject, Python.type(Python.None)) == true
     }
