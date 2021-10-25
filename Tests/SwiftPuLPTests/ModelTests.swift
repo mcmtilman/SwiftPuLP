@@ -182,10 +182,7 @@ final class ModelTests: XCTestCase {
         
         XCTAssertEqual(Python.type(pythonModel), pulp.LpProblem)
         XCTAssertEqual(pythonModel.name, "XYZ")
-        
-        // Comparison of objective with None succeeds, which is not expected.
-        XCTAssertEqual(Python.type(pythonModel.objective), pulp.LpAffineExpression)
-
+        XCTAssertFalse(pythonModel.objective.isNone)
         XCTAssertEqual(pythonModel.sense, pulp.LpMaximize)
     }
     
@@ -193,8 +190,17 @@ final class ModelTests: XCTestCase {
         guard let model = Model("XYZ") else { return XCTFail("Nil model") }
         let pythonModel = model.pythonObject
         
-        XCTAssertEqual(pythonModel.objective, Python.None)
+        XCTAssertTrue(pythonModel.objective.isNone)
         XCTAssertEqual(pythonModel.sense, pulp.LpMinimize)
+    }
+    
+}
+
+
+extension PythonObject {
+    
+    var isNone: Bool {
+        Python.type(self) == Python.type(Python.None)
     }
     
 }
