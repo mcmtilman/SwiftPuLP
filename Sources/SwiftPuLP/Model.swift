@@ -7,6 +7,7 @@
 //
 
 import PythonKit
+import Collections
 
 // The Python PuLP module loaded lazily.
 fileprivate let pulpModule = Python.import("pulp")
@@ -202,3 +203,206 @@ public struct Variable: LinearExpression {
     }
     
 }
+
+
+/**
+ Linear functions are linear combinations of variables and Double factors and constants.
+ They have the canonical format: a * x + b * y + ... + c, where:
+    * a, b, ... represent double coefficients which may be omitted when 1;
+    * the trailing double constant c may be omitted when 0.
+    * x, y, ... represent variables.
+ */
+public struct LinearFunction {
+    
+    // Merge terms with same variable, keeping the order of terms.
+    static private func mergeTerms(_ terms: [Term]) -> [Term] {
+        guard terms.count > 1 else { return terms }
+        let groupedTerms = OrderedDictionary<Variable, [Term]>(grouping: terms, by: (\.variable))
+        
+        return groupedTerms.values.map { terms in
+            let factor = terms.reduce(0.0) { factor, term in factor + term.factor }
+            
+            return terms.first!.variable.withFactor(factor)
+        }
+    }
+    
+    /// A term is a variable multipled by a double factor (i.e. its coefficient).
+    public struct Term {
+        
+        // MARK: Stored properties
+        
+        // The factor.
+        // Default = 1.
+        let factor: Double
+        
+        // The variable of a term.
+        // When creating a linear function, terms with same variable are merged,
+        // with the combined factor.
+       let variable: Variable
+
+        // MARK: Initializing
+        
+        /// Creates a term consisting of a variable with optional factor.
+        public init(variable: Variable, factor: Double = 1) {
+            self.factor = factor
+            self.variable = variable
+        }
+        
+    }
+    
+    // MARK: Stored properties
+    
+    // Terms of the linear function.
+    // May be empty.
+    let terms: [Term]
+    
+    // Minimal element of a linear function.
+    let constant: Double
+    
+    // MARK: Initializing
+    
+    /// Creates linear function with given terms and constant.
+    public init(terms: [Term], constant: Double = 0) {
+        self.terms = Self.mergeTerms(terms)
+        self.constant = constant
+    }
+    
+}
+
+
+/**
+ Covenience functions to compose linear functions using basic arithmetic operators.
+ */
+public extension LinearFunction {
+    
+    // MARK: Building linear functions
+    
+    static func + (lhs: Self, rhs: Double) -> Self {
+        LinearFunction(terms: lhs.terms, constant: lhs.constant + rhs)
+    }
+    
+    static func + (lhs: Self, rhs: Term) -> Self {
+        LinearFunction(terms: lhs.terms + [rhs], constant: lhs.constant)
+    }
+    
+    static func + (lhs: Self, rhs: Variable) -> Self {
+        LinearFunction(terms: lhs.terms + [rhs.withFactor(1)], constant: lhs.constant)
+    }
+    
+    static func - (lhs: Self, rhs: Double) -> Self {
+        LinearFunction(terms: lhs.terms, constant: lhs.constant - rhs)
+    }
+    
+    static func - (lhs: Self, rhs: Term) -> Self {
+        LinearFunction(terms: lhs.terms + [rhs.negated], constant: lhs.constant)
+    }
+    
+    static func - (lhs: Self, rhs: Variable) -> Self {
+        LinearFunction(terms: lhs.terms + [rhs.withFactor(-1)], constant: lhs.constant)
+    }
+    
+}
+
+/**
+ Covenience functions to compose linear functions using basic arithmetic operators.
+ */
+public extension LinearFunction.Term {
+    
+    // MARK: Building linear functions
+    
+    static func + (lhs: Self, rhs: Double) -> LinearFunction {
+        LinearFunction(terms: [lhs], constant: rhs)
+    }
+    
+    static func + (lhs: Self, rhs: Self) -> LinearFunction {
+        LinearFunction(terms: [lhs, rhs])
+    }
+    
+    static func + (lhs: Self, rhs: Variable) -> LinearFunction {
+        LinearFunction(terms: [lhs, rhs.withFactor(1)])
+    }
+    
+    static func - (lhs: Self, rhs: Double) -> LinearFunction {
+        LinearFunction(terms: [lhs], constant: -rhs)
+    }
+    
+    static func - (lhs: Self, rhs: Self) -> LinearFunction {
+        LinearFunction(terms: [lhs, rhs.negated])
+    }
+    
+    static func - (lhs: Self, rhs: Variable) -> LinearFunction {
+        LinearFunction(terms: [lhs, rhs.withFactor(-1)])
+    }
+    
+    // MARK: Private building linear functions
+    
+    // Answers the term with negated factor.
+    fileprivate var negated: Self {
+        Self(variable: variable, factor: -factor)
+    }
+    
+}
+
+
+/**
+ Covenience functions to compose linear functions using basic arithmetic operators.
+ */
+public extension Double {
+    
+    // MARK: Building linear functions
+    
+    static func * (lhs: Double, rhs: Variable) -> LinearFunction.Term {
+        rhs.withFactor(lhs)
+    }
+     
+}
+
+
+/**
+ Covenience functions to compose linear functions using basic arithmetic operators.
+ */
+public extension Variable {
+    
+    // MARK: Building linear functions
+    
+    static func + (lhs: Variable, rhs: Double) -> LinearFunction {
+        LinearFunction(terms: [lhs.withFactor(1)], constant: rhs)
+    }
+     
+    static func + (lhs: Variable, rhs: Variable) -> LinearFunction {
+        LinearFunction(terms: [lhs.withFactor(1), rhs.withFactor(1)])
+    }
+     
+    static func + (lhs: Variable, rhs: LinearFunction.Term) -> LinearFunction {
+        LinearFunction(terms: [lhs.withFactor(1), rhs])
+    }
+    
+    static func - (lhs: Variable, rhs: Double) -> LinearFunction {
+        LinearFunction(terms: [lhs.withFactor(1)], constant: -rhs)
+    }
+     
+    static func - (lhs: Variable, rhs: Variable) -> LinearFunction {
+        LinearFunction(terms: [lhs.withFactor(1), rhs.withFactor(-1)])
+    }
+     
+    static func - (lhs: Variable, rhs: LinearFunction.Term) -> LinearFunction {
+        LinearFunction(terms: [lhs.withFactor(1), rhs.negated])
+    }
+    
+    // MARK: Private building linear functions
+    
+    fileprivate func withFactor(_ factor: Double = 1) -> LinearFunction.Term {
+        LinearFunction.Term(variable: self, factor: factor)
+    }
+
+}
+
+
+/**
+ Equatable extensions for variables and linear functions.
+ */
+extension Variable: Equatable, Hashable {}
+
+extension LinearFunction.Term: Equatable {}
+
+extension LinearFunction: Equatable {}

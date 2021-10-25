@@ -12,11 +12,14 @@ let package = Package(
     ],
     dependencies: [
         .package(url: "https://github.com/pvieito/PythonKit.git", .branch("master")),
+        .package(url: "https://github.com/apple/swift-collections.git", .upToNextMajor(from: "1.0.0")),
     ],
     targets: [
         .target(
             name: "SwiftPuLP",
-            dependencies: ["PythonKit"]),
+            dependencies: [.product(name: "PythonKit", package: "PythonKit"),
+                           .product(name: "Collections", package: "swift-collections"),
+                          ]),
         .testTarget(
             name: "SwiftPuLPTests",
             dependencies: ["SwiftPuLP"]),

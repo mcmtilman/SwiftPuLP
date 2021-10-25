@@ -194,7 +194,29 @@ final class ModelTests: XCTestCase {
         XCTAssertEqual(pythonModel.sense, pulp.LpMinimize)
     }
     
+    // MARK: Linear function tests
+    
+    func testLinearFunction() throws {
+        guard let x = Variable("x"), let y = Variable("y") else { return XCTFail("Nil variable") }
+        let function = 2 * x + 3 * y + 10
+        
+        XCTAssertEqual(function, LinearFunction(terms: [Term(variable: x, factor: 2), Term(variable: y, factor: 3)], constant: 10))
+    }
+    
+    func testMergedConstantsLinearFunction() throws {
+        guard let x = Variable("x"), let y = Variable("y") else { return XCTFail("Nil variable") }
+        let function = 2 * x + 6 + 3 * y + 10
+        
+        XCTAssertEqual(function, LinearFunction(terms: [Term(variable: x, factor: 2), Term(variable: y, factor: 3)], constant: 16))
+    }
+    
 }
+
+
+/**
+ Utility types.
+ */
+typealias Term = LinearFunction.Term
 
 
 /**
