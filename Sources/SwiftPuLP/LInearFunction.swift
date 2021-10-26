@@ -14,6 +14,7 @@ import Collections
     * factors a, b, ... represent double coefficients which may be omitted when 1;
     * the trailing double constant c may be omitted when 0.
     * x, y, ... represent variables.
+ Note. Expressions consisting of a single variable or a single constant are not recognized as linear functions by the compiler.
  */
 public struct LinearFunction {
     
