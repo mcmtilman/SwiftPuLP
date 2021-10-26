@@ -14,20 +14,21 @@ import Collections
     * factors a, b, ... represent non-zero double coefficients which may be omitted when 1;
     * the trailing double constant c may be omitted when 0.
     * x, y, ... represent different variables.
- Note. Expressions consisting of a single variable or a single constant are not recognized as linear functions by the compiler (cf. arithmetic operator building blocks).
+ Note. Expressions consisting of a single variable or a single constant are not recognized as linear functions (cf. arithmetic operator building blocks).
  */
 public struct LinearFunction {
     
-    // Merge terms with same variable, keeping the order of terms.
+    // Merges terms with same variable name, respecting the original order of terms.
     static private func mergeTerms(_ terms: [Term]) -> [Term] {
-        let groupedTerms = OrderedDictionary<String, [Term]>(grouping: terms, by: (\.variable.name))
-        guard groupedTerms.count < terms.count else { return terms }
+        guard terms.count > 1 else { return terms }
+        let groups = OrderedDictionary<String, [Term]>(grouping: terms, by: (\.variable.name))
+        guard groups.count < terms.count else { return terms }
 
-        return groupedTerms.values.map { terms in
-            let factor = terms.reduce(0.0) { factor, term in factor + term.factor }
-            let variable = terms.first!.variable
-            
-            return Term(variable: variable, factor: factor)
+        return groups.values.map { terms in
+            let term = terms[0]
+            guard terms.count > 1 else { return term }
+
+            return Term(variable: term.variable, factor: terms.map(\.factor).reduce(0, +))
         }
     }
     
@@ -68,9 +69,9 @@ public struct LinearFunction {
     
     /// Creates linear function with given terms and constant.
     /// Merges terms with the same variable name into one, using the first encountered variable's properties.
-    /// Ignores terms with 0 factor.
+    /// Ignores merged terms with factor 0.
     public init(terms: [Term], constant: Double = 0) {
-        self.terms = (terms.count > 1 ? Self.mergeTerms(terms) : terms).filter { $0.factor != 0 }
+        self.terms = Self.mergeTerms(terms).filter { $0.factor != 0 }
         self.constant = constant
     }
     

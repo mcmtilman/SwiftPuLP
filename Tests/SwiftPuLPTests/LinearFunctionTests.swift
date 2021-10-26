@@ -138,6 +138,13 @@ final class LinearFunctionTests: XCTestCase {
         XCTAssertEqual(function, LinearFunction(terms: [Term(variable: x, factor: 1), Term(variable: y, factor: 3)], constant: 0))
     }
     
+    func testMergeAndFilterFactors() throws {
+        guard let x = Variable("x") else { return XCTFail("Nil variable") }
+        let function = (2 * x) - (2 * x)
+        
+        XCTAssertEqual(function, LinearFunction(terms: [], constant: 0))
+    }
+    
     func testMergeSameVariables() throws {
         guard let x = Variable("x"), let y = Variable("y") else { return XCTFail("Nil variable") }
         let z = x
