@@ -240,7 +240,7 @@ extension Model: PythonConvertible {
      Converts the model into a PuLP problem.
      */
     public var pythonObject: PythonObject {
-        var problem = pulpModule.LpProblem(name: name, sense: objective?.optimization ?? .minimize)// set sense, even without an objective.
+        var problem = pulpModule.LpProblem(name: name, sense: objective?.optimization ?? .minimize) // set sense, even without an objective.
         if let objective = objective {
             problem += objective.function.pythonAffineExpression()
         }

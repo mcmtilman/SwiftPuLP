@@ -178,7 +178,7 @@ public extension LinearFunction {
 /**
  Covenience functions to compose linear functions.
  */
-public extension LinearFunction.Term {
+extension LinearFunction.Term {
     
     // MARK: Private computed properties
     
