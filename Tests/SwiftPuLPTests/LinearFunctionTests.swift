@@ -7,6 +7,7 @@
 //
 
 import XCTest
+import PythonKit
 import SwiftPuLP
 
 /**
@@ -14,6 +15,8 @@ import SwiftPuLP
  */
 final class LinearFunctionTests: XCTestCase {
         
+    let pulp = Python.import("pulp")
+    
     // MARK: Arithmetic operators tests
     
     func testFactorTimesVariable() throws {
@@ -158,6 +161,32 @@ final class LinearFunctionTests: XCTestCase {
         let function = (2 * x) + (3 * y) - z
         
         XCTAssertEqual(function, LinearFunction(terms: [Term(variable: x, factor: 1), Term(variable: y, factor: 3)], constant: 0))
+    }
+    
+    // MARK: Conversion to PuLP tests
+    
+    func testFunctionToAffineExpression() throws {
+        guard let x = Variable("x"), let y = Variable("y") else { return XCTFail("Nil variable") }
+        let function = 2 * x + 3 * y + 10
+        let affineExpression = function.pythonAffineExpression()
+
+        XCTAssertEqual(Python.type(affineExpression), pulp.LpAffineExpression)
+        XCTAssertEqual(affineExpression.toDict(), [["name": "x", "value": 2], ["name": "y", "value": 3]])
+        XCTAssertEqual(affineExpression.constant, 10)
+    }
+
+    func testModelToPuLP() throws {
+        guard let x = Variable("x"), let y = Variable("y") else { return XCTFail("Nil variable") }
+        let function = 2 * x + 3 * y + 10
+        guard let model = Model("XYZ", objective: Objective(function, optimization: .maximize)) else { return XCTFail("Nil model") }
+        let pythonModel = model.pythonObject
+        
+        XCTAssertEqual(Python.type(pythonModel), pulp.LpProblem)
+        XCTAssertEqual(pythonModel.name, "XYZ")
+        XCTAssertEqual(Python.type(pythonModel.objective), pulp.LpAffineExpression)
+        XCTAssertEqual(pythonModel.objective.toDict(), [["name": "x", "value": 2], ["name": "y", "value": 3]])
+        XCTAssertEqual(pythonModel.objective.constant, 10)
+        XCTAssertEqual(pythonModel.sense, pulp.LpMaximize)
     }
     
 }

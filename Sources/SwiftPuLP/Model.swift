@@ -9,26 +9,14 @@
 import PythonKit
 
 // The Python PuLP module loaded lazily.
-fileprivate let pulpModule = Python.import("pulp")
-
-
-/*
- Represents an expression to be used in objective functions and constraints.
- */
-public protocol Expression: PythonConvertible {}
-
-
-/*
- Represents an objective function.
- */
-public protocol LinearExpression: Expression {}
+let pulpModule = Python.import("pulp")
 
 
 /*
  Represents an LP problem consisting of an objective and a list of contraints.
  A model has a non-empty name containing no spaces.
  */
-public struct Model: PythonConvertible {
+public struct Model {
     
     // MARK: Stored properties
     
@@ -39,20 +27,6 @@ public struct Model: PythonConvertible {
     /// Default = nil.
     public let objective: Objective?
     
-    // MARK: Computed properties
-    
-    /**
-     Converts the model into a PuLP problem.
-     */
-    public var pythonObject: PythonObject {
-        var problem = pulpModule.LpProblem(name: name, sense: objective?.optimization ?? .minimize)// set sense, even without an objective.
-        if let objective = objective {
-            problem += objective.function.pythonObject
-        }
-        
-        return problem
-    }
-        
     // MARK: Initializing
     
     /**
@@ -70,6 +44,17 @@ public struct Model: PythonConvertible {
 
 
 /**
+ Represents an objective function.
+ */
+public protocol ObjectiveFunction {
+    
+    /// An objective function can be converted into a PuLP LpAffineExpression.
+    func pythonAffineExpression() -> PythonObject
+    
+}
+
+
+/**
  Represent the objective of a linear programming problem: maximize or minimize a linear expression.
  */
 public struct Objective {
@@ -77,29 +62,16 @@ public struct Objective {
     /**
      Specifies if the objective function must be maximized or minimized.
      */
-    public enum Optimization: PythonConvertible {
+    public enum Optimization {
         
-        case minimize
-        case maximize
-        
-        // MARK: Computed properties
-        
-        /**
-         Converts the optimization into a PuLP sense.
-         */
-        public var pythonObject: PythonObject {
-            switch self {
-            case .maximize: return pulpModule.LpMaximize
-            case .minimize: return pulpModule.LpMinimize
-            }
-        }
+        case minimize, maximize
         
     }
     
     // MARK: Stored properties
     
     /// The linear function to be optimized.
-    public let function: LinearExpression
+    public let function: ObjectiveFunction
         
     /// The optimization to be performed.
     /// Default = minimize.
@@ -108,7 +80,7 @@ public struct Objective {
     // MARK: Initializing
     
     /// Creates an objective to optimize given linear expression.
-    public init(_ function: LinearExpression, optimization: Optimization = .minimize) {
+    public init(_ function: ObjectiveFunction, optimization: Optimization = .minimize) {
         self.function = function
         self.optimization = optimization
     }
@@ -120,7 +92,7 @@ public struct Objective {
  A variable has a name and a domain.
  The domain may be further restricted to optional lower and upper bounds.
  */
-public struct Variable: LinearExpression {
+public struct Variable {
     
     /**
      A domain identifies the range of values of a variable:
@@ -128,25 +100,10 @@ public struct Variable: LinearExpression {
      - real (real numbers)
      - integer (integer values)
      */
-    public enum Domain: PythonConvertible {
+    public enum Domain {
 
-        case binary
-        case real
-        case integer
+        case binary, real, integer
 
-        // MARK: Computed properties
-        
-        /**
-         Converts the domain into a PuLP category.
-         */
-        public var pythonObject: PythonObject {
-            switch self {
-            case .binary: return pulpModule.LpBinary
-            case .real: return pulpModule.LpContinuous
-            case .integer: return pulpModule.LpInteger
-            }
-        }
-        
     }
 
     // MARK: Stored properties
@@ -167,15 +124,6 @@ public struct Variable: LinearExpression {
     /// Default = real.
     public let domain: Domain
     
-    // MARK: Computed properties
-    
-    /**
-     Converts the variable into a PuLP variable.
-     */
-    public var pythonObject: PythonObject {
-        pulpModule.LpVariable(name: name, lowBound: minimum, upBound: maximum, cat: domain.pythonObject)
-    }
-
     // MARK: Initializing
     
     /**
@@ -205,6 +153,99 @@ public struct Variable: LinearExpression {
 
 
 /**
- Equatable extensions for variables and linear functions.
+ Variable domain adopts PythonConvertible.
+ */
+extension Variable.Domain: PythonConvertible {
+
+    // MARK: Computed properties
+    
+    /**
+     Converts the domain into a PuLP category.
+     */
+    public var pythonObject: PythonObject {
+        switch self {
+        case .binary: return pulpModule.LpBinary
+        case .real: return pulpModule.LpContinuous
+        case .integer: return pulpModule.LpInteger
+        }
+    }
+    
+}
+
+
+/**
+ Variable adopts PythonConvertible.
+ */
+extension Variable: PythonConvertible {
+    
+    // MARK: Computed properties
+    
+    /**
+     Converts the variable into a PuLP variable.
+     */
+    public var pythonObject: PythonObject {
+        pulpModule.LpVariable(name: name, lowBound: minimum, upBound: maximum, cat: domain.pythonObject)
+    }
+
+}
+
+
+/**
+ Variable adopts ObjectiveFunction.
+ */
+extension Variable: ObjectiveFunction {
+    
+    /// Answers the variable as a PuLP LpAffineExpression.
+    public func pythonAffineExpression() -> PythonObject {
+        pulpModule.LpAffineExpression([PythonObject(tupleOf: self, 1.0)])
+    }
+    
+}
+
+
+/**
+ Variable adopts Equatable and Hashable extensions.
  */
 extension Variable: Equatable, Hashable {}
+
+
+/**
+ Objective optimization adopts PythonConvertible.
+ */
+extension Objective.Optimization: PythonConvertible {
+
+    // MARK: Computed properties
+    
+    /**
+     Converts the optimization into a PuLP sense.
+     */
+    public var pythonObject: PythonObject {
+        switch self {
+        case .maximize: return pulpModule.LpMaximize
+        case .minimize: return pulpModule.LpMinimize
+        }
+    }
+
+}
+
+
+/**
+ Model adopts PythonConvertible.
+ */
+extension Model: PythonConvertible {
+    
+    // MARK: Computed properties
+    
+    /**
+     Converts the model into a PuLP problem.
+     */
+    public var pythonObject: PythonObject {
+        var problem = pulpModule.LpProblem(name: name, sense: objective?.optimization ?? .minimize)// set sense, even without an objective.
+        if let objective = objective {
+            problem += objective.function.pythonAffineExpression()
+        }
+        
+        return problem
+    }
+        
+}

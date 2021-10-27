@@ -7,6 +7,7 @@
 //
 
 import Collections
+import PythonKit
 
 /**
  Linear functions are linear combinations of variables and (double) factors and constants.
@@ -175,7 +176,7 @@ public extension LinearFunction {
 
 
 /**
- Covenience functions to compose linear functions using basic arithmetic operators.
+ Covenience functions to compose linear functions.
  */
 public extension LinearFunction.Term {
     
@@ -190,8 +191,20 @@ public extension LinearFunction.Term {
 
 
 /**
- Equatable extensions for variables and linear functions.
+ LinearFunction adopts ObjectiveFunction.
+ */
+extension LinearFunction: ObjectiveFunction {
+    
+    /// Answers the linear function as a PuLP LpAffineExpression.
+    public func pythonAffineExpression() -> PythonObject {
+        pulpModule.LpAffineExpression(terms.map { PythonObject(tupleOf: $0.variable, $0.factor) }, constant: constant)
+    }
+    
+}
+
+
+/**
+ LinearFunction adopts Equatable.
  */
 extension LinearFunction.Term: Equatable {}
-
 extension LinearFunction: Equatable {}
