@@ -9,7 +9,7 @@
 import PythonKit
 import Foundation
 
-// Answers true is the name is not empty and does not contain special characters.
+// Answers true if the name is not empty and does not contain special characters (cf. PuLP).
 fileprivate func isValidName(_ name: String) -> Bool {
     guard !name.isEmpty else { return false }
     let nameChars = CharacterSet(charactersIn: name)
