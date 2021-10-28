@@ -8,10 +8,6 @@
 
 import PythonKit
 
-// The Python PuLP module loaded lazily.
-let pulpModule = Python.import("pulp")
-
-
 /*
  Represents an LP problem consisting of an objective and a list of contraints.
  A model has a non-empty name containing no spaces.
@@ -164,9 +160,9 @@ extension Variable.Domain: PythonConvertible {
      */
     public var pythonObject: PythonObject {
         switch self {
-        case .binary: return pulpModule.LpBinary
-        case .real: return pulpModule.LpContinuous
-        case .integer: return pulpModule.LpInteger
+        case .binary: return pulp.LpBinary
+        case .real: return pulp.LpContinuous
+        case .integer: return pulp.LpInteger
         }
     }
     
@@ -184,7 +180,7 @@ extension Variable: PythonConvertible {
      Converts the variable into a PuLP variable.
      */
     public var pythonObject: PythonObject {
-        pulpModule.LpVariable(name: name, lowBound: minimum, upBound: maximum, cat: domain.pythonObject)
+        pulp.LpVariable(name: name, lowBound: minimum, upBound: maximum, cat: domain.pythonObject)
     }
 
 }
@@ -197,7 +193,7 @@ extension Variable: ObjectiveFunction {
     
     /// Answers the variable as a PuLP LpAffineExpression.
     public func pythonAffineExpression() -> PythonObject {
-        pulpModule.LpAffineExpression([PythonObject(tupleOf: self, 1.0)])
+        pulp.LpAffineExpression([PythonObject(tupleOf: self, 1.0)])
     }
     
 }
@@ -221,8 +217,8 @@ extension Objective.Optimization: PythonConvertible {
      */
     public var pythonObject: PythonObject {
         switch self {
-        case .maximize: return pulpModule.LpMaximize
-        case .minimize: return pulpModule.LpMinimize
+        case .maximize: return pulp.LpMaximize
+        case .minimize: return pulp.LpMinimize
         }
     }
 
@@ -240,7 +236,7 @@ extension Model: PythonConvertible {
      Converts the model into a PuLP problem.
      */
     public var pythonObject: PythonObject {
-        var problem = pulpModule.LpProblem(name: name, sense: objective?.optimization ?? .minimize) // set sense, even without an objective.
+        var problem = pulp.LpProblem(name: name, sense: objective?.optimization ?? .minimize) // set sense, even without an objective.
         if let objective = objective {
             problem += objective.function.pythonAffineExpression()
         }

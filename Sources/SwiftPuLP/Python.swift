@@ -8,6 +8,10 @@
 
 import PythonKit
 
+// The Python PuLP module loaded lazily.
+let pulp = Python.import("pulp")
+
+
 /**
  Utility functions.
  */

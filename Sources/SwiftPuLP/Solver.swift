@@ -78,7 +78,7 @@ extension SolverResult.Variable: ConvertibleFromPython {
     /// Creates a variable from given python object.
     /// Fails if object is not a PuLP LpVariable.
     public init?(_ object: PythonObject) {
-        guard object.isInstance(of: pulpModule.LpVariable),
+        guard object.isInstance(of: pulp.LpVariable),
                 let name = String(object.name),
                 let value = Double(object.value()) else { return nil }
 
