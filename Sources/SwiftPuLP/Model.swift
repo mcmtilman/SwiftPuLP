@@ -56,7 +56,7 @@ public struct Model {
 public protocol ObjectiveFunction {
     
     /// An objective function can be converted into a PuLP LpAffineExpression.
-    func pythonAffineExpression() -> PythonObject
+    var pythonLinearFunction: PythonObject { get }
     
 }
 
@@ -202,8 +202,10 @@ extension Variable: PythonConvertible {
  */
 extension Variable: ObjectiveFunction {
     
+    // MARK: Computed properties
+
     /// Answers the variable as a PuLP LpAffineExpression.
-    public func pythonAffineExpression() -> PythonObject {
+    public var pythonLinearFunction: PythonObject {
         PuLP.LpAffineExpression([PythonObject(tupleOf: self, 1.0)])
     }
     
@@ -211,9 +213,9 @@ extension Variable: ObjectiveFunction {
 
 
 /**
- Variable adopts Equatable and Hashable extensions.
+ Variable adopts Equatable extensions with default behaviour.
  */
-extension Variable: Equatable, Hashable {}
+extension Variable: Equatable {}
 
 
 /**
@@ -249,7 +251,7 @@ extension Model: PythonConvertible {
     public var pythonObject: PythonObject {
         var problem = PuLP.LpProblem(name: name, sense: objective?.optimization ?? .minimize) // set sense, even without an objective.
         if let objective = objective {
-            problem += objective.function.pythonAffineExpression()
+            problem += objective.function.pythonLinearFunction
         }
         
         return problem

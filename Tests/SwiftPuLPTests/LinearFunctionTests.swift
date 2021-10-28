@@ -168,7 +168,7 @@ final class LinearFunctionTests: XCTestCase {
     func testFunctionToAffineExpression() throws {
         guard let x = Variable("x"), let y = Variable("y") else { return XCTFail("Nil variable") }
         let function = 2 * x + 3 * y + 10
-        let affineExpression = function.pythonAffineExpression()
+        let affineExpression = function.pythonLinearFunction
 
         XCTAssertTrue(affineExpression.isInstance(of: PuLP.LpAffineExpression))
         XCTAssertEqual(affineExpression.toDict(), [["name": "x", "value": 2], ["name": "y", "value": 3]])

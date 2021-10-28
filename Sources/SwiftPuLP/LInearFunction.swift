@@ -149,27 +149,27 @@ public extension LinearFunction {
     // MARK: Building linear functions
     
     static func + (lhs: Self, rhs: Double) -> Self {
-        LinearFunction(terms: lhs.terms, constant: lhs.constant + rhs)
+        Self(terms: lhs.terms, constant: lhs.constant + rhs)
     }
     
     static func + (lhs: Self, rhs: Variable) -> Self {
-        LinearFunction(terms: lhs.terms + [rhs.withFactor(1)], constant: lhs.constant)
+        Self(terms: lhs.terms + [rhs.withFactor(1)], constant: lhs.constant)
     }
     
     static func + (lhs: Self, rhs: Self) -> Self {
-        LinearFunction(terms: lhs.terms + rhs.terms, constant: lhs.constant + rhs.constant)
+        Self(terms: lhs.terms + rhs.terms, constant: lhs.constant + rhs.constant)
     }
     
     static func - (lhs: Self, rhs: Double) -> Self {
-        LinearFunction(terms: lhs.terms, constant: lhs.constant - rhs)
+        Self(terms: lhs.terms, constant: lhs.constant - rhs)
     }
     
     static func - (lhs: Self, rhs: Variable) -> Self {
-        LinearFunction(terms: lhs.terms + [rhs.withFactor(-1)], constant: lhs.constant)
+        Self(terms: lhs.terms + [rhs.withFactor(-1)], constant: lhs.constant)
     }
     
     static func - (lhs: Self, rhs: Self) -> Self {
-        LinearFunction(terms: lhs.terms + rhs.terms.map(\.negated), constant: lhs.constant - rhs.constant)
+        Self(terms: lhs.terms + rhs.terms.map(\.negated), constant: lhs.constant - rhs.constant)
     }
     
 }
@@ -195,8 +195,10 @@ extension LinearFunction.Term {
  */
 extension LinearFunction: ObjectiveFunction {
     
+    // MARK: Private computed properties
+    
     /// Answers the linear function as a PuLP LpAffineExpression.
-    public func pythonAffineExpression() -> PythonObject {
+    public var pythonLinearFunction: PythonObject {
         PuLP.LpAffineExpression(terms.map { PythonObject(tupleOf: $0.variable, $0.factor) }, constant: constant)
     }
     
@@ -204,7 +206,7 @@ extension LinearFunction: ObjectiveFunction {
 
 
 /**
- LinearFunction adopts Equatable.
+ LinearFunction adopts Equatable with default behaviour.
  */
 extension LinearFunction.Term: Equatable {}
 extension LinearFunction: Equatable {}

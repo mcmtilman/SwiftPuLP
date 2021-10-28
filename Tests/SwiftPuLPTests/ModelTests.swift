@@ -196,7 +196,7 @@ final class ModelTests: XCTestCase {
     
     func testVariableToAffineExpression() throws {
         guard let variable = Variable("x", minimum: 1, maximum: 10, domain: .integer) else { return XCTFail("Nil variable") }
-        let affineExpression = variable.pythonAffineExpression()
+        let affineExpression = variable.pythonLinearFunction
         
         XCTAssertTrue(affineExpression.isInstance(of: PuLP.LpAffineExpression))
         XCTAssertEqual(affineExpression.toDict(), [["name": "x", "value": 1]])
