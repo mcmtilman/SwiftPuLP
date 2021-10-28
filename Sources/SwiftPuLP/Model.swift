@@ -7,6 +7,17 @@
 //
 
 import PythonKit
+import Foundation
+
+// Answers true is the name is not empty and does not contain special characters.
+fileprivate func isValidName(_ name: String) -> Bool {
+    guard !name.isEmpty else { return false }
+    let nameChars = CharacterSet(charactersIn: name)
+    let specialChars = CharacterSet(charactersIn: "-+[] ->/")
+    
+    return nameChars.isDisjoint(with: specialChars)
+}
+
 
 /*
  Represents an LP problem consisting of an objective and a list of contraints.
@@ -27,15 +38,15 @@ public struct Model {
     
     /**
      Creates a model with given name and objective.
-     Fails if the name is empty or contains spaces.
+     Fails if the name is empty or contains special characters.
      */
     public init?(_ name: String, objective: Objective? = nil) {
-        guard !name.isEmpty, !name.contains(" ") else { return nil }
+        guard isValidName(name) else { return nil }
 
         self.name = name
         self.objective = objective
     }
-
+    
 }
 
 
@@ -135,7 +146,7 @@ public struct Variable {
      - the variable is binary with minimum != 0 and nil, or maximum != 1 and nil.
      */
     public init?(_ name: String, minimum: Double? = nil, maximum: Double? = nil, domain: Domain = .real) {
-        guard !name.isEmpty, !name.contains(" ") else { return nil }
+        guard isValidName(name) else { return nil }
         if let min = minimum, let max = maximum, min > max { return nil }
         if domain == .binary, minimum != nil && minimum != 0 || maximum != nil && maximum != 1 { return nil }
         
