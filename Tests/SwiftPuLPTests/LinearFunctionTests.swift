@@ -15,7 +15,7 @@ import SwiftPuLP
  */
 final class LinearFunctionTests: XCTestCase {
         
-    let pulp = Python.import("pulp")
+    let PuLP = Python.import("pulp")
     
     // MARK: Arithmetic operators tests
     
@@ -170,7 +170,7 @@ final class LinearFunctionTests: XCTestCase {
         let function = 2 * x + 3 * y + 10
         let affineExpression = function.pythonAffineExpression()
 
-        XCTAssertTrue(affineExpression.isInstance(of: pulp.LpAffineExpression))
+        XCTAssertTrue(affineExpression.isInstance(of: PuLP.LpAffineExpression))
         XCTAssertEqual(affineExpression.toDict(), [["name": "x", "value": 2], ["name": "y", "value": 3]])
         XCTAssertEqual(affineExpression.constant, 10)
     }
@@ -181,12 +181,12 @@ final class LinearFunctionTests: XCTestCase {
         guard let model = Model("XYZ", objective: Objective(function, optimization: .maximize)) else { return XCTFail("Nil model") }
         let pythonModel = model.pythonObject
         
-        XCTAssertTrue(pythonModel.isInstance(of: pulp.LpProblem))
+        XCTAssertTrue(pythonModel.isInstance(of: PuLP.LpProblem))
         XCTAssertEqual(pythonModel.name, "XYZ")
-        XCTAssertTrue(pythonModel.objective.isInstance(of: pulp.LpAffineExpression))
+        XCTAssertTrue(pythonModel.objective.isInstance(of: PuLP.LpAffineExpression))
         XCTAssertEqual(pythonModel.objective.toDict(), [["name": "x", "value": 2], ["name": "y", "value": 3]])
         XCTAssertEqual(pythonModel.objective.constant, 10)
-        XCTAssertEqual(pythonModel.sense, pulp.LpMaximize)
+        XCTAssertEqual(pythonModel.sense, PuLP.LpMaximize)
     }
     
 }

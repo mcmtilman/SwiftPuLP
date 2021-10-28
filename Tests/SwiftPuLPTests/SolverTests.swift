@@ -15,17 +15,17 @@ import SwiftPuLP
  */
 final class SolverTests: XCTestCase {
 
-    let pulp = Python.import("pulp")
+    let PuLP = Python.import("pulp")
     
     // MARK: Status conversion from PuLP tests
     
     func testStatusFromPuLP() {
         let data: [(object: PythonObject, status: SolverResult.Status)] = [
-            (pulp.LpStatusNotSolved, .unsolved),
-            (pulp.LpStatusOptimal, .optimal),
-            (pulp.LpStatusInfeasible, .infeasible),
-            (pulp.LpStatusUnbounded, .unbounded),
-            (pulp.LpStatusUndefined, .undefined)
+            (PuLP.LpStatusNotSolved, .unsolved),
+            (PuLP.LpStatusOptimal, .optimal),
+            (PuLP.LpStatusInfeasible, .infeasible),
+            (PuLP.LpStatusUnbounded, .unbounded),
+            (PuLP.LpStatusUndefined, .undefined)
         ]
 
         for (object, status) in data {

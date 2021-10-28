@@ -15,7 +15,7 @@ import SwiftPuLP
  */
 final class ModelTests: XCTestCase {
     
-    let pulp = Python.import("pulp")
+    let PuLP = Python.import("pulp")
     
     // MARK: Variable tests
     
@@ -140,11 +140,11 @@ final class ModelTests: XCTestCase {
         guard let variable = Variable("x", minimum: 1, maximum: 10, domain: .integer) else { return XCTFail("Nil variable") }
         let pythonVariable = variable.pythonObject
         
-        XCTAssertTrue(pythonVariable.isInstance(of: pulp.LpVariable))
+        XCTAssertTrue(pythonVariable.isInstance(of: PuLP.LpVariable))
         XCTAssertEqual(pythonVariable.name, "x")
         XCTAssertEqual(pythonVariable.lowBound, 1)
         XCTAssertEqual(pythonVariable.upBound, 10)
-        XCTAssertEqual(pythonVariable.cat, pulp.LpInteger)
+        XCTAssertEqual(pythonVariable.cat, PuLP.LpInteger)
     }
 
     func testDefaultVariableToPuLP() throws {
@@ -154,12 +154,12 @@ final class ModelTests: XCTestCase {
         XCTAssertEqual(pythonVariable.name, "x")
         XCTAssertEqual(pythonVariable.lowBound, Python.None)
         XCTAssertEqual(pythonVariable.upBound, Python.None)
-        XCTAssertEqual(pythonVariable.cat, pulp.LpContinuous)
+        XCTAssertEqual(pythonVariable.cat, PuLP.LpContinuous)
     }
 
     func testDomainToPuLP() throws {
         let domains = [Variable.Domain.binary, .real, .integer]
-        let categories = [pulp.LpBinary, pulp.LpContinuous, pulp.LpInteger]
+        let categories = [PuLP.LpBinary, PuLP.LpContinuous, PuLP.LpInteger]
 
         for (domain, category) in zip(domains, categories) {
             XCTAssertEqual(domain.pythonObject, category)
@@ -168,7 +168,7 @@ final class ModelTests: XCTestCase {
 
     func testOptimizationToPuLP() throws {
         let optimizations = [Objective.Optimization.maximize, .minimize]
-        let senses = [pulp.LpMaximize, pulp.LpMinimize]
+        let senses = [PuLP.LpMaximize, PuLP.LpMinimize]
 
         for (optimization, sense) in zip(optimizations, senses) {
             XCTAssertEqual(optimization.pythonObject, sense)
@@ -180,11 +180,11 @@ final class ModelTests: XCTestCase {
         guard let model = Model("XYZ", objective: Objective(variable, optimization: .maximize)) else { return XCTFail("Nil model") }
         let pythonModel = model.pythonObject
         
-        XCTAssertTrue(pythonModel.isInstance(of: pulp.LpProblem))
+        XCTAssertTrue(pythonModel.isInstance(of: PuLP.LpProblem))
         XCTAssertEqual(pythonModel.name, "XYZ")
-        XCTAssertTrue(pythonModel.objective.isInstance(of: pulp.LpAffineExpression))
+        XCTAssertTrue(pythonModel.objective.isInstance(of: PuLP.LpAffineExpression))
         XCTAssertEqual(pythonModel.objective.toDict(), [["name": "x", "value": 1]])
-        XCTAssertEqual(pythonModel.sense, pulp.LpMaximize)
+        XCTAssertEqual(pythonModel.sense, PuLP.LpMaximize)
     }
     
     func testDefaultModelToPuLP() throws {
@@ -192,14 +192,14 @@ final class ModelTests: XCTestCase {
         let pythonModel = model.pythonObject
         
         XCTAssertTrue(pythonModel.objective.isNone)
-        XCTAssertEqual(pythonModel.sense, pulp.LpMinimize)
+        XCTAssertEqual(pythonModel.sense, PuLP.LpMinimize)
     }
     
     func testVariableToAffineExpression() throws {
         guard let variable = Variable("x", minimum: 1, maximum: 10, domain: .integer) else { return XCTFail("Nil variable") }
         let affineExpression = variable.pythonAffineExpression()
         
-        XCTAssertTrue(affineExpression.isInstance(of: pulp.LpAffineExpression))
+        XCTAssertTrue(affineExpression.isInstance(of: PuLP.LpAffineExpression))
         XCTAssertEqual(affineExpression.toDict(), [["name": "x", "value": 1]])
         XCTAssertEqual(affineExpression.constant, 0)
     }
