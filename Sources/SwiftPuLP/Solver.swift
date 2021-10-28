@@ -9,10 +9,9 @@
 import PythonKit
 
 /**
-Result of the solver.
-Contains status of solver result, values for the variables and value of the objective function in case of a solution.
+ Solver for a linear programming model.
 */
-public struct SolverResult {
+public struct Solver {
 
     /// Status of the solver result..
     public enum Status: Double {
@@ -35,29 +34,53 @@ public struct SolverResult {
 
     }
     
-    // MARK: Stored properties
-    
-    /// Status of the solver result.
-    public let status: Status
-    
-    /// Computed values for the decision variables.
-    public let variables: [Variable]
+    /// Result of the solver.
+    /// Contains status of solver result and values for the variables.
+    public struct Result {
+        
+        // MARK: Stored properties
+        
+        /// Status of the result.
+        public let status: Status
+        
+        /// Computed values for the decision variables.
+        public let variables: [Variable]
+        
+        // MARK: Initializing
+        
+        /// Initializes a result with given status and variable bindings.
+        public init(status: Status, variables: [Variable]) {
+            self.status = status
+            self.variables = variables
+        }
+
+    }
     
     // MARK: Initializing
     
-    /// Creates a result with given status and variable bindings.
-    public init(status: Status, variables: [Variable]) {
-        self.status = status
-        self.variables = variables
+    /// Default initializer made public.
+    public init() {}
+    
+    // MARK: Solving
+    
+    /// Solves given model and returns a result with status and computed variables.
+    public func solve(_ model: Model) -> Result? {
+        let pythonModel = model.pythonObject
+        let solver = PuLP.LpSolverDefault.copy()
+
+        solver.msg = false
+        solver.solve(pythonModel)
+        
+        return Result(pythonModel)
     }
 
 }
 
 
 /**
- Result status adopts ConvertibleFromPython.
+ Solver status adopts ConvertibleFromPython.
  */
-extension SolverResult.Status: ConvertibleFromPython {
+extension Solver.Status: ConvertibleFromPython {
 
     /// Creates a status case from given python object.
     /// Fails if object is not a float or does not correspond to a raw case value.
@@ -73,7 +96,7 @@ extension SolverResult.Status: ConvertibleFromPython {
 /**
  Result variable adopts ConvertibleFromPython.
  */
-extension SolverResult.Variable: ConvertibleFromPython {
+extension Solver.Variable: ConvertibleFromPython {
 
     /// Creates a variable from given python object.
     /// Fails if object is not a PuLP LpVariable.
@@ -92,33 +115,15 @@ extension SolverResult.Variable: ConvertibleFromPython {
 /**
  Result adopts ConvertibleFromPython.
  */
-extension SolverResult: ConvertibleFromPython {
+extension Solver.Result: ConvertibleFromPython {
     
     /// Creates a result from given python model.
     public init?(_ object: PythonObject) {
-        guard let status = Status(object.status),
-              let variables = Array(object.variables())?.compactMap(Variable.init) else { return nil }
+        guard let status = Solver.Status(object.status),
+              let variables = Array(object.variables())?.compactMap(Solver.Variable.init) else { return nil }
 
         self.status = status
         self.variables = variables
-    }
-    
-}
-
-
-/**
- Model extension to solve the optimization problem.
- */
-public extension Model {
-    
-    func solve() -> SolverResult? {
-        let pythonModel = self.pythonObject
-        let solver = PuLP.LpSolverDefault.copy()
-
-        solver.msg = false
-        solver.solve(pythonModel)
-        
-        return SolverResult(pythonModel)
     }
     
 }

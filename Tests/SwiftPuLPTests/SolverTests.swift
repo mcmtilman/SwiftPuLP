@@ -20,7 +20,7 @@ final class SolverTests: XCTestCase {
     // MARK: Status conversion from PuLP tests
     
     func testStatusFromPuLP() {
-        let data: [(object: PythonObject, status: SolverResult.Status)] = [
+        let data: [(object: PythonObject, status: Solver.Status)] = [
             (PuLP.LpStatusNotSolved, .unsolved),
             (PuLP.LpStatusOptimal, .optimal),
             (PuLP.LpStatusInfeasible, .infeasible),
@@ -29,36 +29,36 @@ final class SolverTests: XCTestCase {
         ]
 
         for (object, status) in data {
-            XCTAssertEqual(SolverResult.Status(object), status)
+            XCTAssertEqual(Solver.Status(object), status)
         }
     }
     
     func testInvalidStatusObjectFromPuLP() {
         let object: PythonObject = "A string"
         
-        XCTAssertNil(SolverResult.Status(object))
+        XCTAssertNil(Solver.Status(object))
     }
     
     func testUnknownStatusValueFromPuLP() {
         let value: PythonObject = 10
         
-        XCTAssertNil(SolverResult.Status(value))
+        XCTAssertNil(Solver.Status(value))
     }
     
     // MARK: Solver tests
     
-    func testOptimalModel() {
+    func testSolveOptimalModel() {
         guard let model = Model("Optimal", objective: Objective(LinearFunction(terms: []))) else { return XCTFail("Nil model") }
-        guard let result = model.solve() else { return XCTFail("Nil result") }
+        guard let result = Solver().solve(model) else { return XCTFail("Nil result") }
         
         XCTAssertEqual(result.status, .optimal)
         XCTAssertEqual(result.variables.count, 0)
     }
 
-    func testUnboundedModel() {
+    func testSolveUnboundedModel() {
         guard let x = Variable("x") else { return XCTFail("Nil variable") }
         guard let model = Model("Unbounded", objective: Objective(x)) else { return XCTFail("Nil model") }
-        guard let result = model.solve() else { return XCTFail("Nil result") }
+        guard let result = Solver().solve(model) else { return XCTFail("Nil result") }
         
         XCTAssertEqual(result.status, .unbounded)
         XCTAssertEqual(result.variables.count, 1)
