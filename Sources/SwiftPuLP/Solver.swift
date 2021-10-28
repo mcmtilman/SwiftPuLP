@@ -113,8 +113,10 @@ public extension Model {
     
     func solve() -> SolverResult? {
         let pythonModel = self.pythonObject
-        
-        pythonModel.solve()
+        let solver = PuLP.LpSolverDefault.copy()
+
+        solver.msg = false
+        solver.solve(pythonModel)
         
         return SolverResult(pythonModel)
     }
