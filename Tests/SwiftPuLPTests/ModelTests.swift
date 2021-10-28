@@ -140,7 +140,7 @@ final class ModelTests: XCTestCase {
         guard let variable = Variable("x", minimum: 1, maximum: 10, domain: .integer) else { return XCTFail("Nil variable") }
         let pythonVariable = variable.pythonObject
         
-        XCTAssertEqual(Python.type(pythonVariable), pulp.LpVariable)
+        XCTAssertTrue(pythonVariable.isInstance(of: pulp.LpVariable))
         XCTAssertEqual(pythonVariable.name, "x")
         XCTAssertEqual(pythonVariable.lowBound, 1)
         XCTAssertEqual(pythonVariable.upBound, 10)
@@ -180,9 +180,9 @@ final class ModelTests: XCTestCase {
         guard let model = Model("XYZ", objective: Objective(variable, optimization: .maximize)) else { return XCTFail("Nil model") }
         let pythonModel = model.pythonObject
         
-        XCTAssertEqual(Python.type(pythonModel), pulp.LpProblem)
+        XCTAssertTrue(pythonModel.isInstance(of: pulp.LpProblem))
         XCTAssertEqual(pythonModel.name, "XYZ")
-        XCTAssertEqual(Python.type(pythonModel.objective), pulp.LpAffineExpression)
+        XCTAssertTrue(pythonModel.objective.isInstance(of: pulp.LpAffineExpression))
         XCTAssertEqual(pythonModel.objective.toDict(), [["name": "x", "value": 1]])
         XCTAssertEqual(pythonModel.sense, pulp.LpMaximize)
     }
@@ -199,7 +199,7 @@ final class ModelTests: XCTestCase {
         guard let variable = Variable("x", minimum: 1, maximum: 10, domain: .integer) else { return XCTFail("Nil variable") }
         let affineExpression = variable.pythonAffineExpression()
         
-        XCTAssertEqual(Python.type(affineExpression), pulp.LpAffineExpression)
+        XCTAssertTrue(affineExpression.isInstance(of: pulp.LpAffineExpression))
         XCTAssertEqual(affineExpression.toDict(), [["name": "x", "value": 1]])
         XCTAssertEqual(affineExpression.constant, 0)
     }
