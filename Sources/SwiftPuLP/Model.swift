@@ -10,10 +10,10 @@ import PythonKit
 import Foundation
 
 // Answers true if the name is not empty and does not contain special characters (cf. PuLP).
-fileprivate func isValidName(_ name: String) -> Bool {
+fileprivate func isValidName(_ name: String, invalidCharacters: String) -> Bool {
     guard !name.isEmpty else { return false }
     let nameChars = CharacterSet(charactersIn: name)
-    let specialChars = CharacterSet(charactersIn: "-+[] ->/")
+    let specialChars = CharacterSet(charactersIn: invalidCharacters)
     
     return nameChars.isDisjoint(with: specialChars)
 }
@@ -41,7 +41,7 @@ public struct Model {
      Fails if the name is empty or contains special characters.
      */
     public init?(_ name: String, objective: Objective? = nil) {
-        guard isValidName(name) else { return nil }
+        guard isValidName(name, invalidCharacters: " ") else { return nil }
 
         self.name = name
         self.objective = objective
@@ -146,7 +146,7 @@ public struct Variable {
      - the variable is binary with minimum != 0 and nil, or maximum != 1 and nil.
      */
     public init?(_ name: String, minimum: Double? = nil, maximum: Double? = nil, domain: Domain = .real) {
-        guard isValidName(name) else { return nil }
+        guard isValidName(name, invalidCharacters: "-+[] ->/") else { return nil }
         if let min = minimum, let max = maximum, min > max { return nil }
         if domain == .binary, minimum != nil && minimum != 0 || maximum != nil && maximum != 1 { return nil }
         

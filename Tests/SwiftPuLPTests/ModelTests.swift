@@ -129,11 +129,8 @@ final class ModelTests: XCTestCase {
 
     func testInvalidNameModel() throws {
         guard let variable = Variable("x") else { return XCTFail("Nil variable") }
-        let objective = Objective(variable)
         
-        for name in ("-+[] ->/".map { "X\($0)Y" }) {
-            XCTAssertNil(Model(name, objective: objective))
-        }
+        XCTAssertNil(Model("X Z", objective: Objective(variable)))
     }
 
     // MARK: Conversion to PuLP tests
