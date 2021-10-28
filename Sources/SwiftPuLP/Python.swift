@@ -9,7 +9,7 @@
 import PythonKit
 
 // The Python PuLP module loaded lazily.
-let pulp = Python.import("pulp")
+let PuLP = Python.import("pulp")
 
 
 /**

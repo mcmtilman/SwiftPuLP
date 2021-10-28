@@ -160,9 +160,9 @@ extension Variable.Domain: PythonConvertible {
      */
     public var pythonObject: PythonObject {
         switch self {
-        case .binary: return pulp.LpBinary
-        case .real: return pulp.LpContinuous
-        case .integer: return pulp.LpInteger
+        case .binary: return PuLP.LpBinary
+        case .real: return PuLP.LpContinuous
+        case .integer: return PuLP.LpInteger
         }
     }
     
@@ -180,7 +180,7 @@ extension Variable: PythonConvertible {
      Converts the variable into a PuLP variable.
      */
     public var pythonObject: PythonObject {
-        pulp.LpVariable(name: name, lowBound: minimum, upBound: maximum, cat: domain.pythonObject)
+        PuLP.LpVariable(name: name, lowBound: minimum, upBound: maximum, cat: domain.pythonObject)
     }
 
 }
@@ -193,7 +193,7 @@ extension Variable: ObjectiveFunction {
     
     /// Answers the variable as a PuLP LpAffineExpression.
     public func pythonAffineExpression() -> PythonObject {
-        pulp.LpAffineExpression([PythonObject(tupleOf: self, 1.0)])
+        PuLP.LpAffineExpression([PythonObject(tupleOf: self, 1.0)])
     }
     
 }
@@ -217,8 +217,8 @@ extension Objective.Optimization: PythonConvertible {
      */
     public var pythonObject: PythonObject {
         switch self {
-        case .maximize: return pulp.LpMaximize
-        case .minimize: return pulp.LpMinimize
+        case .maximize: return PuLP.LpMaximize
+        case .minimize: return PuLP.LpMinimize
         }
     }
 
@@ -236,7 +236,7 @@ extension Model: PythonConvertible {
      Converts the model into a PuLP problem.
      */
     public var pythonObject: PythonObject {
-        var problem = pulp.LpProblem(name: name, sense: objective?.optimization ?? .minimize) // set sense, even without an objective.
+        var problem = PuLP.LpProblem(name: name, sense: objective?.optimization ?? .minimize) // set sense, even without an objective.
         if let objective = objective {
             problem += objective.function.pythonAffineExpression()
         }

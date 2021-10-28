@@ -197,7 +197,7 @@ extension LinearFunction: ObjectiveFunction {
     
     /// Answers the linear function as a PuLP LpAffineExpression.
     public func pythonAffineExpression() -> PythonObject {
-        pulp.LpAffineExpression(terms.map { PythonObject(tupleOf: $0.variable, $0.factor) }, constant: constant)
+        PuLP.LpAffineExpression(terms.map { PythonObject(tupleOf: $0.variable, $0.factor) }, constant: constant)
     }
     
 }
