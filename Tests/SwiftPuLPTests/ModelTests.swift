@@ -203,19 +203,5 @@ final class ModelTests: XCTestCase {
         XCTAssertEqual(affineExpression.toDict(), [["name": "x", "value": 1]])
         XCTAssertEqual(affineExpression.constant, 0)
     }
-
-}
-
-
-/**
- Utility functions.
- */
-extension PythonObject {
-    
-    // LpAffineExpression.__eq__ returns an LpConstraint.
-    // This messes up testing the presence of an objective when comparing to None.
-    var isNone: Bool {
-        Python.isinstance(self.pythonObject, Python.type(Python.None)) == true
-    }
     
 }

@@ -78,7 +78,7 @@ extension SolverResult.Variable: ConvertibleFromPython {
     /// Creates a variable from given python object.
     /// Fails if object is not a PuLP LpVariable.
     public init?(_ object: PythonObject) {
-        guard Python.isinstance(object, pulpModule.LpVariable) == true,
+        guard object.isInstance(of: pulpModule.LpVariable),
                 let name = String(object.name),
                 let value = Double(object.value()) else { return nil }
 
@@ -94,19 +94,20 @@ extension SolverResult.Variable: ConvertibleFromPython {
  */
 extension SolverResult: ConvertibleFromPython {
     
-    /// Creates a result from given python problem.
+    /// Creates a result from given python model.
     public init?(_ object: PythonObject) {
         guard let status = Status(object.status),
-              let pythonVariables = [PythonObject](object.variables()) else { return nil }
+              let variables = Array(object.variables())?.compactMap(Variable.init) else { return nil }
 
         self.status = status
-        self.variables = pythonVariables.compactMap(Variable.init)
+        self.variables = variables
     }
     
 }
 
+
 /**
- Model extension to solve the model.
+ Model extension to solve the optimization problem.
  */
 public extension Model {
     
@@ -119,4 +120,3 @@ public extension Model {
     }
     
 }
-
