@@ -61,6 +61,20 @@ public struct LinearConstraint {
         self.constant = constant
     }
 
+    // MARK: Evaluating
+    
+    // Applies the function to given values and compares the result with the constant.
+    public func callAsFunction(_ values: [String: Double]) -> Bool {
+        switch comparison {
+        case .lte:
+            return function(values) <= constant
+        case .eq:
+            return function(values) == constant
+        case .gte:
+            return function(values) >= constant
+        }
+    }
+
 }
 
 
@@ -76,9 +90,12 @@ extension LinearConstraint.Comparison: PythonConvertible {
      */
     public var pythonObject: PythonObject {
         switch self {
-        case .lte: return PuLP.LpConstraintLE
-        case .eq: return PuLP.LpConstraintEQ
-        case .gte: return PuLP.LpConstraintGE
+        case .lte:
+            return PuLP.LpConstraintLE
+        case .eq:
+            return PuLP.LpConstraintEQ
+        case .gte:
+            return PuLP.LpConstraintGE
         }
     }
     

@@ -45,7 +45,7 @@ public struct LinearFunction {
         // The variable of a term.
         // When creating a linear function, terms with same variable are merged,
         // with the combined factor.
-       let variable: Variable
+        let variable: Variable
 
         // MARK: Initializing
         
@@ -57,8 +57,9 @@ public struct LinearFunction {
         
         // MARK: Evaluating
         
-        // Answers the result of evaluating the term with given variable values.
-        func eval(with values: [String: Double]) -> Double {
+        // Answers the result of applying the term to given values dictionary.
+        // Ignores variables with name not listed in the dictionary.
+        func callAsFunction(_ values: [String: Double]) -> Double {
             (values[variable.name] ?? 0) * factor
         }
         
@@ -91,9 +92,9 @@ public struct LinearFunction {
     
     // MARK: Evaluating
     
-    // Answers the result of evaluating the function with given variable values.
-    public func eval(with values: [String: Double]) -> Double {
-        terms.reduce(constant) { total, term in total + term.eval(with: values) }
+    // Answers the result of applying the function to given values.
+    public func callAsFunction(_ values: [String: Double]) -> Double {
+        terms.reduce(constant) { total, term in total + term(values) }
     }
     
 }

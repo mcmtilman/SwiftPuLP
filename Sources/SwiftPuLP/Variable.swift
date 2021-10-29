@@ -99,9 +99,12 @@ extension Variable.Domain: PythonConvertible {
      */
     public var pythonObject: PythonObject {
         switch self {
-        case .binary: return PuLP.LpBinary
-        case .real: return PuLP.LpContinuous
-        case .integer: return PuLP.LpInteger
+        case .binary:
+            return PuLP.LpBinary
+        case .real:
+            return PuLP.LpContinuous
+        case .integer:
+            return PuLP.LpInteger
         }
     }
     

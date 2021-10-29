@@ -102,8 +102,10 @@ extension Objective.Optimization: PythonConvertible {
      */
     public var pythonObject: PythonObject {
         switch self {
-        case .maximize: return PuLP.LpMaximize
-        case .minimize: return PuLP.LpMinimize
+        case .maximize:
+            return PuLP.LpMaximize
+        case .minimize:
+            return PuLP.LpMinimize
         }
     }
 

@@ -83,7 +83,7 @@ final class SolverTests: XCTestCase {
         XCTAssertEqual(result.variables.count, 2)
         XCTAssertEqual(result.variables["x"], 7)
         XCTAssertEqual(result.variables["y"], 4.4)
-        XCTAssertEqual(function.eval(with: result.variables), 15.8)
+        XCTAssertEqual(function(result.variables), 15.8)
     }
 
     func testSolveIllegalThreadState() {

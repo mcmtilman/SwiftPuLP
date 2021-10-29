@@ -188,11 +188,11 @@ final class LinearFunctionTests: XCTestCase {
     
     // Evaluation tests
     
-    func testEval() throws {
+    func testFunctionCall() throws {
         guard let x = Variable("x"), let y = Variable("y") else { return XCTFail("Nil variable") }
         let function = 2 * x + 3 * y + 10
         
-        XCTAssertEqual(function.eval(with: ["x": 100, "y": 1000]), 3210)
+        XCTAssertEqual(function(["x": 100, "y": 1000]), 3210)
     }
         
     // MARK: Conversion to PuLP tests

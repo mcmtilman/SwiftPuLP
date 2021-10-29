@@ -73,6 +73,21 @@ final class LinearConstraintTests: XCTestCase {
         XCTAssertEqual(constraint.constant, 5)
     }
     
+    // Evaluation tests
+    
+    func testCompareFunctionCall() throws {
+        guard let x = Variable("x"), let y = Variable("y") else { return XCTFail("Nil variable") }
+        let constraints = [
+            2 * x + 3 * y + 9 <= 3210,
+            2 * x + 3 * y + 10 == 3210,
+            2 * x + 3 * y + 11 >= 3210
+        ]
+        
+        for constraint in constraints {
+            XCTAssertTrue(constraint(["x": 100, "y": 1000]))
+        }
+    }
+        
     // MARK: Conversion to PuLP tests
     
     func testConstraintToPuLP() throws {
