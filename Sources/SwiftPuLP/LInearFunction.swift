@@ -55,6 +55,13 @@ public struct LinearFunction {
             self.variable = variable
         }
         
+        // MARK: Evaluating
+        
+        // Answers the result of evaluating the term with given variable values.
+        func eval(with values: [String: Double]) -> Double {
+            (values[variable.name] ?? 0) * factor
+        }
+        
     }
     
     // MARK: Stored properties
@@ -80,6 +87,13 @@ public struct LinearFunction {
     public init(variable: Variable) {
         self.terms = [variable.withFactor(1)]
         self.constant = 0
+    }
+    
+    // MARK: Evaluating
+    
+    // Answers the result of evaluating the function with given variable values.
+    public func eval(with values: [String: Double]) -> Double {
+        terms.reduce(constant) { total, term in total + term.eval(with: values) }
     }
     
 }

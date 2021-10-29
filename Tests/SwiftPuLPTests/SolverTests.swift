@@ -63,13 +63,13 @@ final class SolverTests: XCTestCase {
         
         XCTAssertEqual(result.status, .unbounded)
         XCTAssertEqual(result.variables.count, 1)
-        XCTAssertEqual(result.variables[0].name, "x")
-        XCTAssertEqual(result.variables[0].value, 0)
+        XCTAssertEqual(result.variables["x"], 0)
     }
 
     func testSolveBasicModel() {
         guard let x = Variable("x", domain: .integer), let y = Variable("y") else { return XCTFail("Nil variable") }
-        let objective = Objective(x + 2 * y, optimization: .maximize)
+        let function = x + 2 * y
+        let objective = Objective(function, optimization: .maximize)
         let constraints = [
             (2 * x + y <= 20, "red"),
             (4 * x - 5 * y >= -10, "blue"),
@@ -78,18 +78,18 @@ final class SolverTests: XCTestCase {
         ]
         guard let model = Model("Basic", objective: objective, constraints: constraints) else { return XCTFail("Nil model") }
         guard let result = Solver().solve(model) else { return XCTFail("Nil result") }
-
+        
         XCTAssertEqual(result.status, .optimal)
         XCTAssertEqual(result.variables.count, 2)
-        XCTAssertEqual(result.variables[0].name, "x")
-        XCTAssertEqual(result.variables[0].value, 7)
-        XCTAssertEqual(result.variables[1].name, "y")
-        XCTAssertEqual(result.variables[1].value, 4.4)
+        XCTAssertEqual(result.variables["x"], 7)
+        XCTAssertEqual(result.variables["y"], 4.4)
+        XCTAssertEqual(function.eval(with: result.variables), 15.8)
     }
 
     func testSolveIllegalThreadState() {
         Thread.current.threadDictionary[ThreadLocalKey] = VariableRegistry()
-
+        defer { Thread.current.threadDictionary.removeObject(forKey: ThreadLocalKey) }
+                                                             
         guard let model = Model("Optimal", objective: Objective(LinearFunction(terms: []))) else { return XCTFail("Nil model") }
         let result = Solver().solve(model)
         
