@@ -128,6 +128,10 @@ public extension Variable {
     
     // MARK: Building linear functions
     
+    static prefix func - (value: Variable) -> LinearFunction {
+        LinearFunction(terms: [value.withFactor(-1)])
+    }
+     
     static func + (lhs: Variable, rhs: Double) -> LinearFunction {
         LinearFunction(terms: [lhs.withFactor(1)], constant: rhs)
     }
@@ -168,6 +172,10 @@ public extension LinearFunction {
     
     // MARK: Building linear functions
     
+    static prefix func - (value: LinearFunction) -> LinearFunction {
+        LinearFunction(terms: value.terms.map(\.negated), constant: -value.constant)
+    }
+     
     static func + (lhs: Self, rhs: Double) -> Self {
         Self(terms: lhs.terms, constant: lhs.constant + rhs)
     }

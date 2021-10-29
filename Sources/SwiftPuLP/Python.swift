@@ -8,7 +8,7 @@
 
 import PythonKit
 
-// The Python PuLP module loaded lazily.
+// The Python PuLP module.
 let PuLP = Python.import("pulp")
 
 
@@ -19,12 +19,12 @@ public extension PythonObject {
     
     // MARK: Computed properties
     
-    /// Answers the unique id of the object.
+    /// Answers the id of the object.
     var id: Double? {
         Double(Python.id(self))
     }
     
-    /// Answers true of the object is None.
+    /// Answers true if the object is None.
     /// Testing for equality in Python may cause strange side effects, e.g. testing the presence of an object.
     /// For instance, LpAffineExpression.__eq__ returns an LpConstraint, which may cause simple equality
     /// testing between a PuLP model objective and None to fail.

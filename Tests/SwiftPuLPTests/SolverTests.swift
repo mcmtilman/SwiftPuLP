@@ -73,8 +73,8 @@ final class SolverTests: XCTestCase {
         let constraints = [
             (2 * x + y <= 20, "red"),
             (4 * x - 5 * y >= -10, "blue"),
-            (2 * y - x  >= -2, "yellow"),
-            (5 * y - x == 15, "green")
+            (-x + 2 * y >= -2, "yellow"),
+            (-x + 5 * y == 15, "green")
         ]
         guard let model = Model("Basic", objective: objective, constraints: constraints) else { return XCTFail("Nil model") }
         guard let result = Solver().solve(model) else { return XCTFail("Nil result") }

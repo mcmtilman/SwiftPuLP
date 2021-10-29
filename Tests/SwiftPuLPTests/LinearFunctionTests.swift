@@ -28,11 +28,18 @@ final class LinearFunctionTests: XCTestCase {
     
     // MARK: Arithmetic operators tests
     
-    func testFactorTimesVariable() throws {
+    func testMinusVariable() throws {
+        guard let x = Variable("x") else { return XCTFail("Nil variable") }
+        let function = -1 * x
+        
+        XCTAssertEqual(function, LinearFunction(terms: [Term(variable: x, factor: -1)]))
+    }
+    
+   func testFactorTimesVariable() throws {
         guard let x = Variable("x") else { return XCTFail("Nil variable") }
         let function = 2 * x
         
-        XCTAssertEqual(function, LinearFunction(terms: [Term(variable: x, factor: 2)], constant: 0))
+        XCTAssertEqual(function, LinearFunction(terms: [Term(variable: x, factor: 2)]))
     }
     
     func testFactorTimesFunction() throws {
@@ -53,7 +60,7 @@ final class LinearFunctionTests: XCTestCase {
         guard let x = Variable("x"), let y = Variable("y") else { return XCTFail("Nil variable") }
         let function = x + y
         
-        XCTAssertEqual(function, LinearFunction(terms: [Term(variable: x, factor: 1), Term(variable: y, factor: 1)], constant: 0))
+        XCTAssertEqual(function, LinearFunction(terms: [Term(variable: x, factor: 1), Term(variable: y, factor: 1)]))
     }
     
     func testVariablePlusFunction() throws {
@@ -74,7 +81,7 @@ final class LinearFunctionTests: XCTestCase {
         guard let x = Variable("x"), let y = Variable("y") else { return XCTFail("Nil variable") }
         let function = x - y
         
-        XCTAssertEqual(function, LinearFunction(terms: [Term(variable: x, factor: 1), Term(variable: y, factor: -1)], constant: 0))
+        XCTAssertEqual(function, LinearFunction(terms: [Term(variable: x, factor: 1), Term(variable: y, factor: -1)]))
     }
     
     func testVariableMinusFunction() throws {
@@ -84,6 +91,13 @@ final class LinearFunctionTests: XCTestCase {
         XCTAssertEqual(function, LinearFunction(terms: [Term(variable: x, factor: 1), Term(variable: y, factor: -3)], constant: -10))
     }
 
+    func testMinusFunction() throws {
+        guard let x = Variable("x") else { return XCTFail("Nil variable") }
+        let function = 2 * x
+        
+        XCTAssertEqual(-function, LinearFunction(terms: [Term(variable: x, factor: -2)]))
+    }
+    
     func testFunctionPlusConstant() throws {
         guard let x = Variable("x") else { return XCTFail("Nil variable") }
         let function = (2 * x + 5) + 10
@@ -140,21 +154,21 @@ final class LinearFunctionTests: XCTestCase {
         guard let x = Variable("x") else { return XCTFail("Nil variable") }
         let function = 0 * x
         
-        XCTAssertEqual(function, LinearFunction(terms: [], constant: 0))
+        XCTAssertEqual(function, LinearFunction(terms: []))
     }
     
     func testMergeFactors() throws {
         guard let x = Variable("x"), let y = Variable("y") else { return XCTFail("Nil variable") }
         let function = (2 * x) + (3 * y) - x
         
-        XCTAssertEqual(function, LinearFunction(terms: [Term(variable: x, factor: 1), Term(variable: y, factor: 3)], constant: 0))
+        XCTAssertEqual(function, LinearFunction(terms: [Term(variable: x, factor: 1), Term(variable: y, factor: 3)]))
     }
     
     func testMergeAndFilterFactors() throws {
         guard let x = Variable("x") else { return XCTFail("Nil variable") }
         let function = (2 * x) - (2 * x)
         
-        XCTAssertEqual(function, LinearFunction(terms: [], constant: 0))
+        XCTAssertEqual(function, LinearFunction(terms: []))
     }
     
     func testMergeSameVariables() throws {
@@ -162,14 +176,14 @@ final class LinearFunctionTests: XCTestCase {
         let z = x
         let function = (2 * x) + (3 * y) - z
         
-        XCTAssertEqual(function, LinearFunction(terms: [Term(variable: x, factor: 1), Term(variable: y, factor: 3)], constant: 0))
+        XCTAssertEqual(function, LinearFunction(terms: [Term(variable: x, factor: 1), Term(variable: y, factor: 3)]))
     }
     
     func testMergeSameNameVariables() throws {
         guard let x = Variable("x"), let y = Variable("y"), let z = Variable("x", domain: .integer) else { return XCTFail("Nil variable") }
         let function = (2 * x) + (3 * y) - z
         
-        XCTAssertEqual(function, LinearFunction(terms: [Term(variable: x, factor: 1), Term(variable: y, factor: 3)], constant: 0))
+        XCTAssertEqual(function, LinearFunction(terms: [Term(variable: x, factor: 1), Term(variable: y, factor: 3)]))
     }
     
     // Evaluation tests
@@ -186,11 +200,11 @@ final class LinearFunctionTests: XCTestCase {
     func testFunctionToPuLP() throws {
         guard let x = Variable("x"), let y = Variable("y") else { return XCTFail("Nil variable") }
         let function = 2 * x + 3 * y + 10
-        let affineExpression = function.pythonObject
+        let pythonObject = function.pythonObject
 
-        XCTAssertTrue(affineExpression.isInstance(of: PuLP.LpAffineExpression))
-        XCTAssertEqual(affineExpression.toDict(), [["name": "x", "value": 2], ["name": "y", "value": 3]])
-        XCTAssertEqual(affineExpression.constant, 10)
+        XCTAssertTrue(pythonObject.isInstance(of: PuLP.LpAffineExpression))
+        XCTAssertEqual(pythonObject.toDict(), [["name": "x", "value": 2], ["name": "y", "value": 3]])
+        XCTAssertEqual(pythonObject.constant, 10)
     }
 
 }
