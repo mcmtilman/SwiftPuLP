@@ -103,7 +103,7 @@ extension LinearConstraint: PythonConvertible {
 
 
 /**
- Covenience functions to compose linear constraints using basic comparison operators.
+ Covenience functions to compose linear constraints using basic comparison operators on variables.
  */
 public extension Variable {
     
@@ -125,7 +125,7 @@ public extension Variable {
 
 
 /**
- Covenience functions to compose linear constraints using basic comparison operators.
+ Covenience functions to compose linear constraints using basic comparison operators on linear functions.
  */
 public extension LinearFunction {
     
