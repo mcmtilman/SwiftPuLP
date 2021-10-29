@@ -87,7 +87,16 @@ final class SolverTests: XCTestCase {
         XCTAssertEqual(result.variables[1].value, 4.4)
     }
 
-    func testClearRegistry() {
+    func testSolveIllegalThreadState() {
+        Thread.current.threadDictionary[ThreadLocalKey] = VariableRegistry()
+
+        guard let model = Model("Optimal", objective: Objective(LinearFunction(terms: []))) else { return XCTFail("Nil model") }
+        let result = Solver().solve(model)
+        
+        XCTAssertNil(result)
+    }
+    
+    func testSolveClearRegistry() {
         guard let model = Model("Optimal", objective: Objective(LinearFunction(terms: []))) else { return XCTFail("Nil model") }
         guard let result = Solver().solve(model) else { return XCTFail("Nil result") }
         

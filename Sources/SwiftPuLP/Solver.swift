@@ -67,6 +67,9 @@ public struct Solver {
     /// Solves given model and returns a result with status and computed variables.
     /// Provide a variable registry in thread-local storage.
     public func solve(_ model: Model) -> Result? {
+        guard Thread.current.threadDictionary[ThreadLocalKey] == nil else {
+            return nil
+        }
         Thread.current.threadDictionary[ThreadLocalKey] = VariableRegistry()
         defer { Thread.current.threadDictionary.removeObject(forKey: ThreadLocalKey) }
         
