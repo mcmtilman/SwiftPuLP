@@ -97,8 +97,11 @@ final class LinearConstraintTests: XCTestCase {
 
         XCTAssertTrue(pythonConstraint.isInstance(of: PuLP.LpConstraint))
         XCTAssertEqual(pythonConstraint.toDict()["coefficients"], [["name": "x", "value": 2], ["name": "y", "value": 3]])
-        XCTAssertEqual(pythonConstraint.sense, PuLP.LpConstraintLE)
+        // PuLP internally transforms the constraint into 2 * x + 3 * y - 5 <= 0.
+        // The PuLP constant retrieved from LpConstraint is actually the constant of the
+        // transformed linear function, hence -5.
         XCTAssertEqual(pythonConstraint.constant, -5)
+        XCTAssertEqual(pythonConstraint.sense, PuLP.LpConstraintLE)
     }
 
     func testComparisonToPuLP() throws {
