@@ -121,4 +121,24 @@ final class VariableTests: XCTestCase {
         }
     }
 
+    // MARK: Variable registry tests
+    
+    func testNonThreadLocalRegistry() {
+        guard let x = Variable("x"), let y = Variable("y"), let z = Variable("x" ) else { return XCTFail("Nil variable") }
+        let pythonObjects = [x, y, z].map(\.pythonObject) // If not retained, ids may be reused.
+        let ids = pythonObjects.map(\.id)
+        
+        XCTAssertEqual(Set(ids).count, 3)
+    }
+    
+    func testThreadLocalRegistry() {
+        Thread.current.threadDictionary[ThreadLocalKey] = VariableRegistry()
+        defer { Thread.current.threadDictionary.removeObject(forKey: ThreadLocalKey) }
+        
+        guard let x = Variable("x"), let y = Variable("y"), let z = Variable("x" ) else { return XCTFail("Nil variable") }
+
+        XCTAssertEqual(x.pythonObject.id, z.pythonObject.id)
+        XCTAssertNotEqual(x.pythonObject.id, y.pythonObject.id)
+    }
+    
 }

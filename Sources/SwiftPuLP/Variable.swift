@@ -9,6 +9,9 @@
 import Foundation
 import PythonKit
 
+// Key referencing a variable registry in thread-local storage.
+public let ThreadLocalKey = "be.dotted.pair.pulp.variables"
+
 /**
  A variable has a name and a domain.
  The domain may be further restricted to optional lower and upper bounds.
@@ -114,13 +117,53 @@ extension Variable: PythonConvertible {
     
     /**
      Converts the variable into a PuLP variable.
+     If a variable registry is present in local storage, retrieve the Python object from the registry,
+     or create a new one if absent and register it.
      */
     public var pythonObject: PythonObject {
+        guard let threadLocal = Thread.current.threadDictionary[ThreadLocalKey],
+              let registry = threadLocal as? VariableRegistry
+            else { return newPythonObject() }
+        
+        return registry[name, registerDefault: self.newPythonObject()]
+    }
+    
+    // Creates a new PuLP LpVariable object.
+    private func newPythonObject() -> PythonObject {
         PuLP.LpVariable(name: name, lowBound: minimum, upBound: maximum, cat: domain.pythonObject)
     }
 
 }
 
+
+/**
+ PuLP expects only one object for all similarly-named variables.
+ The variable registry allows clients to register new LpVariables if not already present,
+ otherwise the existing one is returned.
+ */
+public class VariableRegistry {
+    
+    // MARK: Stored properties
+    
+    var registry = [String: PythonObject]()
+    
+    // MARK: Initializing
+    
+    // Default initializer made public.
+    public init() {}
+    
+    // MARK: Registering
+    
+    public subscript(key: String, registerDefault defaultValue: @autoclosure () -> PythonObject) -> PythonObject {
+        get {
+            return registry[key] ?? {
+                let value = defaultValue()
+                registry[key] = value
+                return value
+            }()
+        }
+    }
+}
 
 /**
  Variable adopts Equatable extensions with default behaviour.

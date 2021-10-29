@@ -19,6 +19,11 @@ public extension PythonObject {
     
     // MARK: Computed properties
     
+    /// Answers the unique id of the object.
+    var id: Double? {
+        Double(Python.id(self))
+    }
+    
     /// Answers true of the object is None.
     /// Testing for equality in Python may cause strange side effects, e.g. testing the presence of an object.
     /// For instance, LpAffineExpression.__eq__ returns an LpConstraint, which may cause simple equality

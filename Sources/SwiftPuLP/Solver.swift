@@ -6,6 +6,7 @@
 //  Licensed under Apache License v2.0.
 //
 
+import Foundation
 import PythonKit
 
 /**
@@ -64,10 +65,14 @@ public struct Solver {
     // MARK: Solving
     
     /// Solves given model and returns a result with status and computed variables.
+    /// Provide a variable registry in thread-local storage.
     public func solve(_ model: Model) -> Result? {
+        Thread.current.threadDictionary[ThreadLocalKey] = VariableRegistry()
+        defer { Thread.current.threadDictionary.removeObject(forKey: ThreadLocalKey) }
+        
         let pythonModel = model.pythonObject
         let solver = PuLP.LpSolverDefault.copy()
-
+        
         solver.msg = false
         solver.solve(pythonModel)
         

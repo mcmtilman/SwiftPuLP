@@ -30,17 +30,21 @@ public struct Model {
     /// Default = nil.
     public let objective: Objective?
     
-    // MARK: Initializing
+    /// The linear constraints.
+    public let constraints: [(constraint: LinearConstraint, name: String)]
+    
+   // MARK: Initializing
     
     /**
-     Creates a model with given name and objective.
+     Creates a model with given name, optional objective and constraints.
      Fails if the name is empty or contains spaces.
      */
-    public init?(_ name: String, objective: Objective? = nil) {
+    public init?(_ name: String, objective: Objective? = nil, constraints: [(constraint: LinearConstraint, name: String)] = []) {
         guard Self.isValidName(name) else { return nil }
 
         self.name = name
         self.objective = objective
+        self.constraints = constraints
     }
     
 }
@@ -121,8 +125,18 @@ extension Model: PythonConvertible {
         if let objective = objective {
             problem += objective.function.pythonObject
         }
+        for (constraint, name) in constraints {
+            problem += PythonObject(tupleOf: constraint, name)
+        }
         
         return problem
     }
         
 }
+
+//model += x + 2 * y
+//
+//model += (2 * x + y <= 20, "red")
+//model += (4 * x - 5 * y >= -10, "blue")
+//model += (-x + 2 * y >= -2, "yellow")
+//model += (-x + 5 * y == 15, "green")
