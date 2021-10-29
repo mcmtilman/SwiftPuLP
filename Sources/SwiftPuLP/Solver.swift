@@ -14,7 +14,7 @@ import PythonKit
 */
 public struct Solver {
 
-    /// Status of the solver result..
+    /// Status of the solver result.
     public enum Status: Double {
         
         case unsolved = 0

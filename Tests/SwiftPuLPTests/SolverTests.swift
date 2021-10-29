@@ -98,7 +98,7 @@ final class SolverTests: XCTestCase {
     
     func testSolveClearRegistry() {
         guard let model = Model("Optimal", objective: Objective(LinearFunction(terms: []))) else { return XCTFail("Nil model") }
-        guard let result = Solver().solve(model) else { return XCTFail("Nil result") }
+        guard Solver().solve(model) != nil else { return XCTFail("Nil result") }
         
         XCTAssertNil(Thread.current.threadDictionary[ThreadLocalKey])
     }
