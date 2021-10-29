@@ -133,10 +133,3 @@ extension Model: PythonConvertible {
     }
         
 }
-
-//model += x + 2 * y
-//
-//model += (2 * x + y <= 20, "red")
-//model += (4 * x - 5 * y >= -10, "blue")
-//model += (-x + 2 * y >= -2, "yellow")
-//model += (-x + 5 * y == 15, "green")
