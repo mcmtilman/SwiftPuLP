@@ -27,7 +27,7 @@ public struct LinearConstraint {
     }
     
     /// Linear function to be constrained.
-    public let function: ObjectiveFunction
+    public let function: LinearFunction
     
     /// Comparison.
     /// Default = .eq.
@@ -44,8 +44,19 @@ public struct LinearConstraint {
      Default comparison is equal to.
      Default constant = 0.
      */
-    public init(function: ObjectiveFunction, comparison: Comparison = .eq, constant: Double = 0) {
+    public init(function: LinearFunction, comparison: Comparison = .eq, constant: Double = 0) {
         self.function = function
+        self.comparison = comparison
+        self.constant = constant
+    }
+
+    /**
+     Initializes a constraint with given name,variable, comparison and constant.
+     Default comparison is equal to.
+     Default constant = 0.
+     */
+    public init(variable: Variable, comparison: Comparison = .eq, constant: Double = 0) {
+        self.function = LinearFunction(variable: variable)
         self.comparison = comparison
         self.constant = constant
     }
@@ -85,7 +96,7 @@ extension LinearConstraint: PythonConvertible {
      Converts the linear constraint into a PuLP constraint.
      */
     public var pythonObject: PythonObject {
-        PuLP.LpConstraint(function.pythonLinearFunction, sense: comparison, rhs: constant)
+        PuLP.LpConstraint(function.pythonObject, sense: comparison, rhs: constant)
     }
         
 }
@@ -99,15 +110,15 @@ public extension Variable {
     // MARK: Building linear constraints
     
     static func <= (lhs: Variable, rhs: Double) -> LinearConstraint {
-        LinearConstraint(function: lhs, comparison: .lte, constant: rhs)
+        LinearConstraint(variable: lhs, comparison: .lte, constant: rhs)
     }
     
     static func == (lhs: Variable, rhs: Double) -> LinearConstraint {
-        LinearConstraint(function: lhs, comparison: .eq, constant: rhs)
+        LinearConstraint(variable: lhs, comparison: .eq, constant: rhs)
     }
     
     static func >= (lhs: Variable, rhs: Double) -> LinearConstraint {
-        LinearConstraint(function: lhs, comparison: .gte, constant: rhs)
+        LinearConstraint(variable: lhs, comparison: .gte, constant: rhs)
     }
     
 }
@@ -136,6 +147,7 @@ public extension LinearFunction {
 
 
 /**
- LinearConstraint.Comparison adopts Equatable with default behaviour.
+ LinearConstraint adopts Equatable with default behaviour.
  */
 extension LinearConstraint.Comparison: Equatable {}
+extension LinearConstraint: Equatable {}

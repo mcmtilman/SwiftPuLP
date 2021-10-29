@@ -68,12 +68,18 @@ public struct LinearFunction {
     
     // MARK: Initializing
     
-    /// Creates linear function with given terms and constant.
+    /// Creates a linear function with given terms and constant.
     /// Merges terms with the same variable name into one, using the first encountered variable's properties.
     /// Ignores merged terms with factor 0.
     public init(terms: [Term], constant: Double = 0) {
         self.terms = Self.mergeTerms(terms).filter { $0.factor != 0 }
         self.constant = constant
+    }
+    
+    /// Creates a linear function with given variable.
+    public init(variable: Variable) {
+        self.terms = [variable.withFactor(1)]
+        self.constant = 0
     }
     
 }
@@ -191,17 +197,23 @@ extension LinearFunction.Term {
 
 
 /**
- LinearFunction adopts ObjectiveFunction.
+ Linear function adopts PythonConvertible.
  */
-extension LinearFunction: ObjectiveFunction {
+extension LinearFunction: PythonConvertible {
+
+    // MARK: Computed properties
     
-    // MARK: Private computed properties
-    
-    /// Answers the linear function as a PuLP LpAffineExpression.
-    public var pythonLinearFunction: PythonObject {
-        PuLP.LpAffineExpression(terms.map { PythonObject(tupleOf: $0.variable, $0.factor) }, constant: constant)
+    /**
+     Converts the linear function into a PuLP LpAffineExpression.
+     */
+    public var pythonObject: PythonObject {
+        func pythonTuple(_ term: Term) -> PythonObject {
+            PythonObject(tupleOf: term.variable, term.factor)
+        }
+        
+        return PuLP.LpAffineExpression(terms.map(pythonTuple), constant: constant)
     }
-    
+
 }
 
 

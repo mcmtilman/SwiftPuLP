@@ -17,6 +17,15 @@ final class LinearFunctionTests: XCTestCase {
         
     let PuLP = Python.import("pulp")
     
+    // MARK: Variable as function tests
+    
+    func testVariableAsFunction() throws {
+        guard let x = Variable("x") else { return XCTFail("Nil variable") }
+        let function = LinearFunction(variable: x)
+        
+        XCTAssertEqual(function, LinearFunction(terms: [Term(variable: x, factor: 1)], constant: 0))
+    }
+    
     // MARK: Arithmetic operators tests
     
     func testFactorTimesVariable() throws {
@@ -165,30 +174,16 @@ final class LinearFunctionTests: XCTestCase {
     
     // MARK: Conversion to PuLP tests
     
-    func testFunctionToAffineExpression() throws {
+    func testFunctionToPuLP() throws {
         guard let x = Variable("x"), let y = Variable("y") else { return XCTFail("Nil variable") }
         let function = 2 * x + 3 * y + 10
-        let affineExpression = function.pythonLinearFunction
+        let affineExpression = function.pythonObject
 
         XCTAssertTrue(affineExpression.isInstance(of: PuLP.LpAffineExpression))
         XCTAssertEqual(affineExpression.toDict(), [["name": "x", "value": 2], ["name": "y", "value": 3]])
         XCTAssertEqual(affineExpression.constant, 10)
     }
 
-    func testModelToPuLP() throws {
-        guard let x = Variable("x"), let y = Variable("y") else { return XCTFail("Nil variable") }
-        let function = 2 * x + 3 * y + 10
-        guard let model = Model("XYZ", objective: Objective(function, optimization: .maximize)) else { return XCTFail("Nil model") }
-        let pythonModel = model.pythonObject
-        
-        XCTAssertTrue(pythonModel.isInstance(of: PuLP.LpProblem))
-        XCTAssertEqual(pythonModel.name, "XYZ")
-        XCTAssertTrue(pythonModel.objective.isInstance(of: PuLP.LpAffineExpression))
-        XCTAssertEqual(pythonModel.objective.toDict(), [["name": "x", "value": 2], ["name": "y", "value": 3]])
-        XCTAssertEqual(pythonModel.objective.constant, 10)
-        XCTAssertEqual(pythonModel.sense, PuLP.LpMaximize)
-    }
-    
 }
 
 
