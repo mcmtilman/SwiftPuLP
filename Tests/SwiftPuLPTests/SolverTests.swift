@@ -11,6 +11,7 @@ import Collections
 import PythonKit
 import SwiftPuLP
 
+// Temporary.
 func VariableSum<T>(_ variables: T) -> LinearFunction where T: Sequence, T.Element == Variable {
     LinearFunction(terms: variables.map { LinearFunction.Term(variable: $0, factor: 1) })
 }
@@ -90,6 +91,7 @@ final class SolverTests: XCTestCase {
         XCTAssertEqual(function(result.variables), 15.8)
     }
 
+    // Temporary.
     func testSolveResourceAllocationModel() {
         let x = (0 ... 4).compactMap { i in Variable("x\(i)", minimum: 0) }
         let y = (0 ... 2).compactMap { i in Variable("y\(i)", domain: .binary) }
