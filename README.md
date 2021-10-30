@@ -20,7 +20,7 @@ The building blocks are:
 
 To create a variable use the following initializer.
 
-        public init?(_ name: String, minimum: Double? = nil, maximum: Double? = nil, domain: Domain = .real)
+    public init?(_ name: String, minimum: Double? = nil, maximum: Double? = nil, domain: Domain = .real)
 
 Here domain is one of:
 
@@ -58,17 +58,17 @@ The initializer fails if:
 
 The Swift data structures are converted into PuLP objects using PythonKit, according to the following mapping.
 
-    Variable -> LpVariable
-    Variable.Domain -> LpContinuous | LpInteger | LpBinary
-    LinearFunction -> LpAffineExpression
-    LinearConstraint -> LpConstraint
-    Model -> LpProblem
-    Objective.Optimization -> LpMinimize | LpMaximize
+* Variable -> LpVariable
+* Variable.Domain -> LpContinuous | LpInteger | LpBinary
+* LinearFunction -> LpAffineExpression
+* LinearConstraint -> LpConstraint
+* Model -> LpProblem
+* Objective.Optimization -> LpMinimize | LpMaximize
 
 The solver requests PuLP to solve the constructed LpProblem and builds a result from data extracted from the updated problem.
 
-    LpStatusNotSolved | LpStatusOptimal | LpStatusInfeasible | LpStatusUnbounded ? LpStatusUndefined -> Solver.Status
-    LpProblem variables -> Dictionary with key = variable name, value = variable value
+* LpStatusNotSolved | LpStatusOptimal | LpStatusInfeasible | LpStatusUnbounded ? LpStatusUndefined -> Solver.Status
+* LpProblem variables -> Dictionary with key = variable name, value = variable value
 
 ### Generating a unique LpVariable instance for each variable *name*
 
