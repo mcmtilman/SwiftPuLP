@@ -18,9 +18,9 @@ The building blocks are:
 
 ### Variable
 
-To create a variable use the following initializer.
+To create a variable use the following public initializer.
 
-    public init?(_ name: String, minimum: Double? = nil, maximum: Double? = nil, domain: Domain = .real)
+    init?(_ name: String, minimum: Double? = nil, maximum: Double? = nil, domain: Domain = .real)
 
 Here domain is one of:
 
@@ -38,7 +38,7 @@ The initializer fails if:
 
 1. Create a continuous variable named *x* without lower or upper bounds.
 
-        let x = Variable("x")
+        guard let x = Variable("x") else {...}
 
 2. Create a list of 100 binary variables named *x_0* through *x_99*.
 
@@ -46,17 +46,70 @@ The initializer fails if:
 
 ### LinearFunction
 
+A LinearFunction is a linear combination of zero or more weighted variables and an optional constant. The most basic cases consist of:
+
+* a single variable without coefficient
+* a single constant.
+
+#### Examples of linear functions
+
+1. A variable x
+
+    x
+
+2. A constant c
+
+    10
+
+3. A variable x with coefficient + a constant
+
+    2 * x + 10
+
+4. Multiple coefficient - variables pairs + a constant
+
+    2 * x + 3 * y + 10
+
+Internally a linear function consists of zero or more coefficient - variable pairs (aka *terms*) and a constant.
+
+To create a linear function use one of the following public initializers.
+
+    init(terms: [LinearFunction.Term], constant: Double = 0)
+
+    init(variable: Variable)
+
+Create a term as follows.
+
+    init(variable: Variable, factor: Double = 1)
+
+#### Use arithmethic operators to build a linear function
+
+Arithmetic operators may be used in a more intuitive way to build linear functions, and parentheses may be used to alter precedence. In the following examples x, y, z represent variables (coefficients must be placed before the variables).
+
+    1 * x
+
+    0 * x + 10
+
+    -x + 10
+
+    2 * x + 3 * y + z - 10
+
+    2 * x - 3 * (y + z - 10)
+
+Note that the compiler does not recognize the following constructs as linear functions.
+
+    x
+
+    10
+
 ### LinearConstraint
 
 ### Model
 
 ### Solver
 
-## Examples
-
 ## Conversion to / from PuLP
 
-The Swift data structures are converted into PuLP objects using PythonKit, according to the following mapping.
+The Swift data structures are converted into PuLP objects using PythonKit (cf. the *PythonConvertible* protocol), according to the following mapping.
 
 * Variable -> LpVariable
 * Variable.Domain -> LpContinuous | LpInteger | LpBinary
@@ -65,29 +118,35 @@ The Swift data structures are converted into PuLP objects using PythonKit, accor
 * Model -> LpProblem
 * Objective.Optimization -> LpMinimize | LpMaximize
 
-The solver requests PuLP to solve the constructed LpProblem and builds a result from data extracted from the updated problem.
+The solver requests PuLP to solve the constructed LpProblem and builds a result from data extracted from the updated problem (cf. the *ConvertibleFromPython* protocol).
 
-* LpStatusNotSolved | LpStatusOptimal | LpStatusInfeasible | LpStatusUnbounded ? LpStatusUndefined -> Solver.Status
+* LpStatusNotSolved | LpStatusOptimal | LpStatusInfeasible | LpStatusUnbounded | LpStatusUndefined -> Solver.Status
 * LpProblem variables -> Dictionary with key = variable name, value = variable value
 
-### Generating a unique LpVariable instance for each variable *name*
+### Generating a unique LpVariable instance for each variable
 
 The Python counterparts of the Swift model elements are generated when the solver tries to solve the model. Since a given variable may occur multiple times in the objective function and / or one or more constraints, this may result in multiple LpVariables being generated for each Swift variable.
 
-PuLP can run into problems when this happens. Hence converting variables into Python relies on a *VariableRegistry* to keep track of the first Python object generated for each variable name. The following example illustrates the impact.
+PuLP can run into problems when this happens. Hence converting variables into Python relies on a *VariableRegistry* to keep track of the first Python object generated for each variable *name*. The following example illustrates the impact.
 
     guard let x = Variable("x"), let z = Variable("x", domain: .integer) else {...}
 
 Both these variables will be mapped onto the same Python LpVariable (whichever variable comes first wins). Currently no error is generated when such a conflict arises.
 
+## Examples
+
+## Dependencies
+
+SwiftPulp depends on the *Collections* and *PythonKit* packages.
+
 ## Requirements
 
-Needs PuLP and may require the PYTHON_LIBRARY environment variable to be set.
+SwiftPulp needs PuLP to be installed and may require the PYTHON_LIBRARY environment variable to be set.
 
 ## Compatibility
 
-Tested on macOS Big Sur 11.6 with XCode 13.0, Python 3.9.7 and PuLP 2.5.1.
+SwiftPulp was tested on macOS Big Sur 11.6 with XCode 13.1, Python 3.9.7 and PuLP 2.5.1.
 
 ## Status
 
-Work in progress , but able to run some simple optimization problems.
+Work in progress, but able to run some simple optimization problems.
