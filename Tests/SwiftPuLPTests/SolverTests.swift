@@ -11,6 +11,10 @@ import Collections
 import PythonKit
 import SwiftPuLP
 
+func VariableSum<T>(_ variables: T) -> LinearFunction where T: Sequence, T.Element == Variable {
+    LinearFunction(terms: variables.map { LinearFunction.Term(variable: $0, factor: 1) })
+}
+
 /**
  Tests result of a solver process.
  */
@@ -84,6 +88,34 @@ final class SolverTests: XCTestCase {
         XCTAssertEqual(result.variables["x"], 7)
         XCTAssertEqual(result.variables["y"], 4.4)
         XCTAssertEqual(function(result.variables), 15.8)
+    }
+
+    func testSolveResourceAllocationModel() {
+        let x = (0 ... 4).compactMap { i in Variable("x\(i)", minimum: 0) }
+        let y = (0 ... 2).compactMap { i in Variable("y\(i)", domain: .binary) }
+        guard x.count == 5, y.count == 3 else { return XCTFail("Nil variable") }
+        
+        let function = (20 * x[1] + 12 * x[2]) + (40 * x[3] + 25 * x[4])
+        let objective = Objective(function, optimization: .maximize)
+        let constraints = [
+            (VariableSum(x[1...]) <= 50, "manpower"),
+            (3 * x[1] + 2 * x[2] + x[3] <= 100, "a"),
+            (x[2] + 2 * x[3] + 3 * x[4] <= 90, "b"),
+            (x[1] - 100 * y[1] <= 0, "x1"),
+            (x[3] - 100 * y[2] <= 0, "x3"),
+            (y[1] + y[2] <= 1, "y")
+        ]
+        guard let model = Model("Resource-allocation", objective: objective, constraints: constraints) else { return XCTFail("Nil model") }
+        guard let result = Solver().solve(model) else { return XCTFail("Nil result") }
+        let variables = result.variables
+        
+        XCTAssertEqual(result.status, .optimal)
+        XCTAssertEqual(variables.count, 6)
+        XCTAssertEqual(variables, ["x1": 0, "x2": 0, "x3": 45, "x4": 0, "y1": 0, "y2": 1])
+        XCTAssertEqual(variables["x4"], 0)
+        XCTAssertEqual(variables["y1"], 0)
+        XCTAssertEqual(variables["y2"], 1)
+        XCTAssertEqual(function(result.variables), 1800)
     }
 
     func testSolveIllegalThreadState() {

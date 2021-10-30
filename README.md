@@ -18,11 +18,11 @@ The building blocks are:
 
 ### Variable
 
-To create a variable use the following initializer
+To create a variable use the following initializer.
 
-    public init?(_ name: String, minimum: Double? = nil, maximum: Double? = nil, domain: Domain = .real)
+        public init?(_ name: String, minimum: Double? = nil, maximum: Double? = nil, domain: Domain = .real)
 
-where domain is one of:
+Here domain is one of:
 
 * .real (aka continuous)
 * .integer
