@@ -19,10 +19,12 @@ import PythonKit
  */
 public struct LinearFunction {
     
-    // Merges terms with same variable name, respecting the original order of terms.
+    // Merges terms with same variable, respecting the original order of terms.
     static private func mergeTerms(_ terms: [Term]) -> [Term] {
         guard terms.count > 1 else { return terms }
-        let groups = OrderedDictionary<String, [Term]>(grouping: terms, by: (\.variable.name))
+        let groups = OrderedDictionary<ObjectIdentifier, [Term]>(grouping: terms) {
+            ObjectIdentifier($0.variable)
+        }
         guard groups.count < terms.count else { return terms }
 
         return groups.values.map { terms in

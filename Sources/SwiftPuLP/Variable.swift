@@ -1,4 +1,4 @@
-////
+//
 //  Variable.swift
 //  
 //  Created by Michel Tilman on 29/10/2021.
@@ -9,14 +9,11 @@
 import Foundation
 import PythonKit
 
-// Key referencing a variable registry in thread-local storage.
-public let ThreadLocalKey = "be.dotted.pair.pulp.variables"
-
 /**
  A variable has a name and a domain.
  The domain may be further restricted to optional lower and upper bounds.
  */
-public struct Variable {
+public class Variable {
     
     /**
      A domain identifies the range of values of a variable:
@@ -133,7 +130,7 @@ extension Variable: PythonConvertible {
     func pythonObject(withCache cache: VariableCache?) -> PythonObject {
         guard let cache = cache else { return pythonObject }
 
-        return cache[self.name, default: pythonObject]
+        return cache[ObjectIdentifier(self), default: pythonObject]
     }
     
 }
@@ -149,7 +146,7 @@ public class VariableCache {
     // MARK: Stored properties
     
     // Links variable names to generated PuLP variables.
-    private var cache = [String: PythonObject]()
+    private var cache = [ObjectIdentifier: PythonObject]()
     
     // MARK: Initializing
     
@@ -160,7 +157,7 @@ public class VariableCache {
     
     /// Answers the cached PuLP variable.
     /// If none found, generates a new one and caches it.
-    public subscript(key: String, default defaultValue: @autoclosure () -> PythonObject) -> PythonObject {
+    public subscript(key: ObjectIdentifier, default defaultValue: @autoclosure () -> PythonObject) -> PythonObject {
         get {
             return cache[key] ?? {
                 let value = defaultValue()
@@ -172,6 +169,14 @@ public class VariableCache {
 }
 
 /**
- Variable adopts Equatable extensions with default behaviour.
+ Variable adopts Equatable.
  */
-extension Variable: Equatable {}
+extension Variable: Equatable {
+    public static func == (lhs: Variable, rhs: Variable) -> Bool {
+        lhs.name == rhs.name
+            && lhs.minimum == rhs.minimum
+            && lhs.maximum == rhs.maximum
+            && lhs.domain == rhs.domain
+    }
+    
+}

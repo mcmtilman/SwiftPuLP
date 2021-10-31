@@ -176,14 +176,14 @@ final class LinearFunctionTests: XCTestCase {
         let z = x
         let function = (2 * x) + (3 * y) - z
         
-        XCTAssertEqual(function, LinearFunction(terms: [Term(variable: x, factor: 1), Term(variable: y, factor: 3)]))
+        XCTAssertEqual(function, LinearFunction(terms: [Term(variable: x), Term(variable: y, factor: 3)]))
     }
     
     func testMergeSameNameVariables() throws {
         guard let x = Variable("x"), let y = Variable("y"), let z = Variable("x", domain: .integer) else { return XCTFail("Nil variable") }
         let function = (2 * x) + (3 * y) - z
         
-        XCTAssertEqual(function, LinearFunction(terms: [Term(variable: x, factor: 1), Term(variable: y, factor: 3)]))
+        XCTAssertEqual(function, LinearFunction(terms: [Term(variable: x, factor: 2), Term(variable: y, factor: 3), Term(variable: z, factor: -1)]))
     }
     
     // Evaluation tests

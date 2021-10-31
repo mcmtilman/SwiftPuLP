@@ -1,4 +1,4 @@
-////
+//
 //  LinearConstraint.swift
 //  
 //  Created by Michel Tilman on 28/10/2021.

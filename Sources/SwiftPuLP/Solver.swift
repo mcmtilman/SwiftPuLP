@@ -55,7 +55,6 @@ public struct Solver {
     // MARK: Solving
     
     /// Solves given model and returns a result with status and computed variables.
-    /// Provides a variable cache.
     public func solve(_ model: Model) -> Result? {
         let pythonModel = model.pythonObject
         let solver = PuLP.LpSolverDefault.copy()

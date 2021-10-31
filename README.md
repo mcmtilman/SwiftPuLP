@@ -115,6 +115,8 @@ Also note that the compiler does not recognize the following constructs as linea
 
 ### Solver
 
+### Validating the model
+
 ## Conversion to / from PuLP
 
 The Swift data structures are converted into PuLP objects using PythonKit (cf. the *PythonConvertible* protocol), according to the following mapping.
@@ -133,13 +135,19 @@ The solver requests PuLP to solve the constructed LpProblem and builds a result 
 
 ### Generating a unique LpVariable instance for each variable
 
-The Python counterparts of the Swift model elements are generated when the solver tries to solve the model. Since a given variable may occur multiple times in the objective function and / or one or more constraints, this may result in multiple LpVariables being generated for each Swift variable.
+The Python counterparts of the Swift model elements are generated when the solver tries to solve the model. Since a given variable may occur multiple times in the objective function and / or one or more constraints, this may result in multiple LpVariables being generated for each Swift distinct variable. Converting variables into Python relies on a variable cache to keep track of the Python object generated for each new variable encountered.
 
-PuLP can run into problems when this happens. Hence converting variables into Python relies on a variable cache to keep track of the first Python object generated for each variable *name*. The following example illustrates the impact.
+In the following scenario only one LpVariable instance will be generated, which is OK.
 
-    guard let x = Variable("x"), let z = Variable("x", domain: .integer) else {...}
+    guard let x = Variable("x") else {...}
 
-Both these variables will be mapped onto the same Python LpVariable (whichever variable comes first wins). Currently no error is generated when such a conflict arises.
+    let y = x
+
+In the following scenario however, PuLP may still run into problems.
+
+    guard let x = Variable("x"), let y = Variable("x", domain: .integer) else {...}
+
+Each variable is mapped onto a different Python LpVariable with the same name. Validation of the model will contain errors whenever a variable name is reused for different variable instances.
 
 ## Examples
 
