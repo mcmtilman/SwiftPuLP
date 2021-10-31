@@ -135,7 +135,7 @@ The solver requests PuLP to solve the constructed LpProblem and builds a result 
 
 The Python counterparts of the Swift model elements are generated when the solver tries to solve the model. Since a given variable may occur multiple times in the objective function and / or one or more constraints, this may result in multiple LpVariables being generated for each Swift variable.
 
-PuLP can run into problems when this happens. Hence converting variables into Python relies on a *VariableRegistry* to keep track of the first Python object generated for each variable *name*. The following example illustrates the impact.
+PuLP can run into problems when this happens. Hence converting variables into Python relies on a variable cache to keep track of the first Python object generated for each variable *name*. The following example illustrates the impact.
 
     guard let x = Variable("x"), let z = Variable("x", domain: .integer) else {...}
 
