@@ -130,15 +130,5 @@ final class VariableTests: XCTestCase {
         
         XCTAssertEqual(Set(ids).count, 3)
     }
-    
-    func testThreadLocalRegistry() {
-        Thread.current.threadDictionary[ThreadLocalKey] = VariableRegistry()
-        defer { Thread.current.threadDictionary.removeObject(forKey: ThreadLocalKey) }
-        
-        guard let x = Variable("x"), let y = Variable("y"), let z = Variable("x" ) else { return XCTFail("Nil variable") }
 
-        XCTAssertEqual(x.pythonObject.id, z.pythonObject.id)
-        XCTAssertNotEqual(x.pythonObject.id, y.pythonObject.id)
-    }
-    
 }

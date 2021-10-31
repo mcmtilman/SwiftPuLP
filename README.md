@@ -83,9 +83,11 @@ Create a term as follows.
 
 #### Use arithmethic operators to build a linear function
 
-Arithmetic operators may be used in a more intuitive way to build linear functions, and parentheses may be used to alter precedence. In the following examples x, y, z represent variables (coefficients must be placed before the variables).
+Arithmetic operators may be used in a more intuitive way to build linear functions, and parentheses may be used to alter precedence. In the following examples x, y, z represent variables.
 
     1 * x
+
+    x + 0
 
     0 * x + 10
 
@@ -95,7 +97,13 @@ Arithmetic operators may be used in a more intuitive way to build linear functio
 
     2 * x - 3 * (y + z - 10)
 
-Note that the compiler does not recognize the following constructs as linear functions.
+The LinearFunction initializer normalizes the last function as follows.
+
+    2 * x - 3 * y - 3 * z + 30
+
+Note that coefficients must be placed to the left of variables and nested linear functions.
+
+Also note that the compiler does not recognize the following constructs as linear functions.
 
     x
 

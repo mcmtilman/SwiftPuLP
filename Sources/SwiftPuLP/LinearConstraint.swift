@@ -113,7 +113,16 @@ extension LinearConstraint: PythonConvertible {
      Converts the linear constraint into a PuLP constraint.
      */
     public var pythonObject: PythonObject {
-        PuLP.LpConstraint(function.pythonObject, sense: comparison, rhs: constant)
+        pythonObject(withCache: nil)
+    }
+    
+    // MARK: Converting to Python
+    
+    /**
+     Converts the linear function into a PuLP LpAffineExpression, optionally caching PuLP variables.
+     */
+    func pythonObject(withCache cache: VariableCache?) -> PythonObject {
+        PuLP.LpConstraint(function.pythonObject(withCache: cache), sense: comparison, rhs: constant)
     }
         
 }

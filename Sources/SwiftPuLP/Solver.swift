@@ -55,13 +55,8 @@ public struct Solver {
     // MARK: Solving
     
     /// Solves given model and returns a result with status and computed variables.
-    /// Provide a variable registry in thread-local storage.
+    /// Provides a variable cache.
     public func solve(_ model: Model) -> Result? {
-        guard Thread.current.threadDictionary[ThreadLocalKey] == nil else { return nil }
-
-        Thread.current.threadDictionary[ThreadLocalKey] = VariableRegistry()
-        defer { Thread.current.threadDictionary.removeObject(forKey: ThreadLocalKey) }
-        
         let pythonModel = model.pythonObject
         let solver = PuLP.LpSolverDefault.copy()
         

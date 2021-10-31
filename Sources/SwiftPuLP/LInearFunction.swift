@@ -230,13 +230,22 @@ extension LinearFunction: PythonConvertible {
      Converts the linear function into a PuLP LpAffineExpression.
      */
     public var pythonObject: PythonObject {
+        pythonObject(withCache: nil)
+    }
+
+    // MARK: Converting to Python
+    
+    /**
+     Converts the linear function into a PuLP LpAffineExpression, optionally caching PuLP variables.
+     */
+    func pythonObject(withCache cache: VariableCache?) -> PythonObject {
         func pythonTuple(_ term: Term) -> PythonObject {
-            PythonObject(tupleOf: term.variable, term.factor)
+            PythonObject(tupleOf: term.variable.pythonObject(withCache: cache), term.factor)
         }
         
         return PuLP.LpAffineExpression(terms.map(pythonTuple), constant: constant)
     }
-
+    
 }
 
 

@@ -120,48 +120,51 @@ extension Variable: PythonConvertible {
     
     /**
      Converts the variable into a PuLP variable.
-     If a variable registry is present in local storage, retrieve the Python object from the registry,
-     or create a new one if absent and register it.
      */
     public var pythonObject: PythonObject {
-        guard let threadLocal = Thread.current.threadDictionary[ThreadLocalKey],
-              let registry = threadLocal as? VariableRegistry
-            else { return newPythonObject() }
-        
-        return registry[name, registerDefault: self.newPythonObject()]
-    }
-    
-    // Creates a new PuLP LpVariable object.
-    private func newPythonObject() -> PythonObject {
         PuLP.LpVariable(name: name, lowBound: minimum, upBound: maximum, cat: domain.pythonObject)
     }
+    
+    // MARK: Converting to Python
+    
+    /**
+     Converts the linear function into a PuLP LpAffineExpression, optionally caching PuLP variables.
+     */
+    func pythonObject(withCache cache: VariableCache?) -> PythonObject {
+        guard let cache = cache else { return pythonObject }
 
+        return cache[self.name, default: pythonObject]
+    }
+    
 }
 
 
 /**
  PuLP expects only one object for all similarly-named variables.
- The variable registry allows clients to register new LpVariables if not already present,
+ The variable cache allows clients to cache new LpVariables if not already present,
  otherwise the existing one is returned.
  */
-public class VariableRegistry {
+public class VariableCache {
     
     // MARK: Stored properties
     
-    var registry = [String: PythonObject]()
+    // Links variable names to generated PuLP variables.
+    private var cache = [String: PythonObject]()
     
     // MARK: Initializing
     
     // Default initializer made public.
     public init() {}
     
-    // MARK: Registering
+    // MARK: Accessing
     
-    public subscript(key: String, registerDefault defaultValue: @autoclosure () -> PythonObject) -> PythonObject {
+    /// Answers the cached PuLP variable.
+    /// If none found, generates a new one and caches it.
+    public subscript(key: String, default defaultValue: @autoclosure () -> PythonObject) -> PythonObject {
         get {
-            return registry[key] ?? {
+            return cache[key] ?? {
                 let value = defaultValue()
-                registry[key] = value
+                cache[key] = value
                 return value
             }()
         }

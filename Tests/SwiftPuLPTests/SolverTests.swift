@@ -119,21 +119,4 @@ final class SolverTests: XCTestCase {
         XCTAssertEqual(function(result.variables), 1800)
     }
 
-    func testSolveIllegalThreadState() {
-        Thread.current.threadDictionary[ThreadLocalKey] = VariableRegistry()
-        defer { Thread.current.threadDictionary.removeObject(forKey: ThreadLocalKey) }
-                                                             
-        guard let model = Model("Optimal", objective: Objective(LinearFunction(terms: []))) else { return XCTFail("Nil model") }
-        let result = Solver().solve(model)
-        
-        XCTAssertNil(result)
-    }
-    
-    func testSolveClearRegistry() {
-        guard let model = Model("Optimal", objective: Objective(LinearFunction(terms: []))) else { return XCTFail("Nil model") }
-        guard Solver().solve(model) != nil else { return XCTFail("Nil result") }
-        
-        XCTAssertNil(Thread.current.threadDictionary[ThreadLocalKey])
-    }
-
 }
