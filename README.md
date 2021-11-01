@@ -121,7 +121,27 @@ Also note that the compiler does not recognize the following constructs as linea
 
 ### Solver
 
-### Validating the model
+## Validating the model
+
+To validate a model use the following.
+
+    let model = ...
+    
+    model.validationErrors
+
+This property returns a list of all validation errors encountered. Currently the SwiftPuLP supports the following validation errors.
+
+    public enum ValidationError {   
+     
+        case duplicateConstraintName(LinearConstraint, String)
+        case invalidModelName(Model)
+        case duplicateVariableName(Variable)
+        case emptyVariableName(Variable)
+        case invalidVariableBounds(Variable)
+        case invalidVariableName(Variable)
+        
+    }
+
 
 ## Conversion to / from PuLP
 
@@ -145,13 +165,13 @@ The Python counterparts of the Swift model elements are generated when the solve
 
 In the following scenario only one LpVariable instance will be generated, which is OK.
 
-    guard let x = Variable("x") else {...}
+    let x = Variable("x")
 
     let y = x
 
 In the following case, however, PuLP may still run into problems.
 
-    guard let x = Variable("x"), let y = Variable("x", domain: .integer) else {...}
+    let (x, y) = (Variable("x"), Variable("x", domain: .integer))
 
 Each variable is mapped onto a different Python LpVariable with the same name. Validation of the model returns errors whenever a variable name is reused for different variable instances.
 
