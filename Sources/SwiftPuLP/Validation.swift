@@ -68,7 +68,8 @@ extension Variable: Validating {
         if name.isEmpty {
             errors.append(.emptyVariableName(self))
         }
-        if !CharacterSet(charactersIn: name).isDisjoint(with: Self.specialChars) {     errors.append(.invalidVariableName(self))
+        if !CharacterSet(charactersIn: name).isDisjoint(with: Self.specialChars) {
+            errors.append(.invalidVariableName(self))
         }
         if let min = minimum, let max = maximum, min > max {
             errors.append(.invalidVariableBounds(self))
@@ -138,8 +139,8 @@ extension Model: Validating {
         if name.contains(" ") {
             errors.append(.invalidModelName(self))
         }
-        collectConstraintErrors(into: &errors)
         collectVariableErrors(into: &errors)
+        collectConstraintErrors(into: &errors)
     }
     
     // Verifies that distinct constraints have different names.

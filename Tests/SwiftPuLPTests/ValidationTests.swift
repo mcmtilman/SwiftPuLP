@@ -202,7 +202,7 @@ final class ValidationTests: XCTestCase {
         XCTAssertEqual(errors[0], .duplicateConstraintName(constraints[1].0, "red"))
     }
 
-    // Duplicate constraint name errors are listed before duplicate variable name errors.
+    // Variable errors are listed before constraint errors.
     func testMultipleErrorsModel() throws {
         let (x, y) = (Variable("x"), Variable("x"))
         let function = x + 2 * y
@@ -217,8 +217,8 @@ final class ValidationTests: XCTestCase {
         let errors = model.validationErrors
         
         XCTAssertEqual(errors.count, 2)
-        XCTAssertEqual(errors[0], .duplicateConstraintName(constraints[1].0, "red"))
-        XCTAssertEqual(errors[1], .duplicateVariableName(y))
+        XCTAssertEqual(errors[0], .duplicateVariableName(y))
+        XCTAssertEqual(errors[1], .duplicateConstraintName(constraints[1].0, "red"))
     }
 
 }
