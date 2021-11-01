@@ -20,7 +20,7 @@ final class ModelTests: XCTestCase {
     // MARK: Objective tests
     
     func testVariableObjective() throws {
-        guard let x = Variable("x") else { return XCTFail("Nil variable") }
+        let x = Variable("x")
         let objective = Objective(x, optimization: .maximize)
 
         XCTAssertEqual(objective.function, x + 0)
@@ -28,7 +28,7 @@ final class ModelTests: XCTestCase {
     }
     
     func testFunctionObjective() throws {
-        guard let x = Variable("x") else { return XCTFail("Nil variable") }
+        let x = Variable("x")
         let function = 2 * x + 1
         let objective = Objective(function, optimization: .maximize)
 
@@ -37,8 +37,8 @@ final class ModelTests: XCTestCase {
     }
     
     func testDefaultObjective() throws {
-        guard let variable = Variable("x") else { return XCTFail("Nil variable") }
-        let objective = Objective(variable)
+        let x = Variable("x")
+        let objective = Objective(x)
 
         XCTAssertEqual(objective.optimization, .minimize)
     }
@@ -46,29 +46,16 @@ final class ModelTests: XCTestCase {
     // MARK: Model tests
 
     func testModel() throws {
-        guard let variable = Variable("x") else { return XCTFail("Nil variable") }
-        let model = Model("XYZ", objective: Objective(variable))
+        let x = Variable("x")
+        let model = Model("XYZ", objective: Objective(x))
         
         XCTAssertNotNil(model)
     }
 
     func testDefaultModel() throws {
-        guard let model = Model("XYZ") else { return XCTFail("Nil variable") }
+        let model = Model("XYZ")
         
         XCTAssertNil(model.objective)
-    }
-
-    func testEmptyNameModel() throws {
-        guard let variable = Variable("x") else { return XCTFail("Nil variable") }
-        let model = Model("", objective: Objective(variable))
-        
-        XCTAssertNil(model)
-    }
-
-    func testInvalidNameModel() throws {
-        guard let variable = Variable("x") else { return XCTFail("Nil variable") }
-        
-        XCTAssertNil(Model("X Z", objective: Objective(variable)))
     }
 
     // MARK: Conversion to PuLP tests
@@ -83,9 +70,9 @@ final class ModelTests: XCTestCase {
     }
     
     func testModelToPuLP() throws {
-        guard let x = Variable("x"), let y = Variable("y") else { return XCTFail("Nil variable") }
+       let (x, y) = (Variable("x"), Variable("y"))
         let function = 2 * x + 3 * y + 10
-        guard let model = Model("XYZ", objective: Objective(function, optimization: .maximize)) else { return XCTFail("Nil model") }
+        let model = Model("XYZ", objective: Objective(function, optimization: .maximize))
         let pythonModel = model.pythonObject
         
         XCTAssertTrue(pythonModel.isInstance(of: PuLP.LpProblem))
@@ -97,7 +84,7 @@ final class ModelTests: XCTestCase {
     }
     
    func testDefaultModelToPuLP() throws {
-        guard let model = Model("XYZ") else { return XCTFail("Nil model") }
+        let model = Model("XYZ")
         let pythonModel = model.pythonObject
         
         XCTAssertTrue(pythonModel.objective.isNone)

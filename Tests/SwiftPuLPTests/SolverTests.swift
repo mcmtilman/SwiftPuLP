@@ -53,7 +53,7 @@ final class SolverTests: XCTestCase {
     // MARK: Solver tests
     
     func testSolveOptimalModel() {
-        guard let model = Model("Optimal", objective: Objective(LinearFunction(terms: []))) else { return XCTFail("Nil model") }
+        let model = Model("Optimal", objective: Objective(LinearFunction(terms: [])))
         guard let result = Solver().solve(model) else { return XCTFail("Nil result") }
         
         XCTAssertEqual(result.status, .optimal)
@@ -61,8 +61,8 @@ final class SolverTests: XCTestCase {
     }
 
     func testSolveUnboundedModel() {
-        guard let x = Variable("x") else { return XCTFail("Nil variable") }
-        guard let model = Model("Unbounded", objective: Objective(x)) else { return XCTFail("Nil model") }
+        let x = Variable("x")
+        let model = Model("Unbounded", objective: Objective(x))
         guard let result = Solver().solve(model) else { return XCTFail("Nil result") }
         
         XCTAssertEqual(result.status, .unbounded)
@@ -71,7 +71,7 @@ final class SolverTests: XCTestCase {
     }
 
     func testSolveBasicModel() {
-        guard let x = Variable("x", domain: .integer), let y = Variable("y") else { return XCTFail("Nil variable") }
+        let (x, y) = (Variable("x", domain: .integer), Variable("y"))
         let function = x + 2 * y
         let objective = Objective(function, optimization: .maximize)
         let constraints = [
@@ -80,7 +80,7 @@ final class SolverTests: XCTestCase {
             (-x + 2 * y >= -2, "yellow"),
             (-x + 5 * y == 15, "green")
         ]
-        guard let model = Model("Basic", objective: objective, constraints: constraints) else { return XCTFail("Nil model") }
+        let model = Model("Basic", objective: objective, constraints: constraints)
         guard let result = Solver().solve(model) else { return XCTFail("Nil result") }
         
         XCTAssertEqual(result.status, .optimal)
@@ -92,8 +92,8 @@ final class SolverTests: XCTestCase {
 
     // Temporary.
     func testSolveResourceAllocationModel() {
-        let x = (0 ... 4).compactMap { i in Variable("x\(i)", minimum: 0) }
-        let y = (0 ... 2).compactMap { i in Variable("y\(i)", domain: .binary) }
+        let x = (0 ... 4).map { i in Variable("x\(i)", minimum: 0) }
+        let y = (0 ... 2).map { i in Variable("y\(i)", domain: .binary) }
         guard x.count == 5, y.count == 3 else { return XCTFail("Nil variable") }
         
         let function = (20 * x[1] + 12 * x[2]) + (40 * x[3] + 25 * x[4])
@@ -106,7 +106,7 @@ final class SolverTests: XCTestCase {
             (x[3] - 100 * y[2] <= 0, "x3"),
             (y[1] + y[2] <= 1, "y")
         ]
-        guard let model = Model("Resource-allocation", objective: objective, constraints: constraints) else { return XCTFail("Nil model") }
+        let model = Model("Resource-allocation", objective: objective, constraints: constraints)
         guard let result = Solver().solve(model) else { return XCTFail("Nil result") }
         let variables = result.variables
         

@@ -10,17 +10,10 @@ import PythonKit
 
 /*
  Represents an LP problem consisting of an objective and a list of contraints.
- A model has a non-empty name containing no spaces.
+ A model should have a non-empty name containing no spaces.
  */
 public struct Model {
     
-    // MARK: Testing
-    
-    // Answers false if the name is empty or contains spaces (cf. PuLP).
-    private static func isValidName(_ name: String) -> Bool {
-        !name.isEmpty && !name.contains(" ")
-    }
-
     // MARK: Stored properties
     
     /// The name of the model. May not be empty and may not contain spaces.
@@ -37,11 +30,8 @@ public struct Model {
     
     /**
      Creates a model with given name, optional objective and constraints.
-     Fails if the name is empty or contains spaces.
      */
-    public init?(_ name: String, objective: Objective? = nil, constraints: [(constraint: LinearConstraint, name: String)] = []) {
-        guard Self.isValidName(name) else { return nil }
-
+    public init(_ name: String, objective: Objective? = nil, constraints: [(constraint: LinearConstraint, name: String)] = []) {
         self.name = name
         self.objective = objective
         self.constraints = constraints
@@ -97,9 +87,7 @@ extension Objective.Optimization: PythonConvertible {
 
     // MARK: Computed properties
     
-    /**
-     Converts the optimization into a PuLP sense.
-     */
+    /// Converts the optimization into a PuLP sense.
     public var pythonObject: PythonObject {
         switch self {
         case .maximize:
@@ -119,9 +107,7 @@ extension Model: PythonConvertible {
     
     // MARK: Computed properties
     
-    /**
-     Converts the model into a PuLP problem.
-     */
+    /// Converts the model into a PuLP problem, caching generated PuLP variables per Variable.
     public var pythonObject: PythonObject {
         var problem = PuLP.LpProblem(name: name, sense: objective?.optimization ?? .minimize) // set sense, even without an objective.
         let cache = VariableCache()
@@ -136,4 +122,19 @@ extension Model: PythonConvertible {
         return problem
     }
         
+}
+
+
+/**
+ Model adopts Equatable.
+ */
+extension Objective: Equatable {}
+extension Model: Equatable {
+    
+    public static func == (lhs: Model, rhs: Model) -> Bool {
+        lhs.name == rhs.name
+            && lhs.objective == rhs.objective
+            && lhs.constraints.elementsEqual(lhs.constraints, by: ==)
+    }
+    
 }

@@ -20,7 +20,7 @@ final class VariableTests: XCTestCase {
     // MARK: Variable tests
        
     func testVariable() throws {
-        guard let variable = Variable("x", minimum: 1, maximum: 10, domain: .integer) else { return XCTFail("Nil variable") }
+        let variable = Variable("x", minimum: 1, maximum: 10, domain: .integer)
         
         XCTAssertEqual(variable.name, "x")
         XCTAssertEqual(variable.minimum, 1)
@@ -29,7 +29,7 @@ final class VariableTests: XCTestCase {
     }
 
     func testDefaultVariable() throws {
-        guard let variable = Variable("x") else { return XCTFail("Nil variable") }
+        let variable = Variable("x")
 
         XCTAssertEqual(variable.name, "x")
         XCTAssertNil(variable.minimum)
@@ -37,32 +37,8 @@ final class VariableTests: XCTestCase {
         XCTAssertEqual(variable.domain, .real)
     }
 
-    func testEmptyNameVariable() throws {
-        let variable = Variable("")
-        
-        XCTAssertNil(variable)
-    }
-
-    func testInvalidNameVariable() throws {
-        for name in ("-+[] ->/".map { "x\($0)y" }) {
-            XCTAssertNil(Variable(name))
-        }
-    }
-
-    func testFixedVariable() throws {
-        let variable = Variable("x", minimum: 1, maximum: 1, domain: .integer)
-        
-        XCTAssertNotNil(variable)
-    }
-
-    func testInvalidRangeVariable() throws {
-        let variable = Variable("x", minimum: 3, maximum: 2, domain: .integer)
-        
-        XCTAssertNil(variable)
-    }
-
     func testBinaryVariable() throws {
-        guard let variable = Variable("x", minimum: 0, maximum: 1, domain: .binary) else { return XCTFail("Nil variable") }
+        let variable = Variable("x", minimum: 0, maximum: 1, domain: .binary)
 
         XCTAssertEqual(variable.minimum, 0)
         XCTAssertEqual(variable.maximum, 1)
@@ -70,29 +46,17 @@ final class VariableTests: XCTestCase {
     }
 
     func testDefaultBinaryVariable() throws {
-        guard let variable = Variable("x", domain: .binary) else { return XCTFail("Nil variable") }
+        let variable = Variable("x", domain: .binary)
 
         XCTAssertEqual(variable.name, "x")
         XCTAssertEqual(variable.minimum, 0)
         XCTAssertEqual(variable.maximum, 1)
     }
-
-    func testInvalidMinimumBinaryVariable() throws {
-        let variable = Variable("x", minimum: -1, domain: .binary)
-        
-        XCTAssertNil(variable)
-    }
-
-    func testInvalidMaximumBinaryVariable() throws {
-        let variable = Variable("x", maximum: 2, domain: .binary)
-        
-        XCTAssertNil(variable)
-    }
     
     // MARK: Conversion to PuLP tests
     
     func testVariableToPuLP() throws {
-        guard let variable = Variable("x", minimum: 1, maximum: 10, domain: .integer) else { return XCTFail("Nil variable") }
+        let variable = Variable("x", minimum: 1, maximum: 10, domain: .integer)
         let pythonVariable = variable.pythonObject
         
         XCTAssertTrue(pythonVariable.isInstance(of: PuLP.LpVariable))
@@ -103,7 +67,7 @@ final class VariableTests: XCTestCase {
     }
 
     func testDefaultVariableToPuLP() throws {
-        guard let variable = Variable("x") else { return XCTFail("Nil variable") }
+        let variable = Variable("x")
         let pythonVariable = variable.pythonObject
         
         XCTAssertEqual(pythonVariable.name, "x")
@@ -121,13 +85,20 @@ final class VariableTests: XCTestCase {
         }
     }
 
-    // MARK: Variable registry tests
+    // MARK: Variable cache tests
     
-    func testNonThreadLocalRegistry() {
-        guard let x = Variable("x"), let y = Variable("y"), let z = Variable("x" ) else { return XCTFail("Nil variable") }
-        let pythonObjects = [x, y, z].map(\.pythonObject) // If not retained, ids may be reused.
+    func testUncachedVariables() {
+        let variables = [Variable("x"), Variable("y"), Variable("x" )]
+        let ids = variables.map(\.pythonObject.id)
+
+        XCTAssertEqual(Set(ids).count, 1)
+    }
+
+    func testRetainUncachedVariables() {
+        let variables = [Variable("x"), Variable("y"), Variable("x" )]
+        let pythonObjects = variables.map(\.pythonObject) // Needed
         let ids = pythonObjects.map(\.id)
-        
+
         XCTAssertEqual(Set(ids).count, 3)
     }
 

@@ -39,31 +39,25 @@ public struct LinearConstraint {
     
     // MARK: Initializing
     
-    /**
-     Initializes a constraint with given name, linear function, comparison and constant.
-     Default comparison is equal to.
-     Default constant = 0.
-     */
+    /// Initializes a constraint with given name, linear function, comparison and constant.
+    /// Default comparison is equal to.
+    /// Default constant = 0.
     public init(function: LinearFunction, comparison: Comparison = .eq, constant: Double = 0) {
         self.function = function
         self.comparison = comparison
         self.constant = constant
     }
 
-    /**
-     Initializes a constraint with given name,variable, comparison and constant.
-     Default comparison is equal to.
-     Default constant = 0.
-     */
+    /// Initializes a constraint with given name,variable, comparison and constant.
+    /// Default comparison is equal to.
+    /// Default constant = 0.
     public init(variable: Variable, comparison: Comparison = .eq, constant: Double = 0) {
-        self.function = LinearFunction(variable: variable)
-        self.comparison = comparison
-        self.constant = constant
+        self.init(function: LinearFunction(variable: variable), comparison: comparison, constant: constant)
     }
 
     // MARK: Evaluating
     
-    // Applies the function to given values and compares the result with the constant.
+    /// Applies the function to given values and compares the result with the constant.
     public func callAsFunction(_ values: [String: Double]) -> Bool {
         switch comparison {
         case .lte:
@@ -85,9 +79,7 @@ extension LinearConstraint.Comparison: PythonConvertible {
 
     // MARK: Computed properties
     
-    /**
-     Converts the comparison into a PuLP comparison.
-     */
+    /// Converts the comparison into a PuLP comparison.
     public var pythonObject: PythonObject {
         switch self {
         case .lte:
@@ -109,18 +101,14 @@ extension LinearConstraint: PythonConvertible {
     
     // MARK: Computed properties
     
-    /**
-     Converts the linear constraint into a PuLP constraint.
-     */
+    /// Converts the linear constraint into a PuLP constraint.
     public var pythonObject: PythonObject {
         pythonObject(withCache: nil)
     }
     
     // MARK: Converting to Python
     
-    /**
-     Converts the linear function into a PuLP LpAffineExpression, optionally caching PuLP variables.
-     */
+    // Converts the constraint into a LpConstraint, optionally caching PuLP variables.
     func pythonObject(withCache cache: VariableCache?) -> PythonObject {
         PuLP.LpConstraint(function.pythonObject(withCache: cache), sense: comparison, rhs: constant)
     }

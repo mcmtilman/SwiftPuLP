@@ -94,7 +94,7 @@ public struct LinearFunction {
     
     // MARK: Evaluating
     
-    // Answers the result of applying the function to given values.
+    /// Answers the result of applying the function to given values.
     public func callAsFunction(_ values: [String: Double]) -> Double {
         terms.reduce(constant) { total, term in total + term(values) }
     }
@@ -161,7 +161,8 @@ public extension Variable {
     
     // MARK: Private building linear functions
     
-    fileprivate func withFactor(_ factor: Double = 1) -> LinearFunction.Term {
+    // Answesr a Term with the variable and given factor.
+    func withFactor(_ factor: Double = 1) -> LinearFunction.Term {
         LinearFunction.Term(variable: self, factor: factor)
     }
 
@@ -214,7 +215,7 @@ extension LinearFunction.Term {
     // MARK: Private computed properties
     
     // Answers the term with negated factor.
-    fileprivate var negated: Self {
+    var negated: Self {
         Self(variable: variable, factor: -factor)
     }
     
@@ -228,18 +229,14 @@ extension LinearFunction: PythonConvertible {
 
     // MARK: Computed properties
     
-    /**
-     Converts the linear function into a PuLP LpAffineExpression.
-     */
+    /// Converts the linear function into a PuLP LpAffineExpression.
     public var pythonObject: PythonObject {
         pythonObject(withCache: nil)
     }
 
     // MARK: Converting to Python
     
-    /**
-     Converts the linear function into a PuLP LpAffineExpression, optionally caching PuLP variables.
-     */
+    // Converts the function into an LpAffineExpression, optionally caching PuLP variables.
     func pythonObject(withCache cache: VariableCache?) -> PythonObject {
         func pythonTuple(_ term: Term) -> PythonObject {
             PythonObject(tupleOf: term.variable.pythonObject(withCache: cache), term.factor)

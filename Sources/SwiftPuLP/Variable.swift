@@ -27,17 +27,6 @@ public class Variable {
 
     }
 
-    // MARK: Testing
-    
-    // Answers true if the name is not empty and does not contain special characters (cf. PuLP).
-    private static func isValidName(_ name: String) -> Bool {
-        guard !name.isEmpty else { return false }
-        let nameChars = CharacterSet(charactersIn: name)
-        let specialChars = CharacterSet(charactersIn: "-+[] ->/")
-        
-        return nameChars.isDisjoint(with: specialChars)
-    }
-
     // MARK: Stored properties
     
     /// The name of the variable. May not be empty and may not contain spaces.
@@ -58,29 +47,19 @@ public class Variable {
     
     // MARK: Initializing
     
-    /**
-     Creates a variable with given name and domain.
-     The variable may optionally specify a lower and / or upper bound for its values.
-     Variables come in three flavours:
-     - real domain (supports double values satisfying the optional lower and upper bounds)
-     - integer domain (supports integer values satisfying the optional lower and upper bounds)
-     - binary domain (a value is either 0 or 1).
-     Creation fails if:
-     - the name is empty or contains spaces;
-     - a non-nil minimum value is greater than a non-nil maximum value;
-     - the variable is binary with minimum != 0 and nil, or maximum != 1 and nil.
-     */
-    public init?(_ name: String, minimum: Double? = nil, maximum: Double? = nil, domain: Domain = .real) {
-        guard Self.isValidName(name) else { return nil }
-        if let min = minimum, let max = maximum, min > max { return nil }
-        if domain == .binary, minimum != nil && minimum != 0 || maximum != nil && maximum != 1 { return nil }
-        
+    /// Creates a variable with given name and domain.
+    /// The variable may optionally specify a lower and / or upper bound for its values.
+    /// Variables come in three flavours:
+    /// - real domain (supports double values satisfying the optional lower and upper bounds)
+    /// - integer domain (supports integer values satisfying the optional lower and upper bounds)
+    /// - binary domain (a value is either 0 or 1).
+    public init(_ name: String, minimum: Double? = nil, maximum: Double? = nil, domain: Domain = .real) {
         self.name = name
         self.minimum = domain == .binary && minimum == nil ? 0 : minimum
         self.maximum = domain == .binary && maximum == nil ? 1 : maximum
         self.domain = domain
     }
-    
+
 }
 
 
@@ -124,9 +103,7 @@ extension Variable: PythonConvertible {
     
     // MARK: Converting to Python
     
-    /**
-     Converts the linear function into a PuLP LpAffineExpression, optionally caching PuLP variables.
-     */
+    // Converts the variable into a PuLP LpAffineExpression, optionally caching PuLP variables.
     func pythonObject(withCache cache: VariableCache?) -> PythonObject {
         guard let cache = cache else { return pythonObject }
 
@@ -168,10 +145,13 @@ public class VariableCache {
     }
 }
 
+
 /**
  Variable adopts Equatable.
  */
 extension Variable: Equatable {
+ 
+    /// Needed since we do not use a struct,
     public static func == (lhs: Variable, rhs: Variable) -> Bool {
         lhs.name == rhs.name
             && lhs.minimum == rhs.minimum

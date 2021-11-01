@@ -20,7 +20,7 @@ final class LinearConstraintTests: XCTestCase {
     // MARK: Comparison tests
     
     func testVariableLessThanConstraint() throws {
-        guard let x = Variable("x") else { return XCTFail("Nil variable") }
+        let x = Variable("x")
         let constraint = x <= 5
         
         XCTAssertEqual(constraint.function, LinearFunction(variable: x))
@@ -29,7 +29,7 @@ final class LinearConstraintTests: XCTestCase {
     }
     
     func testVariableEqualToConstraint() throws {
-        guard let x = Variable("x") else { return XCTFail("Nil variable") }
+        let x = Variable("x")
         let constraint = x == 5
         
         XCTAssertEqual(constraint.function, LinearFunction(variable: x))
@@ -38,7 +38,7 @@ final class LinearConstraintTests: XCTestCase {
     }
     
     func testVariableGreaterThanConstraint() throws {
-        guard let x = Variable("x") else { return XCTFail("Nil variable") }
+        let x = Variable("x")
         let constraint = x >= 5
         
         XCTAssertEqual(constraint.function, LinearFunction(variable: x))
@@ -47,7 +47,7 @@ final class LinearConstraintTests: XCTestCase {
     }
     
     func testFunctionLessThanConstraint() throws {
-        guard let x = Variable("x"), let y = Variable("y") else { return XCTFail("Nil variable") }
+        let (x, y) = (Variable("x"), Variable("y"))
         let constraint = 2 * x + 3 * y + 10 <= 5
         
         XCTAssertEqual(constraint.function, 2 * x + 3 * y + 10)
@@ -56,7 +56,7 @@ final class LinearConstraintTests: XCTestCase {
     }
     
     func testFunctionEqualToConstraint() throws {
-        guard let x = Variable("x"), let y = Variable("y") else { return XCTFail("Nil variable") }
+        let (x, y) = (Variable("x"), Variable("y"))
         let constraint = 2 * x + 3 * y + 10 == 5
         
         XCTAssertEqual(constraint.function, 2 * x + 3 * y + 10)
@@ -65,7 +65,7 @@ final class LinearConstraintTests: XCTestCase {
     }
     
     func testFunctionGreaterThanConstraint() throws {
-        guard let x = Variable("x"), let y = Variable("y") else { return XCTFail("Nil variable") }
+        let (x, y) = (Variable("x"), Variable("y"))
         let constraint = 2 * x + 3 * y + 10 >= 5
         
         XCTAssertEqual(constraint.function, 2 * x + 3 * y + 10)
@@ -76,7 +76,7 @@ final class LinearConstraintTests: XCTestCase {
     // Evaluation tests
     
     func testCompareFunctionCall() throws {
-        guard let x = Variable("x"), let y = Variable("y") else { return XCTFail("Nil variable") }
+        let (x, y) = (Variable("x"), Variable("y"))
         let constraints = [
             2 * x + 3 * y + 9 <= 3210,
             2 * x + 3 * y + 10 == 3210,
@@ -91,7 +91,7 @@ final class LinearConstraintTests: XCTestCase {
     // MARK: Conversion to PuLP tests
     
     func testConstraintToPuLP() throws {
-        guard let x = Variable("x"), let y = Variable("y") else { return XCTFail("Nil variable") }
+        let (x, y) = (Variable("x"), Variable("y"))
         let constraint = 2 * x + 3 * y <= 5
         let pythonConstraint = constraint.pythonObject
 

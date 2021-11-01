@@ -14,13 +14,13 @@ The building blocks are:
 
 * The **Model**, consisting of an optional **Objective** (a linear function and an optimization goal: minimize or maximize) and zero or more linear constraints.
 
-* The **Solver**, using the default solver from PuLP to optimize the model's objective and return a **Result** with a status and a dictionary of variable - value pairs.
+* The **Solver**, using the default solver from PuLP to optimize the model's objective and return an optional **Result** with a status and a dictionary of variable - value pairs.
 
 ### Variable
 
 To create a variable use the following public initializer.
 
-    init?(_ name: String, minimum: Double? = nil, maximum: Double? = nil, domain: Domain = .real)
+    init(_ name: String, minimum: Double? = nil, maximum: Double? = nil, domain: Domain = .real)
 
 Here domain is one of:
 
@@ -28,21 +28,27 @@ Here domain is one of:
 * .integer
 * .binary (0 or 1)
 
-The initializer fails if:
+The variable is not valid if:
 
 * the variable's name is empty or contains any of the following characters: *-+[] ->/*;
 * a non-nil minimum value exceeds a non-nil maximum value;
 * in case of a binary domain, the mimimum value is not nil or 0, and the maximum value is not nil or 1.
 
+Check for validation errors as follows.
+
+    variable.validationErrors
+
+This returns a list of **ValidationError**.
+
 #### Examples
 
 1. Create a continuous variable named *x* without lower or upper bounds.
 
-        guard let x = Variable("x") else {...}
+        let x = Variable("x")
 
 2. Create a list of 100 binary variables named *x_0* through *x_99*.
 
-        let x = (0..<100).compactMap { Variable("x_\($0)", domain: .binary) }
+        let x = (0..<100).map { Variable("x_\($0)", domain: .binary) }
 
 ### LinearFunction
 
@@ -135,7 +141,7 @@ The solver requests PuLP to solve the constructed LpProblem and builds a result 
 
 ### Generating a unique LpVariable instance for each variable
 
-The Python counterparts of the Swift model elements are generated when the solver tries to solve the model. Since a given variable may occur multiple times in the objective function and / or one or more constraints, this may result in multiple LpVariables being generated for each Swift distinct variable. Converting variables into Python relies on a variable cache to keep track of the Python object generated for each new variable encountered.
+The Python counterparts of the Swift model elements are generated when the solver tries to solve the model. Since a given variable may occur multiple times in the objective function and / or one or more constraints, this may result in multiple LpVariable instances being generated for each Swift distinct variable. Converting variables into Python relies on a variable cache to keep track of the Python object generated for each new variable encountered.
 
 In the following scenario only one LpVariable instance will be generated, which is OK.
 
@@ -143,11 +149,11 @@ In the following scenario only one LpVariable instance will be generated, which 
 
     let y = x
 
-In the following scenario however, PuLP may still run into problems.
+In the following case, however, PuLP may still run into problems.
 
     guard let x = Variable("x"), let y = Variable("x", domain: .integer) else {...}
 
-Each variable is mapped onto a different Python LpVariable with the same name. Validation of the model will contain errors whenever a variable name is reused for different variable instances.
+Each variable is mapped onto a different Python LpVariable with the same name. Validation of the model returns errors whenever a variable name is reused for different variable instances.
 
 ## Examples
 
