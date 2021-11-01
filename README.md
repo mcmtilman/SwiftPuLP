@@ -22,11 +22,13 @@ To create a variable use the following public initializer.
 
     init(_ name: String, minimum: Double? = nil, maximum: Double? = nil, domain: Domain = .real)
 
-Here domain is one of:
+Here **Variable.Domain** is defined as:
 
-* .real (aka continuous)
-* .integer
-* .binary (0 or 1)
+    public enum Domain {
+
+        case binary, real, integer
+
+    }
 
 #### Invalid variables
 
@@ -113,29 +115,59 @@ Also note that the compiler does not recognize the following constructs as linea
 
 ### LinearConstraint
 
+A **LinearConstraint** imposes a restriction by comparing a linear function with a constant, where comparison can be:
+
+* less than or equal to
+* equal to
+* greater than or equal to.
+
+To create a constraint use on of the following public initializers.
+
+    init(function: LinearFunction, comparison: Comparison = .eq, constant: Double = 0)
+    
+    init(variable: Variable, comparison: Comparison = .eq, constant: Double = 0)
+    
+Here **LinearConstraint.Comparison** is defined as:
+
+    public enum Comparison {
+        
+        case lte, eq, gte
+        
+    }
+
+#### Use arithmethic and comparison operators to build a linear constraint
+
+Arithmetic and comparison operators may be used in a more intuitive way to build linear constraints, as illustrated in the following examples.
+
+    x <= 20
+    
+    4 * x - 5 * y >= -10
+    
 ### Model
 
 A model represents an LP problem to be solved by one of the solvers supported by PuLP.
 The model has an optional objective, consisting of a linear function and an optimization goal, where the optimization is one of:
 
-* .minimize
-* .maximize
+    .minimize
+    
+    .maximize
 
-In addition, the model takes 0 or more constraints.
+In addition, the model takes 0 or more labeled constraints.
 
 To create a model use the following public initializer.
 
     init(_ name: String, objective: Objective? = nil, constraints: [(constraint: LinearConstraint, name: String)]
 
-Each constraint are associated with a name, which may be empty.
+Each constraint is associated here with a label, which may be empty.
 
 #### Objective
 
-To create an objective use the following public initializer.
+To create an objective use one of the following public initializers.
 
     init(_ function: LinearFunction, optimization: Optimization = .minimize)
-
-Or use a variant with a variable instead of a linear function.
+    
+    init(_ variable: Variable, optimization: Optimization = .minimize)
+    
 
 #### Invalid models
 
@@ -171,6 +203,30 @@ The following example shows how to create a simple valid model.
 
 ### Solver
 
+The **Solver** takes no parameters and uses the default PuLP solver, while disabling logging of messages to standard output.
+
+The solve a model use the following method.
+
+    func solve(_ model: Model) -> Result?
+
+This method returns a **Solver.Result** when it can convert the relevant data in an LpProblem. Otherwise nil is returned.
+
+#### Result
+
+A solver result contains a **Solver.Status** and a list of values for each resolved variable.
+
+The status cases mirror the status values in PuLP and is one of the following:
+
+    public enum Status: Double {
+        
+        case unsolved = 0
+        case optimal = 1
+        case infeasible = -1
+        case unbounded = -2
+        case undefined = -3
+
+    }
+
 ## Validating a model
 
 ### Validating the complete model
@@ -183,7 +239,7 @@ To validate a model use the following.
     
     ...
 
-This property returns a list of all validation errors encountered. Currently the SwiftPuLP supports the following validation errors.
+This property returns a list of all validation errors. Currently SwiftPuLP supports the following validation errors.
 
     public enum ValidationError {   
      

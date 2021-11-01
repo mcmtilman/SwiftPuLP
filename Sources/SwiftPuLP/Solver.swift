@@ -22,6 +22,7 @@ public struct Solver {
         case infeasible = -1
         case unbounded = -2
         case undefined = -3
+
     }
     
     /// Result of the solver.
