@@ -28,17 +28,13 @@ Here domain is one of:
 * .integer
 * .binary (0 or 1)
 
+#### Invalid variables
+
 The variable is not valid if:
 
 * the variable's name is empty or contains any of the following characters: *-+[] ->/*;
 * a non-nil minimum value exceeds a non-nil maximum value;
 * in case of a binary domain, the mimimum value is not nil or 0, and the maximum value is not nil or 1.
-
-Check for validation errors as follows.
-
-    variable.validationErrors
-
-This returns a list of **ValidationError**.
 
 #### Examples
 
@@ -80,27 +76,27 @@ Internally a linear function consists of zero or more coefficient - variable pai
 To create a linear function use one of the following public initializers.
 
     init(terms: [LinearFunction.Term], constant: Double = 0)
-
+    
     init(variable: Variable)
 
 Create a term as follows.
 
-    init(variable: Variable, factor: Double = 1)
+    LinearFunction.Term(variable: Variable, factor: Double = 1)
 
 #### Use arithmethic operators to build a linear function
 
 Arithmetic operators may be used in a more intuitive way to build linear functions, and parentheses may be used to alter precedence. In the following examples x, y, z represent variables.
 
     1 * x
-
+    
     x + 0
-
+    
     0 * x + 10
-
+    
     -x + 10
-
+    
     2 * x + 3 * y + z - 10
-
+    
     2 * x - 3 * (y + z - 10)
 
 The LinearFunction initializer normalizes the last function as follows.
@@ -112,22 +108,80 @@ Note that coefficients must be placed to the left of variables and nested linear
 Also note that the compiler does not recognize the following constructs as linear functions.
 
     x
-
+    
     10
 
 ### LinearConstraint
 
 ### Model
 
+A model represents an LP problem to be solved by one of the solvers supported by PuLP.
+The model has an optional objective, consisting of a linear function and an optimization goal, where the optimization is one of:
+
+* .minimize
+* .maximize
+
+In addition, the model takes 0 or more constraints.
+
+To create a model use the following public initializer.
+
+    init(_ name: String, objective: Objective? = nil, constraints: [(constraint: LinearConstraint, name: String)]
+
+Each constraint are associated with a name, which may be empty.
+
+#### Objective
+
+To create an objective use the following public initializer.
+
+    init(_ function: LinearFunction, optimization: Optimization = .minimize)
+
+Or use a variant with a variable instead of a linear function.
+
+#### Invalid models
+
+A model is not valid if:
+
+* the variable's name contains spaces;
+* its objective function and constraints use invalid variables or distinct variables with the same name
+* it uses multiple constraints with the same name.
+
+#### Example
+
+The following example shows how to create a simple valid model.
+
+    let (x, y) = (Variable("x"), Variable("y"))
+    
+    let function = x + 2 * y
+    
+    let objective = Objective(function, optimization: .maximize)
+    
+    let constraints = [
+    
+        (2 * x + y <= 20, "red"),
+        
+        (4 * x - 5 * y >= -10, "blue"),
+        
+        (-x + 2 * y >= -2, "yellow"),
+        
+        (-x + 5 * y == 15, "green")
+        
+    ]
+    
+    let model = Model("Basic", objective: objective, constraints: constraints)
+
 ### Solver
 
-## Validating the model
+## Validating a model
+
+### Validating the complete model
 
 To validate a model use the following.
 
     let model = ...
     
-    model.validationErrors
+    let errors = model.validationErrors
+    
+    ...
 
 This property returns a list of all validation errors encountered. Currently the SwiftPuLP supports the following validation errors.
 
@@ -142,6 +196,15 @@ This property returns a list of all validation errors encountered. Currently the
         
     }
 
+### Validating a single variable
+
+To validate an individual variable use a similar approach.
+
+    let variable = ...
+    
+    let errors = variable.validationErrors
+    
+    ...
 
 ## Conversion to / from PuLP
 
