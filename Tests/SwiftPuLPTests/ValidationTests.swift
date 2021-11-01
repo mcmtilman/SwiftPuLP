@@ -84,6 +84,15 @@ final class ValidationTests: XCTestCase {
         XCTAssertEqual(errors[0], .invalidVariableBounds(variable))
     }
 
+    func testMultipleVariableErrors() throws {
+        let variable = Variable("", minimum: 3, maximum: 2, domain: .binary)
+        let errors = variable.validationErrors
+        
+        XCTAssertEqual(errors.count, 2)
+        XCTAssertEqual(errors[0], .emptyVariableName(variable))
+        XCTAssertEqual(errors[1], .invalidVariableBounds(variable))
+    }
+
     // MARK: Validating valid models
     
     func testValidModel() throws {

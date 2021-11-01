@@ -41,6 +41,7 @@ extension Validating {
     
 }
 
+
 /**
  Variable adopts the validation protocol.
  */
@@ -72,10 +73,10 @@ extension Variable: Validating {
         if let min = minimum, let max = maximum, min > max {
             errors.append(.invalidVariableBounds(self))
         }
-        if domain == .binary, minimum ?? 0 != 0 {
+        else if domain == .binary, minimum ?? 0 != 0 {
             errors.append(.invalidVariableBounds(self))
         }
-        if domain == .binary, maximum ?? 1 != 1 {
+        else if domain == .binary, maximum ?? 1 != 1 {
             errors.append(.invalidVariableBounds(self))
         }
     }
@@ -89,13 +90,6 @@ extension Variable: Validating {
 extension LinearFunction {
     
     // MARK: Validating
-    
-   // Delegates collection of errors to the variables used in the function's terms.
-    func collectErrors(into errors: inout [ValidationError]) {
-        for term in terms {
-            term.variable.collectErrors(into: &errors)
-        }
-    }
     
     // Collects the term variables.
     func collectVariables(into variables: inout [ObjectIdentifier: Variable]) {
@@ -113,11 +107,6 @@ extension LinearFunction {
 extension LinearConstraint {
     
     // MARK: Validating
-    
-    // Delegates collection of errors to the linear function.
-    func collectErrors(into errors: inout [ValidationError]) {
-        function.collectErrors(into: &errors)
-    }
     
     // Delegates collection of variables to the linear function.
     func collectVariables(into variables: inout [ObjectIdentifier: Variable]) {
@@ -146,19 +135,36 @@ extension Model: Validating {
     
     // Collects all errors from its nested elements and verifies that variable / constraint names are unique.
     func collectErrors(into errors: inout [ValidationError]) {
-        var constraintMap = [String: LinearConstraint]()
-        
         if name.contains(" ") {
             errors.append(.invalidModelName(self))
         }
-        objective?.function.collectErrors(into: &errors)
-        for (constraint, name) in constraints {
-            constraint.collectErrors(into: &errors)
+        collectConstraintErrors(into: &errors)
+        collectVariableErrors(into: &errors)
+    }
+    
+    // Verifies that distinct constraints have different names.
+    func collectConstraintErrors(into errors: inout [ValidationError]) {
+        var constraintMap = [String: LinearConstraint]()
+        
+       for (constraint, name) in constraints {
             if !name.isEmpty, constraintMap.updateValue(constraint, forKey: name) != nil {
                 errors.append(.duplicateConstraintName(constraint, name))
             }
         }
-        collectDuplicateVariableErrors(into: &errors)
+    }
+    
+    // Verifies that variables are valid and that distinct variables have different names.
+    func collectVariableErrors(into errors: inout [ValidationError]) {
+        var variables = [ObjectIdentifier: Variable]()
+        var variableMap = [String: Variable]()
+
+        collectVariables(into: &variables)
+        for variable in variables.values {
+            variable.collectErrors(into: &errors)
+            if !name.isEmpty, variableMap.updateValue(variable, forKey: variable.name) != nil {
+                errors.append(.duplicateVariableName(variable))
+            }
+        }
     }
     
     // Collects all unique variables from its nested elements.
@@ -169,19 +175,6 @@ extension Model: Validating {
         }
     }
 
-    // Verifies that distinct variables have different names.
-    func collectDuplicateVariableErrors(into errors: inout [ValidationError]) {
-        var variables = [ObjectIdentifier: Variable]()
-        var namedVariables = [String: Variable]()
-
-        collectVariables(into: &variables)
-        for variable in variables.values {
-            if namedVariables.updateValue(variable, forKey: variable.name) != nil {
-                errors.append(.duplicateVariableName(variable))
-            }
-        }
-    }
-    
 }
 
 
