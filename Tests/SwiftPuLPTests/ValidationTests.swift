@@ -222,3 +222,9 @@ final class ValidationTests: XCTestCase {
     }
 
 }
+
+
+/**
+ Utility types.
+ */
+fileprivate typealias Objective = Model.Objective

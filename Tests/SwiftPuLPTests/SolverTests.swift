@@ -120,3 +120,9 @@ final class SolverTests: XCTestCase {
     }
 
 }
+
+
+/**
+ Utility types.
+ */
+fileprivate typealias Objective = Model.Objective

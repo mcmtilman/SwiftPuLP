@@ -61,7 +61,7 @@ final class ModelTests: XCTestCase {
     // MARK: Conversion to PuLP tests
     
     func testOptimizationToPuLP() throws {
-        let optimizations = [Objective.Optimization.maximize, .minimize]
+        let optimizations = [Model.Optimization.maximize, .minimize]
         let senses = [PuLP.LpMaximize, PuLP.LpMinimize]
 
         for (optimization, sense) in zip(optimizations, senses) {
@@ -92,3 +92,9 @@ final class ModelTests: XCTestCase {
     }
     
 }
+
+
+/**
+ Utility types.
+ */
+fileprivate typealias Objective = Model.Objective

@@ -12,9 +12,9 @@ The building blocks are:
 
 * **LinearConstraint**, comparing a linear function with a constant (less than or equal to, equal to or greather than or equal to).
 
-* The **Model**, consisting of an optional **Objective** (a linear function and an optimization goal: minimize or maximize) and zero or more linear constraints.
+* The **Model**, consisting of an optional *Objective* (a linear function and an optimization goal: minimize or maximize) and zero or more linear constraints.
 
-* The **Solver**, using the default solver from PuLP to realize the model's objective and return an optional **Result** with a status and a dictionary of variable - value pairs.
+* The **Solver**, using the default solver from PuLP to realize the model's objective and return an optional *Result* with a status and a dictionary of variable - value pairs.
 
 ### Variable
 
@@ -279,11 +279,11 @@ To validate an individual variable use a similar approach.
     
     LinearConstraint.Comparison
     
-    Objective
-    
-    Objective.Optimization
-    
     Model
+    
+    Model.Objective
+    
+    Model.Optimization
     
     Solver
     

@@ -14,6 +14,41 @@ import PythonKit
  */
 public struct Model {
     
+    /// Specifies if the objective function must be maximized or minimized.
+    public enum Optimization {
+        
+        case minimize, maximize
+        
+    }
+    
+    /// Represent the objective of a linear programming problem: maximize or minimize a linear expression.
+    public struct Objective {
+        
+        // MARK: Stored properties
+        
+        /// The linear function to be optimized.
+        public let function: LinearFunction
+            
+        /// The optimization to be performed.
+        /// Default = minimize.
+        public let optimization: Optimization
+            
+        // MARK: Initializing
+        
+        /// Creates an objective to optimize given linear expression.
+        public init(_ function: LinearFunction, optimization: Optimization = .minimize) {
+            self.function = function
+            self.optimization = optimization
+        }
+        
+        /// Creates an objective to optimize given linear variable.
+        public init(_ variable: Variable, optimization: Optimization = .minimize) {
+            self.function = LinearFunction(variable: variable)
+            self.optimization = optimization
+        }
+        
+    }
+
     // MARK: Stored properties
     
     /// The name of the model. May not be empty and may not contain spaces.
@@ -39,51 +74,10 @@ public struct Model {
     
 }
 
-
-/**
- Represent the objective of a linear programming problem: maximize or minimize a linear expression.
- */
-public struct Objective {
-    
-    /**
-     Specifies if the objective function must be maximized or minimized.
-     */
-    public enum Optimization {
-        
-        case minimize, maximize
-        
-    }
-    
-    // MARK: Stored properties
-    
-    /// The linear function to be optimized.
-    public let function: LinearFunction
-        
-    /// The optimization to be performed.
-    /// Default = minimize.
-    public let optimization: Optimization
-        
-    // MARK: Initializing
-    
-    /// Creates an objective to optimize given linear expression.
-    public init(_ function: LinearFunction, optimization: Optimization = .minimize) {
-        self.function = function
-        self.optimization = optimization
-    }
-    
-    /// Creates an objective to optimize given linear variable.
-    public init(_ variable: Variable, optimization: Optimization = .minimize) {
-        self.function = LinearFunction(variable: variable)
-        self.optimization = optimization
-    }
-    
-}
-
-
 /**
  Objective optimization adopts PythonConvertible.
  */
-extension Objective.Optimization: PythonConvertible {
+extension Model.Optimization: PythonConvertible {
 
     // MARK: Computed properties
     
@@ -128,7 +122,7 @@ extension Model: PythonConvertible {
 /**
  Model adopts Equatable.
  */
-extension Objective: Equatable {}
+extension Model.Objective: Equatable {}
 extension Model: Equatable {
     
     public static func == (lhs: Model, rhs: Model) -> Bool {
