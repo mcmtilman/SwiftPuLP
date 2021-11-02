@@ -14,7 +14,7 @@ The building blocks are:
 
 * The **Model**, consisting of an optional **Objective** (a linear function and an optimization goal: minimize or maximize) and zero or more linear constraints.
 
-* The **Solver**, using the default solver from PuLP to optimize the model's objective and return an optional **Result** with a status and a dictionary of variable - value pairs.
+* The **Solver**, using the default solver from PuLP to realize the model's objective and return an optional **Result** with a status and a dictionary of variable - value pairs.
 
 ### Variable
 
@@ -22,7 +22,7 @@ To create a variable use the following public initializer.
 
     init(_ name: String, minimum: Double? = nil, maximum: Double? = nil, domain: Domain = .real)
 
-Here **Variable.Domain** is defined as:
+*Domain* is defined as follows.
 
     public enum Domain {
 
@@ -30,17 +30,19 @@ Here **Variable.Domain** is defined as:
 
     }
 
+The real domain corresponds *continuous* variables in PuLP.
+
 #### Invalid variables
 
 The variable is not valid if:
 
 * the variable's name is empty or contains any of the following characters: *-+[] ->/*;
 * a non-nil minimum value exceeds a non-nil maximum value;
-* in case of a binary domain, the mimimum value is not nil or 0, and the maximum value is not nil or 1.
+* in case of a binary domain, the mimimum value is not nil or 0, or the maximum value is not nil or 1.
 
 #### Examples
 
-1. Create a continuous variable named *x* without lower or upper bounds.
+1. Create a continuous variable named *x* without lower and upper bounds.
 
         let x = Variable("x")
 
@@ -50,40 +52,38 @@ The variable is not valid if:
 
 ### LinearFunction
 
-A LinearFunction is a linear combination of zero or more weighted variables and an optional constant. The most basic cases consist of:
+A linear function is a linear combination of zero or more weighted variables (aka *terms*))and an optional constant. The most basic cases consist of:
 
 * a single variable without coefficient
 * a single constant.
 
 #### Examples of linear functions
 
-1. A variable x
+1. A variable x.
 
     x
 
-2. A constant c
+2. A constant c.
 
     10
 
-3. A variable x with coefficient + a constant
+3. A variable x with coefficient and a constant.
 
     2 * x + 10
 
-4. Multiple coefficient - variables pairs + a constant
+4. Multiple weighted variables and a constant.
 
     2 * x + 3 * y + 10
 
-Internally a linear function consists of zero or more coefficient - variable pairs (aka *terms*) and a constant.
-
 To create a linear function use one of the following public initializers.
 
-    init(terms: [LinearFunction.Term], constant: Double = 0)
+    init(terms: [Term], constant: Double = 0)
     
     init(variable: Variable)
 
 Create a term as follows.
 
-    LinearFunction.Term(variable: Variable, factor: Double = 1)
+    Term(variable: Variable, factor: Double = 1)
 
 #### Use arithmethic operators to build a linear function
 
@@ -115,7 +115,7 @@ Also note that the compiler does not recognize the following constructs as linea
 
 ### LinearConstraint
 
-A **LinearConstraint** imposes a restriction by comparing a linear function with a constant, where comparison can be:
+A Linear Constraint imposes a restriction by comparing a linear function with a constant, where the comparison can be:
 
 * less than or equal to
 * equal to
@@ -127,7 +127,7 @@ To create a constraint use on of the following public initializers.
     
     init(variable: Variable, comparison: Comparison = .eq, constant: Double = 0)
     
-Here **LinearConstraint.Comparison** is defined as:
+*Comparison* is defined as follows.
 
     public enum Comparison {
         
@@ -146,11 +146,7 @@ Arithmetic and comparison operators may be used in a more intuitive way to build
 ### Model
 
 A model represents an LP problem to be solved by one of the solvers supported by PuLP.
-The model has an optional objective, consisting of a linear function and an optimization goal, where the optimization is one of:
-
-    .minimize
-    
-    .maximize
+The model has an optional *Objective*, consisting of a linear function and an optimization goal.
 
 In addition, the model takes 0 or more labeled constraints.
 
@@ -158,7 +154,7 @@ To create a model use the following public initializer.
 
     init(_ name: String, objective: Objective? = nil, constraints: [(constraint: LinearConstraint, name: String)]
 
-Each constraint is associated here with a label, which may be empty.
+Each constraint is associated with a label, which may be empty.
 
 #### Objective
 
@@ -168,6 +164,13 @@ To create an objective use one of the following public initializers.
     
     init(_ variable: Variable, optimization: Optimization = .minimize)
     
+*Optimization* is defined as follows.
+
+    public enum Optimization {
+        
+        case minimize, maximize
+        
+    }
 
 #### Invalid models
 
@@ -175,11 +178,11 @@ A model is not valid if:
 
 * the variable's name contains spaces;
 * its objective function and constraints use invalid variables or distinct variables with the same name
-* it uses multiple constraints with the same name.
+* it uses multiple constraints with the same label.
 
 #### Example
 
-The following example shows how to create a simple valid model.
+The following example illustrates how to create a simple valid model.
 
     let (x, y) = (Variable("x"), Variable("y"))
     
@@ -203,19 +206,19 @@ The following example shows how to create a simple valid model.
 
 ### Solver
 
-The **Solver** takes no parameters and uses the default PuLP solver, while disabling logging of messages to standard output.
+The Solver takes no parameters and uses the default PuLP solver, disabling logging of messages to standard output.
 
 The solve a model use the following method.
 
     func solve(_ model: Model) -> Result?
 
-This method returns a **Solver.Result** when it can convert the relevant data in an LpProblem. Otherwise nil is returned.
+This method returns a result when it can convert the status and variable bindings in the LpProblem. Otherwise nil is returned.
 
 #### Result
 
-A solver result contains a **Solver.Status** and a list of values for each resolved variable.
+A solver result contains a *Status* and a list of values for each resolved variable name.
 
-The status cases mirror the status values in PuLP and is one of the following:
+The status cases mirror the status values in PuLP and are defined as follows.
 
     public enum Status: Double {
         
@@ -239,7 +242,7 @@ To validate a model use the following.
     
     ...
 
-This property returns a list of all validation errors. Currently SwiftPuLP supports the following validation errors.
+This property returns a list of all *validation errors*. Currently SwiftPuLP supports the following validation errors.
 
     public enum ValidationError {   
      
@@ -262,6 +265,32 @@ To validate an individual variable use a similar approach.
     
     ...
 
+## Type overview
+
+    Variable
+    
+    Variable.Domain
+    
+    LinearFunction
+    
+    LinearFunction.Term
+        
+    LinearConstraint
+    
+    LinearConstraint.Comparison
+    
+    Objective
+    
+    Objective.Optimization
+    
+    Model
+    
+    Solver
+    
+    Solver.Status
+    
+    Solver.Result
+    
 ## Conversion to / from PuLP
 
 The Swift data structures are converted into PuLP objects using PythonKit (cf. the *PythonConvertible* protocol), according to the following mapping.
@@ -280,9 +309,11 @@ The solver requests PuLP to solve the constructed LpProblem and builds a result 
 
 ### Generating a unique LpVariable instance for each variable
 
-The Python counterparts of the Swift model elements are generated when the solver tries to solve the model. Since a given variable may occur multiple times in the objective function and / or one or more constraints, this may result in multiple LpVariable instances being generated for each Swift distinct variable. Converting variables into Python relies on a variable cache to keep track of the Python object generated for each new variable encountered.
+The Python counterparts of the Swift model elements are generated when the solver tries to solve the model. Since a given variable may occur multiple times in the objective function and / or one or more constraints, this may result in multiple LpVariable instances being generated for each distinct Swift variable. Converting variables into Python relies on a variable cache to keep track of the Python object generated for each new variable encountered.
 
-In the following scenario only one LpVariable instance will be generated, which is OK.
+#### Examples
+
+In the following scenario only one LpVariable instance will be generated, since y is an alias for x.
 
     let x = Variable("x")
 
@@ -292,7 +323,7 @@ In the following case, however, PuLP may still run into problems.
 
     let (x, y) = (Variable("x"), Variable("x", domain: .integer))
 
-Each variable is mapped onto a different Python LpVariable with the same name. Validation of the model returns errors whenever a variable name is reused for different variable instances.
+Each variable here is mapped onto a different Python LpVariable with the same name. Validation of this model returns a duplicate variable name error.
 
 ## Examples
 
