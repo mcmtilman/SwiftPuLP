@@ -309,8 +309,9 @@ The Swift data structures are converted into PuLP objects using PythonKit (cf. t
 
 The solver requests PuLP to solve the constructed LpProblem and builds a result from data extracted from the updated problem (cf. the *ConvertibleFromPython* protocol).
 
-* LpStatusNotSolved | LpStatusOptimal | LpStatusInfeasible | LpStatusUnbounded | LpStatusUndefined -> Solver.Status
-* LpProblem variables -> Dictionary with key = variable name, value = variable value
+    LpStatusNotSolved | LpStatusOptimal | LpStatusInfeasible | LpStatusUnbounded | LpStatusUndefined -> Solver.Status
+    
+    LpProblem variables -> Dictionary with key = variable name, value = variable value
 
 ### Generating a unique LpVariable instance for each variable
 
