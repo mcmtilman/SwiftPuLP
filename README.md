@@ -295,12 +295,17 @@ To validate an individual variable use a similar approach.
 
 The Swift data structures are converted into PuLP objects using PythonKit (cf. the *PythonConvertible* protocol), according to the following mapping.
 
-* Variable -> LpVariable
-* Variable.Domain -> LpContinuous | LpInteger | LpBinary
-* LinearFunction -> LpAffineExpression
-* LinearConstraint -> LpConstraint
-* Model -> LpProblem
-* Objective.Optimization -> LpMinimize | LpMaximize
+    Variable -> LpVariable
+    
+    Variable.Domain -> LpContinuous | LpInteger | LpBinary
+    
+    LinearFunction -> LpAffineExpression
+    
+    LinearConstraint -> LpConstraint
+    
+    Model -> LpProblem
+    
+    Objective.Optimization -> LpMinimize | LpMaximize
 
 The solver requests PuLP to solve the constructed LpProblem and builds a result from data extracted from the updated problem (cf. the *ConvertibleFromPython* protocol).
 
