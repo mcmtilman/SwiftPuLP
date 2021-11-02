@@ -103,32 +103,38 @@ final class SudokuTests: XCTestCase {
     
     // Lists all constraints. Only the last part depends on the input.
     var constraints: [(LinearConstraint, String)] {
-        var constraints = [LinearConstraint]()
+        var constraints = [(LinearConstraint, String)]()
 
+        // Exactly one variable in the list should have value 1.
+        // The rest must have value 0.
+        func addExactlyOneConstraint(for variables: [Variable]) {
+            constraints.append((VarSum(variables) == 1, ""))
+        }
+        
         for r in rows {
             for c in columns {
-                constraints.append(VarSum(values.map { v in choices[v][r][c] }) == 1)
+                addExactlyOneConstraint(for: values.map { v in choices[v][r][c] })
             }
         }
         
         for v in values {
             for r in rows {
-                constraints.append(VarSum(columns.map { c in choices[v][r][c] }) == 1)
+                addExactlyOneConstraint(for: columns.map { c in choices[v][r][c] })
             }
             for c in columns {
-                constraints.append(VarSum(rows.map { r in choices[v][r][c] }) == 1)
+                addExactlyOneConstraint(for: rows.map { r in choices[v][r][c] })
             }
             for b in boxes {
-                constraints.append(VarSum(b.map { (r, c) in choices[v][r][c] }) == 1)
+                addExactlyOneConstraint(for: b.map { (r, c) in choices[v][r][c] })
             }
         }
         
-        // Input-dependent.
+        // Fix the givens for cells in the input data,
         for (v, r, c) in Self.sudokuData {
-           constraints.append(choices[v - 1][r - 1][c - 1] == 1)
+           constraints.append((choices[v - 1][r - 1][c - 1] == 1, ""))
         }
         
-        return constraints.map{ ($0, "") }
+        return constraints
     }
     
     // MARK: Sudoku tests
