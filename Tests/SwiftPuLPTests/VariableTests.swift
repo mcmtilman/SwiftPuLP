@@ -19,7 +19,7 @@ final class VariableTests: XCTestCase {
     
     // MARK: Variable tests
        
-    func testVariable() throws {
+    func testVariable() {
         let variable = Variable("x", minimum: 1, maximum: 10, domain: .integer)
         
         XCTAssertEqual(variable.name, "x")
@@ -28,7 +28,7 @@ final class VariableTests: XCTestCase {
         XCTAssertEqual(variable.domain, .integer)
     }
 
-    func testDefaultVariable() throws {
+    func testDefaultVariable() {
         let variable = Variable("x")
 
         XCTAssertEqual(variable.name, "x")
@@ -37,7 +37,7 @@ final class VariableTests: XCTestCase {
         XCTAssertEqual(variable.domain, .real)
     }
 
-    func testBinaryVariable() throws {
+    func testBinaryVariable() {
         let variable = Variable("x", minimum: 0, maximum: 1, domain: .binary)
 
         XCTAssertEqual(variable.minimum, 0)
@@ -45,7 +45,7 @@ final class VariableTests: XCTestCase {
         XCTAssertEqual(variable.domain, .binary)
     }
 
-    func testDefaultBinaryVariable() throws {
+    func testDefaultBinaryVariable() {
         let variable = Variable("x", domain: .binary)
 
         XCTAssertEqual(variable.name, "x")
@@ -55,7 +55,7 @@ final class VariableTests: XCTestCase {
     
     // MARK: Conversion to PuLP tests
     
-    func testVariableToPuLP() throws {
+    func testVariableToPuLP() {
         let variable = Variable("x", minimum: 1, maximum: 10, domain: .integer)
         let pythonVariable = variable.pythonObject
         
@@ -66,7 +66,7 @@ final class VariableTests: XCTestCase {
         XCTAssertEqual(pythonVariable.cat, PuLP.LpInteger)
     }
 
-    func testDefaultVariableToPuLP() throws {
+    func testDefaultVariableToPuLP() {
         let variable = Variable("x")
         let pythonVariable = variable.pythonObject
         
@@ -76,7 +76,7 @@ final class VariableTests: XCTestCase {
         XCTAssertEqual(pythonVariable.cat, PuLP.LpContinuous)
     }
 
-    func testDomainToPuLP() throws {
+    func testDomainToPuLP() {
         let domains = [Variable.Domain.binary, .real, .integer]
         let categories = [PuLP.LpBinary, PuLP.LpContinuous, PuLP.LpInteger]
 

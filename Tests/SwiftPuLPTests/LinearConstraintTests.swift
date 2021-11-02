@@ -19,7 +19,7 @@ final class LinearConstraintTests: XCTestCase {
     
     // MARK: Comparison tests
     
-    func testVariableLessThanConstraint() throws {
+    func testVariableLessThanConstraint() {
         let x = Variable("x")
         let constraint = x <= 5
         
@@ -28,7 +28,7 @@ final class LinearConstraintTests: XCTestCase {
         XCTAssertEqual(constraint.constant, 5)
     }
     
-    func testVariableEqualToConstraint() throws {
+    func testVariableEqualToConstraint() {
         let x = Variable("x")
         let constraint = x == 5
         
@@ -37,7 +37,7 @@ final class LinearConstraintTests: XCTestCase {
         XCTAssertEqual(constraint.constant, 5)
     }
     
-    func testVariableGreaterThanConstraint() throws {
+    func testVariableGreaterThanConstraint() {
         let x = Variable("x")
         let constraint = x >= 5
         
@@ -46,7 +46,7 @@ final class LinearConstraintTests: XCTestCase {
         XCTAssertEqual(constraint.constant, 5)
     }
     
-    func testFunctionLessThanConstraint() throws {
+    func testFunctionLessThanConstraint() {
         let (x, y) = (Variable("x"), Variable("y"))
         let constraint = 2 * x + 3 * y + 10 <= 5
         
@@ -55,7 +55,7 @@ final class LinearConstraintTests: XCTestCase {
         XCTAssertEqual(constraint.constant, 5)
     }
     
-    func testFunctionEqualToConstraint() throws {
+    func testFunctionEqualToConstraint() {
         let (x, y) = (Variable("x"), Variable("y"))
         let constraint = 2 * x + 3 * y + 10 == 5
         
@@ -64,7 +64,7 @@ final class LinearConstraintTests: XCTestCase {
         XCTAssertEqual(constraint.constant, 5)
     }
     
-    func testFunctionGreaterThanConstraint() throws {
+    func testFunctionGreaterThanConstraint() {
         let (x, y) = (Variable("x"), Variable("y"))
         let constraint = 2 * x + 3 * y + 10 >= 5
         
@@ -75,7 +75,7 @@ final class LinearConstraintTests: XCTestCase {
     
     // Evaluation tests
     
-    func testCompareFunctionCall() throws {
+    func testCompareFunctionCall() {
         let (x, y) = (Variable("x"), Variable("y"))
         let constraints = [
             2 * x + 3 * y + 9 <= 3210,
@@ -90,7 +90,7 @@ final class LinearConstraintTests: XCTestCase {
         
     // MARK: Conversion to PuLP tests
     
-    func testConstraintToPuLP() throws {
+    func testConstraintToPuLP() {
         let (x, y) = (Variable("x"), Variable("y"))
         let constraint = 2 * x + 3 * y <= 5
         let pythonConstraint = constraint.pythonObject
@@ -104,7 +104,7 @@ final class LinearConstraintTests: XCTestCase {
         XCTAssertEqual(pythonConstraint.sense, PuLP.LpConstraintLE)
     }
 
-    func testComparisonToPuLP() throws {
+    func testComparisonToPuLP() {
         let comparisons = [LinearConstraint.Comparison.lte, .eq, .gte]
         let senses = [PuLP.LpConstraintLE, PuLP.LpConstraintEQ, PuLP.LpConstraintGE]
 

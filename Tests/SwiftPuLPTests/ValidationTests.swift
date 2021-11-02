@@ -28,13 +28,13 @@ final class ValidationTests: XCTestCase {
         XCTAssertTrue(variable.validationErrors.isEmpty)
     }
     
-    func testFixedVariable() throws {
+    func testFixedVariable() {
         let variable = Variable("x", minimum: 1, maximum: 1, domain: .integer)
         
         XCTAssertTrue(variable.validationErrors.isEmpty)
     }
 
-    func testBinaryVariable() throws {
+    func testBinaryVariable() {
         let variable = Variable("x", minimum: 0, maximum: 1, domain: .binary)
 
         XCTAssertTrue(variable.validationErrors.isEmpty)
@@ -50,7 +50,7 @@ final class ValidationTests: XCTestCase {
         XCTAssertEqual(errors[0], .emptyVariableName(variable))
     }
 
-    func testInvalidNameVariable() throws {
+    func testInvalidNameVariable() {
         for name in ("-+[] ->/".map { "x\($0)y" }) {
             let variable = Variable(name)
             let errors = variable.validationErrors
@@ -60,7 +60,7 @@ final class ValidationTests: XCTestCase {
         }
     }
 
-    func testInvalidRangeVariable() throws {
+    func testInvalidRangeVariable() {
         let variable = Variable("x", minimum: 3, maximum: 2, domain: .integer)
         let errors = variable.validationErrors
         
@@ -68,7 +68,7 @@ final class ValidationTests: XCTestCase {
         XCTAssertEqual(errors[0], .invalidVariableBounds(variable))
     }
 
-    func testInvalidMinimumBinaryVariable() throws {
+    func testInvalidMinimumBinaryVariable() {
         let variable = Variable("x", minimum: -1, domain: .binary)
         let errors = variable.validationErrors
         
@@ -76,7 +76,7 @@ final class ValidationTests: XCTestCase {
         XCTAssertEqual(errors[0], .invalidVariableBounds(variable))
     }
 
-    func testInvalidMaximumBinaryVariable() throws {
+    func testInvalidMaximumBinaryVariable() {
         let variable = Variable("x", maximum: 2, domain: .binary)
         let errors = variable.validationErrors
         
@@ -84,7 +84,7 @@ final class ValidationTests: XCTestCase {
         XCTAssertEqual(errors[0], .invalidVariableBounds(variable))
     }
 
-    func testMultipleVariableErrors() throws {
+    func testMultipleVariableErrors() {
         let variable = Variable("", minimum: 3, maximum: 2, domain: .binary)
         let errors = variable.validationErrors
         
@@ -95,7 +95,7 @@ final class ValidationTests: XCTestCase {
 
     // MARK: Validating valid models
     
-    func testValidModel() throws {
+    func testValidModel() {
         let (x, y) = (Variable("x", domain: .integer), Variable("y"))
         let function = x + 2 * y
         let objective = Objective(function, optimization: .maximize)
@@ -110,7 +110,7 @@ final class ValidationTests: XCTestCase {
         XCTAssertTrue(model.validationErrors.isEmpty)
     }
 
-    func testEmptyConstraintsModel() throws {
+    func testEmptyConstraintsModel() {
         let (x, y) = (Variable("x", domain: .integer), Variable("y"))
         let function = x + 2 * y
         let objective = Objective(function, optimization: .maximize)
@@ -119,14 +119,14 @@ final class ValidationTests: XCTestCase {
         XCTAssertTrue(model.validationErrors.isEmpty)
     }
 
-    func testEmptyNameModel() throws {
+    func testEmptyNameModel() {
         let x = Variable("x")
         let model = Model("", objective: Objective(x))
 
         XCTAssertTrue(model.validationErrors.isEmpty)
     }
 
-    func testDuplicateVariablesModel() throws {
+    func testDuplicateVariablesModel() {
         let x = Variable("x")
         let y = x
         let function = x + 2 * y
@@ -142,7 +142,7 @@ final class ValidationTests: XCTestCase {
         XCTAssertTrue(model.validationErrors.isEmpty)
     }
     
-    func testEmptyConstraintNameModel() throws {
+    func testEmptyConstraintNameModel() {
         let (x, y) = (Variable("x", domain: .integer), Variable("y"))
         let function = x + 2 * y
         let objective = Objective(function, optimization: .maximize)
@@ -159,7 +159,7 @@ final class ValidationTests: XCTestCase {
     
     // MARK: Validating invalid models
     
-    func testInvalidNameModel() throws {
+    func testInvalidNameModel() {
         let x = Variable("x")
         let model = Model("X Y", objective: Objective(x))
         let errors = model.validationErrors
@@ -168,7 +168,7 @@ final class ValidationTests: XCTestCase {
         XCTAssertEqual(errors[0], .invalidModelName(model))
     }
 
-    func testDuplicateVariableNamesModel() throws {
+    func testDuplicateVariableNamesModel() {
         let (x, y) = (Variable("x"), Variable("x"))
         let function = x + 2 * y
         let objective = Objective(function, optimization: .maximize)
@@ -185,7 +185,7 @@ final class ValidationTests: XCTestCase {
         XCTAssertEqual(errors[0], .duplicateVariableName(y))
     }
     
-    func testDuplicateConstraintNamesModel() throws {
+    func testDuplicateConstraintNamesModel() {
         let (x, y) = (Variable("x"), Variable("y"))
         let function = x + 2 * y
         let objective = Objective(function, optimization: .maximize)
@@ -203,7 +203,7 @@ final class ValidationTests: XCTestCase {
     }
 
     // Variable errors are listed before constraint errors.
-    func testMultipleErrorsModel() throws {
+    func testMultipleErrorsModel() {
         let (x, y) = (Variable("x"), Variable("x"))
         let function = x + 2 * y
         let objective = Objective(function, optimization: .maximize)

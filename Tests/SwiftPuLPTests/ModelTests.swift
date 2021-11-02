@@ -19,7 +19,7 @@ final class ModelTests: XCTestCase {
     
     // MARK: Objective tests
     
-    func testVariableObjective() throws {
+    func testVariableObjective() {
         let x = Variable("x")
         let objective = Objective(x, optimization: .maximize)
 
@@ -27,7 +27,7 @@ final class ModelTests: XCTestCase {
         XCTAssertEqual(objective.optimization, .maximize)
     }
     
-    func testFunctionObjective() throws {
+    func testFunctionObjective() {
         let x = Variable("x")
         let function = 2 * x + 1
         let objective = Objective(function, optimization: .maximize)
@@ -36,7 +36,7 @@ final class ModelTests: XCTestCase {
         XCTAssertEqual(objective.optimization, .maximize)
     }
     
-    func testDefaultObjective() throws {
+    func testDefaultObjective() {
         let x = Variable("x")
         let objective = Objective(x)
 
@@ -45,14 +45,14 @@ final class ModelTests: XCTestCase {
     
     // MARK: Model tests
 
-    func testModel() throws {
+    func testModel() {
         let x = Variable("x")
         let model = Model("XYZ", objective: Objective(x))
         
         XCTAssertNotNil(model)
     }
 
-    func testDefaultModel() throws {
+    func testDefaultModel() {
         let model = Model("XYZ")
         
         XCTAssertNil(model.objective)
@@ -60,7 +60,7 @@ final class ModelTests: XCTestCase {
 
     // MARK: Conversion to PuLP tests
     
-    func testOptimizationToPuLP() throws {
+    func testOptimizationToPuLP() {
         let optimizations = [Model.Optimization.maximize, .minimize]
         let senses = [PuLP.LpMaximize, PuLP.LpMinimize]
 
@@ -69,7 +69,7 @@ final class ModelTests: XCTestCase {
         }
     }
     
-    func testModelToPuLP() throws {
+    func testModelToPuLP() {
        let (x, y) = (Variable("x"), Variable("y"))
         let function = 2 * x + 3 * y + 10
         let model = Model("XYZ", objective: Objective(function, optimization: .maximize))
@@ -83,7 +83,7 @@ final class ModelTests: XCTestCase {
         XCTAssertEqual(pythonModel.sense, PuLP.LpMaximize)
     }
     
-   func testDefaultModelToPuLP() throws {
+   func testDefaultModelToPuLP() {
         let model = Model("XYZ")
         let pythonModel = model.pythonObject
         
