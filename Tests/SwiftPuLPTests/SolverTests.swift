@@ -11,7 +11,7 @@ import PythonKit
 import SwiftPuLP
 
 // Temporary.
-func VariableSum<T>(_ variables: T) -> LinearFunction where T: Sequence, T.Element == Variable {
+func VarSum<T>(_ variables: T) -> LinearFunction where T: Sequence, T.Element == Variable {
     LinearFunction(terms: variables.map { LinearFunction.Term(variable: $0, factor: 1) })
 }
 
@@ -99,7 +99,7 @@ final class SolverTests: XCTestCase {
         let function = (20 * x[1] + 12 * x[2]) + (40 * x[3] + 25 * x[4])
         let objective = Objective(function, optimization: .maximize)
         let constraints = [
-            (VariableSum(x[1...]) <= 50, "manpower"),
+            (VarSum(x[1...]) <= 50, "manpower"),
             (3 * x[1] + 2 * x[2] + x[3] <= 100, "a"),
             (x[2] + 2 * x[3] + 3 * x[4] <= 90, "b"),
             (x[1] - 100 * y[1] <= 0, "x1"),

@@ -333,6 +333,15 @@ Each variable here is mapped onto a different Python LpVariable with the same na
 
 ## Examples
 
+### Example 1: Solving a sudoku
+
+Based on the [The Sudoku Problem Formulation for the PuLP Modeller](https://coin-or.github.io/pulp/CaseStudies/a_sudoku_problem.html)
+
+    Authors: Antony Phillips, Dr Stuart Mitchell
+    edited by Nathan Sudermann-Merx
+
+The Swift model can be found in *SudokuTests*. It closely mirrors the PuLP model. It has no objective function, and only binary constraints.
+
 ## Dependencies
 
 SwiftPulp depends on the *Collections* and *PythonKit* packages.
