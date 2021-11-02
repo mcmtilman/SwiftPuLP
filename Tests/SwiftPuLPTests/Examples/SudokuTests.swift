@@ -84,8 +84,8 @@ final class SudokuTests: XCTestCase {
     let (values, rows, columns) = (0...8, 0...8, 0...8)
     
     // Each box lists the row / column indices of its cells.
-    let boxes = (0...8).map { r in
-        (0...8).map { c in
+    lazy var boxes = rows.map { r in
+        columns.map { c in
             (r / 3 * 3 + c / 3, r % 3 * 3 + c % 3)
         }
     }
@@ -137,22 +137,23 @@ final class SudokuTests: XCTestCase {
         XCTAssertEqual(dataToGrid(Self.sudokuData), Self.sudokuGrid)
     }
     
-    func testEvilSolveSudokuModel() {
+    func testSolveEvilSudokuModel() {
         let model = Model("Sudoku", constraints: constraints)
         guard let result = Solver().solve(model) else { return XCTFail("Nil result") }
 
+        XCTAssertEqual(result.status, .optimal)
         XCTAssertEqual(dataToGrid(solutionData(result)), Self.solutionGrid)
     }
     
     // MARK: Utility functions
     
-    // Converts the result into the sudoku data format.
+    // Converts the result variables into the sudoku data format.
     private func solutionData(_ result: Solver.Result) -> [(Int, Int, Int)] {
         var data = [(Int, Int, Int)]()
         
-        for r in 0...8 {
-            for c in 0...8 {
-                for v in 0...8 {
+        for r in rows {
+            for c in columns {
+                for v in values {
                     if result.variables[choices[v][r][c].name] == 1 {
                         data.append((v + 1, r + 1, c + 1))
                     }
