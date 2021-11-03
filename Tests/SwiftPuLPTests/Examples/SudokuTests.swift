@@ -34,15 +34,28 @@ final class SudokuTests: XCTestCase {
             }
         }
     }
-
-    // MARK: Computed properties.
     
-    // Lists all constraints. Only the last part depends on the input.
-    var constraints: [(LinearConstraint, String)] {
+    // MARK: Sudoku tests
+    
+    func testGridGeneration() {
+        XCTAssertEqual(dataToGrid(sudokuData), sudokuGrid)
+    }
+    
+    func testSolveEvilSudokuModel() {
+        let model = Model("Sudoku", constraints: constraints(sudokuData))
+        guard let result = Solver().solve(model) else { return XCTFail("Nil result") }
+
+        XCTAssertEqual(result.status, .optimal)
+        XCTAssertEqual(dataToGrid(solutionData(result)), solutionGrid)
+    }
+    
+    // MARK: Utility functions
+    
+    // Lists all constraints for given sudoku data. Only the last part depends on the input.
+    private func constraints(_ sudokuData: [(Int, Int, Int)]) -> [(LinearConstraint, String)] {
         var constraints = [(LinearConstraint, String)]()
 
-        // Exactly one variable in the list should have value 1.
-        // The rest must have value 0.
+        // Adds constraint that exactly one variable in the list should have value 1.
         func addSumIsOneConstraint(_ variables: [Variable]) {
             constraints.append((VarSum(variables) == 1, ""))
         }
@@ -72,22 +85,6 @@ final class SudokuTests: XCTestCase {
         
         return constraints
     }
-    
-    // MARK: Sudoku tests
-    
-    func testGridGeneration() {
-        XCTAssertEqual(dataToGrid(sudokuData), sudokuGrid)
-    }
-    
-    func testSolveEvilSudokuModel() {
-        let model = Model("Sudoku", constraints: constraints)
-        guard let result = Solver().solve(model) else { return XCTFail("Nil result") }
-
-        XCTAssertEqual(result.status, .optimal)
-        XCTAssertEqual(dataToGrid(solutionData(result)), solutionGrid)
-    }
-    
-    // MARK: Utility functions
     
     // Converts the result variables into the sudoku data format.
     private func solutionData(_ result: Solver.Result) -> [(Int, Int, Int)] {
@@ -134,6 +131,7 @@ final class SudokuTests: XCTestCase {
     }
     
 }
+
 
 /**
  Test data.
