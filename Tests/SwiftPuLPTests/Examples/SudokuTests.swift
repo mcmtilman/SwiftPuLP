@@ -14,70 +14,6 @@ import SwiftPuLP
  */
 final class SudokuTests: XCTestCase {
 
-    // MARK: Input / output data
-    
-    // Compact way to input sudoku data.
-    // Values and row / column indices start at 1.
-    static let sudokuData : [(value: Int, row: Int, column: Int)] = [
-        (8, 1, 1),
-        (3, 2, 3),
-        (6, 2, 4),
-        (7, 3, 2),
-        (9, 3, 5),
-        (2, 3, 7),
-        (5, 4, 2),
-        (7, 4, 6),
-        (4, 5, 5),
-        (5, 5, 6),
-        (7, 5, 7),
-        (1, 6, 4),
-        (3, 6, 8),
-        (1, 7, 3),
-        (6, 7, 8),
-        (8, 7, 9),
-        (8, 8, 3),
-        (5, 8, 4),
-        (1, 8, 8),
-        (9, 9, 2),
-        (4, 9, 7),
-    ]
-
-    // Mainly a visual aid, but can be tested as well.
-    static let sudokuGrid =
-        """
-        +-------+-------+-------+
-        | 8 . . | . . . | . . . |
-        | . . 3 | 6 . . | . . . |
-        | . 7 . | . 9 . | 2 . . |
-        +-------+-------+-------+
-        | . 5 . | . . 7 | . . . |
-        | . . . | . 4 5 | 7 . . |
-        | . . . | 1 . . | . 3 . |
-        +-------+-------+-------+
-        | . . 1 | . . . | . 6 8 |
-        | . . 8 | 5 . . | . 1 . |
-        | . 9 . | . . . | 4 . . |
-        +-------+-------+-------+
-        """
-
-    // Mainly a visual aid, but can be tested as well.
-    static let solutionGrid =
-        """
-        +-------+-------+-------+
-        | 8 1 2 | 7 5 3 | 6 4 9 |
-        | 9 4 3 | 6 8 2 | 1 7 5 |
-        | 6 7 5 | 4 9 1 | 2 8 3 |
-        +-------+-------+-------+
-        | 1 5 4 | 2 3 7 | 8 9 6 |
-        | 3 6 9 | 8 4 5 | 7 2 1 |
-        | 2 8 7 | 1 6 9 | 5 3 4 |
-        +-------+-------+-------+
-        | 5 2 1 | 9 7 4 | 3 6 8 |
-        | 4 3 8 | 5 2 6 | 9 1 7 |
-        | 7 9 6 | 3 1 8 | 4 5 2 |
-        +-------+-------+-------+
-        """
-    
     // MARK: Stored properties, common for all 9 by 9 sudokus
     
     // Zero-based ranges and values.
@@ -107,30 +43,30 @@ final class SudokuTests: XCTestCase {
 
         // Exactly one variable in the list should have value 1.
         // The rest must have value 0.
-        func addExactlyOneConstraint(for variables: [Variable]) {
+        func addSumIsOneConstraint(_ variables: [Variable]) {
             constraints.append((VarSum(variables) == 1, ""))
         }
         
         for r in rows {
             for c in columns {
-                addExactlyOneConstraint(for: values.map { v in choices[v][r][c] })
+                addSumIsOneConstraint(values.map { v in choices[v][r][c] })
             }
         }
         
         for v in values {
             for r in rows {
-                addExactlyOneConstraint(for: columns.map { c in choices[v][r][c] })
+                addSumIsOneConstraint(columns.map { c in choices[v][r][c] })
             }
             for c in columns {
-                addExactlyOneConstraint(for: rows.map { r in choices[v][r][c] })
+                addSumIsOneConstraint(rows.map { r in choices[v][r][c] })
             }
             for b in boxes {
-                addExactlyOneConstraint(for: b.map { (r, c) in choices[v][r][c] })
+                addSumIsOneConstraint(b.map { (r, c) in choices[v][r][c] })
             }
         }
         
         // Fix the givens for cells in the input data,
-        for (v, r, c) in Self.sudokuData {
+        for (v, r, c) in sudokuData {
            constraints.append((choices[v - 1][r - 1][c - 1] == 1, ""))
         }
         
@@ -140,7 +76,7 @@ final class SudokuTests: XCTestCase {
     // MARK: Sudoku tests
     
     func testGridGeneration() {
-        XCTAssertEqual(dataToGrid(Self.sudokuData), Self.sudokuGrid)
+        XCTAssertEqual(dataToGrid(sudokuData), sudokuGrid)
     }
     
     func testSolveEvilSudokuModel() {
@@ -148,7 +84,7 @@ final class SudokuTests: XCTestCase {
         guard let result = Solver().solve(model) else { return XCTFail("Nil result") }
 
         XCTAssertEqual(result.status, .optimal)
-        XCTAssertEqual(dataToGrid(solutionData(result)), Self.solutionGrid)
+        XCTAssertEqual(dataToGrid(solutionData(result)), solutionGrid)
     }
     
     // MARK: Utility functions
@@ -179,24 +115,95 @@ final class SudokuTests: XCTestCase {
             grid[row - 1][column - 1] = value
         }
         for r in rows {
-            if [0, 3, 6].contains(r) {
+            if r % 3 == 0 {
                 result += "+-------+-------+-------+\n"
             }
             for c in columns {
                 let v = grid[r][c]
                 
-                if [0, 3, 6].contains(c) {
+                if c % 3 == 0 {
                     result += "| "
                 }
                 result += v == 0 ? ". " : "\(v) "
-                if c == 8 {
-                    result += ("|\n")
-                }
             }
+            result += ("|\n")
         }
         result += "+-------+-------+-------+"
         
         return result
+    }
+    
+}
+
+/**
+ Test data.
+ */
+extension SudokuTests {
+    
+    // Input sudoku data.
+    // Values and row / column indices start at 1.
+    var sudokuData : [(value: Int, row: Int, column: Int)] {
+        [
+            (8, 1, 1),
+            (3, 2, 3),
+            (6, 2, 4),
+            (7, 3, 2),
+            (9, 3, 5),
+            (2, 3, 7),
+            (5, 4, 2),
+            (7, 4, 6),
+            (4, 5, 5),
+            (5, 5, 6),
+            (7, 5, 7),
+            (1, 6, 4),
+            (3, 6, 8),
+            (1, 7, 3),
+            (6, 7, 8),
+            (8, 7, 9),
+            (8, 8, 3),
+            (5, 8, 4),
+            (1, 8, 8),
+            (9, 9, 2),
+            (4, 9, 7),
+        ]
+    }
+
+    // Mainly a visual aid, but can be tested as well.
+    var sudokuGrid: String {
+        """
+        +-------+-------+-------+
+        | 8 . . | . . . | . . . |
+        | . . 3 | 6 . . | . . . |
+        | . 7 . | . 9 . | 2 . . |
+        +-------+-------+-------+
+        | . 5 . | . . 7 | . . . |
+        | . . . | . 4 5 | 7 . . |
+        | . . . | 1 . . | . 3 . |
+        +-------+-------+-------+
+        | . . 1 | . . . | . 6 8 |
+        | . . 8 | 5 . . | . 1 . |
+        | . 9 . | . . . | 4 . . |
+        +-------+-------+-------+
+        """
+    }
+
+    // Mainly a visual aid, but can be tested as well.
+    var solutionGrid: String {
+        """
+        +-------+-------+-------+
+        | 8 1 2 | 7 5 3 | 6 4 9 |
+        | 9 4 3 | 6 8 2 | 1 7 5 |
+        | 6 7 5 | 4 9 1 | 2 8 3 |
+        +-------+-------+-------+
+        | 1 5 4 | 2 3 7 | 8 9 6 |
+        | 3 6 9 | 8 4 5 | 7 2 1 |
+        | 2 8 7 | 1 6 9 | 5 3 4 |
+        +-------+-------+-------+
+        | 5 2 1 | 9 7 4 | 3 6 8 |
+        | 4 3 8 | 5 2 6 | 9 1 7 |
+        | 7 9 6 | 3 1 8 | 4 5 2 |
+        +-------+-------+-------+
+        """
     }
     
 }
