@@ -199,44 +199,4 @@ final class SudokuTests: XCTestCase {
         return result
     }
     
-    func testRange() {
-        let ranges = (0...2) * (0...2)
-        let boxes = ranges.map { i, j in ranges.map { k, l in (3 * i + k, 3 * j + l) } }
-        
-        print(boxes)
-    }
-
-}
-
-extension ClosedRange where Bound: Strideable, Bound.Stride: SignedInteger {
-
-    static func * (lhs: ClosedRange, rhs: ClosedRange) -> RangePair<Bound, Bound> {
-        RangePair(lhs, rhs)
-    }
-
-}
-
-struct RangePair<U, V> where U: Strideable, U.Stride: SignedInteger, V: Strideable, V.Stride: SignedInteger {
-    
-    let u: ClosedRange<U>
-    
-    let v: ClosedRange<V>
-    
-    init(_ u: ClosedRange<U>, _ v: ClosedRange<V>) {
-        self.u = u
-        self.v = v
-    }
-    
-    func map<T>(_ transform: (U, V) -> T) -> [T] {
-        var result = [T]()
-        
-        for x in u {
-            for y in v {
-                result.append(transform(x, y))
-            }
-        }
-        
-        return result
-    }
-    
 }
