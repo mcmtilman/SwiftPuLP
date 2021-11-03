@@ -184,24 +184,15 @@ A model is not valid if:
 
 The following example illustrates how to create a simple valid model.
 
-    let (x, y) = (Variable("x"), Variable("y"))
-    
-    let function = x + 2 * y
-    
-    let objective = Objective(function, optimization: .maximize)
-    
-    let constraints = [
-    
-        (2 * x + y <= 20, "red"),
-        
-        (4 * x - 5 * y >= -10, "blue"),
-        
-        (-x + 2 * y >= -2, "yellow"),
-        
-        (-x + 5 * y == 15, "green")
-        
-    ]
-    
+    let (x, y) = (Variable("x"), Variable("y"))    
+    let function = x + 2 * y    
+    let objective = Objective(function, optimization: .maximize)    
+    let constraints = [    
+        (2 * x + y <= 20, "red"),        
+        (4 * x - 5 * y >= -10, "blue"),        
+        (-x + 2 * y >= -2, "yellow"),        
+        (-x + 5 * y == 15, "green")        
+    ]    
     let model = Model("Basic", objective: objective, constraints: constraints)
 
 ### Solver
@@ -236,10 +227,8 @@ The status cases mirror the status values in PuLP and are defined as follows.
 
 To validate a model use the following.
 
-    let model = ...
-    
-    let errors = model.validationErrors
-    
+    let model = ...    
+    let errors = model.validationErrors    
     ...
 
 This property returns a list of all *validation errors*. Currently SwiftPuLP supports the following validation errors.
@@ -259,10 +248,8 @@ This property returns a list of all *validation errors*. Currently SwiftPuLP sup
 
 To validate an individual variable use a similar approach.
 
-    let variable = ...
-    
-    let errors = variable.validationErrors
-    
+    let variable = ...    
+    let errors = variable.validationErrors    
     ...
 
 ## Type overview
@@ -322,7 +309,6 @@ The Python counterparts of the Swift model elements are generated when the solve
 In the following scenario only one LpVariable instance will be generated, since y is an alias for x.
 
     let x = Variable("x")
-
     let y = x
 
 In the following case, however, PuLP may still run into problems.
@@ -348,14 +334,10 @@ Much of the code is similar (apart from some refactoring to make it more testabl
 
 1. In the Python example the 'boxes' variable is created by list comprehension with 4 'for' variables.
 
-        Boxes = [
-        
+        Boxes = [    
             [(3 * i + k + 1, 3 * j + l + 1) for k in range(3) for l in range(3)]
-
             for i in range(3)
-
             for j in range(3)
-
         ]
 
     This is both concise and readable: variables 'i' and 'j' identify a box in the sudoku grid, while variables 'k' and 'l' identify cells within the boxes.
@@ -363,27 +345,20 @@ Much of the code is similar (apart from some refactoring to make it more testabl
     Attempting to mirror this declaratively in Swift yields something like this (using zero-based coordinates).
     
         (0...2).flatMap { i in (0...2).map { j in (i, j) }}.map { (i, j) in
-
             (0...2).flatMap { k in (0...2).map { l in (3 * i + k, 3 * j + l) }}
-
         }
     
     A simpler variant is the one used in SudokuTests.    
     
         (0...8).map { r in
-
             (0...8).map { c in
-
-                (r / 3 * 3 + c / 3, r % 3 * 3 + c % 3)
- 
-            }
- 
+                (r / 3 * 3 + c / 3, r % 3 * 3 + c % 3) 
+            } 
         }
     
     Support in Swift for iterating over multi-dimensional ranges might be another option.
     
-        let ranges = (0...2) * (0...2)
-  
+        let ranges = (0...2) * (0...2)  
         let boxes = ranges.map { i, j in ranges.map { k, l in (3 * i + k, 3 * j + l) }}
 
 
