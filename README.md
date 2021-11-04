@@ -89,6 +89,8 @@ Create a term as follows.
 
 Arithmetic operators may be used in a more intuitive way to build linear functions, and parentheses may be used to alter precedence. In the following examples x, y, z represent variables.
 
+    +x
+
     1 * x
     
     x + 0
@@ -112,6 +114,18 @@ Also note that the compiler does not recognize the following constructs as linea
     x
     
     10
+
+The compiler may also get confused when using sums of multiple variables.
+
+    x + y + z
+    
+This does not work, so a little help is needed.
+
+    x + y + z + 0
+    
+    1 * x + y + z
+    
+    +x + y + z
 
 ### LinearConstraint
 
@@ -277,6 +291,12 @@ To validate an individual variable use a similar approach.
     Solver.Status
     
     Solver.Result
+    
+## Helper functions
+
+The **Function** enum contains helper functions.
+
+* The *sum* function converts a sequence of variables into a linear function summing the variables.
     
 ## Conversion to / from PuLP
 

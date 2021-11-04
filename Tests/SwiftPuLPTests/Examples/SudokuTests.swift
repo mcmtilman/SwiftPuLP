@@ -57,7 +57,7 @@ final class SudokuTests: XCTestCase {
 
         // Adds constraint that exactly one variable in the list should have value 1.
         func addSumIsOneConstraint(_ variables: [Variable]) {
-            constraints.append((VarSum(variables) == 1, ""))
+            constraints.append((Function.sum(variables) == 1, ""))
         }
         
         for r in rows {

@@ -109,11 +109,11 @@ public extension Double {
     
     // MARK: Building linear functions
     
-    static func * (lhs: Double, rhs: Variable) -> LinearFunction {
+    static func * (lhs: Self, rhs: Variable) -> LinearFunction {
         LinearFunction(terms: [rhs.withFactor(lhs)])
     }
      
-    static func * (lhs: Double, rhs: LinearFunction) -> LinearFunction {
+    static func * (lhs: Self, rhs: LinearFunction) -> LinearFunction {
         func applyFactor(_ term: LinearFunction.Term) -> LinearFunction.Term {
             LinearFunction.Term(variable: term.variable, factor: lhs * term.factor)
         }
@@ -129,8 +129,12 @@ public extension Double {
  */
 public extension Variable {
     
-    // MARK: Building linear functions
+    // MARK: Arithmetic operators building linear functions
     
+    static prefix func + (value: Variable) -> LinearFunction {
+        LinearFunction(terms: [value.withFactor(1)])
+    }
+     
     static prefix func - (value: Variable) -> LinearFunction {
         LinearFunction(terms: [value.withFactor(-1)])
     }
@@ -146,7 +150,7 @@ public extension Variable {
     static func + (lhs: Variable, rhs: LinearFunction) -> LinearFunction {
         LinearFunction(terms: [lhs.withFactor(1)] + rhs.terms, constant: rhs.constant)
     }
-    
+
     static func - (lhs: Variable, rhs: Double) -> LinearFunction {
         LinearFunction(terms: [lhs.withFactor(1)], constant: -rhs)
     }
@@ -159,7 +163,7 @@ public extension Variable {
         LinearFunction(terms: [lhs.withFactor(1)] + rhs.terms.map(\.negated), constant: -rhs.constant)
     }
     
-    // MARK: Private building linear functions
+    // MARK: Building linear functions
     
     // Answesr a Term with the variable and given factor.
     func withFactor(_ factor: Double = 1) -> LinearFunction.Term {
@@ -176,8 +180,12 @@ public extension LinearFunction {
     
     // MARK: Building linear functions
     
-    static prefix func - (value: LinearFunction) -> LinearFunction {
-        LinearFunction(terms: value.terms.map(\.negated), constant: -value.constant)
+    static prefix func + (value: Self) -> LinearFunction {
+        value
+    }
+     
+    static prefix func - (value: Self) -> LinearFunction {
+        Self(terms: value.terms.map(\.negated), constant: -value.constant)
     }
      
     static func + (lhs: Self, rhs: Double) -> Self {
