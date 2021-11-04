@@ -173,6 +173,18 @@ final class LinearFunctionTests: XCTestCase {
         XCTAssertEqual(function, x - -y + z)
     }
     
+    func testResolveWeirdTypeAmbiguity() {
+        let (x, y, z) = (Variable("x"), Variable("y"), Variable("z"))
+        let function = LinearFunction(terms: [Term(variable: x, factor: 1), Term(variable: y, factor: 1), Term(variable: z, factor: 1)])
+        var altFunction = x + y
+
+        XCTAssertNotEqual(function, altFunction)
+
+        // Now it works.
+        altFunction = x + y + z
+        XCTAssertEqual(function, altFunction)
+    }
+    
     // MARK: Filtering and merging terms tests
     
     func testFilterZeroFactorVariable() {

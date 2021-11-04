@@ -109,11 +109,11 @@ public extension Double {
     
     // MARK: Building linear functions
     
-    static func * (lhs: Self, rhs: Variable) -> LinearFunction {
+    static func * (lhs: Double, rhs: Variable) -> LinearFunction {
         LinearFunction(terms: [rhs.withFactor(lhs)])
     }
      
-    static func * (lhs: Self, rhs: LinearFunction) -> LinearFunction {
+    static func * (lhs: Double, rhs: LinearFunction) -> LinearFunction {
         func applyFactor(_ term: LinearFunction.Term) -> LinearFunction.Term {
             LinearFunction.Term(variable: term.variable, factor: lhs * term.factor)
         }
@@ -131,12 +131,12 @@ public extension Variable {
     
     // MARK: Arithmetic operators building linear functions
     
-    static prefix func + (value: Variable) -> LinearFunction {
-        LinearFunction(terms: [value.withFactor(1)])
+    static prefix func + (variable: Variable) -> LinearFunction {
+        LinearFunction(terms: [variable.withFactor(1)])
     }
      
-    static prefix func - (value: Variable) -> LinearFunction {
-        LinearFunction(terms: [value.withFactor(-1)])
+    static prefix func - (variable: Variable) -> LinearFunction {
+        LinearFunction(terms: [variable.withFactor(-1)])
     }
      
     static func + (lhs: Variable, rhs: Double) -> LinearFunction {
@@ -180,36 +180,36 @@ public extension LinearFunction {
     
     // MARK: Building linear functions
     
-    static prefix func + (value: Self) -> LinearFunction {
-        value
+    static prefix func + (function: LinearFunction) -> LinearFunction {
+        function
     }
      
-    static prefix func - (value: Self) -> LinearFunction {
-        Self(terms: value.terms.map(\.negated), constant: -value.constant)
+    static prefix func - (function: LinearFunction) -> LinearFunction {
+        LinearFunction(terms: function.terms.map(\.negated), constant: -function.constant)
     }
      
-    static func + (lhs: Self, rhs: Double) -> Self {
-        Self(terms: lhs.terms, constant: lhs.constant + rhs)
+    static func + (lhs: LinearFunction, rhs: Double) -> LinearFunction {
+        LinearFunction(terms: lhs.terms, constant: lhs.constant + rhs)
     }
     
-    static func + (lhs: Self, rhs: Variable) -> Self {
-        Self(terms: lhs.terms + [rhs.withFactor(1)], constant: lhs.constant)
+    static func + (lhs: LinearFunction, rhs: Variable) -> LinearFunction {
+        LinearFunction(terms: lhs.terms + [rhs.withFactor(1)], constant: lhs.constant)
     }
     
-    static func + (lhs: Self, rhs: Self) -> Self {
-        Self(terms: lhs.terms + rhs.terms, constant: lhs.constant + rhs.constant)
+    static func + (lhs: LinearFunction, rhs: LinearFunction) -> LinearFunction {
+        LinearFunction(terms: lhs.terms + rhs.terms, constant: lhs.constant + rhs.constant)
     }
     
-    static func - (lhs: Self, rhs: Double) -> Self {
-        Self(terms: lhs.terms, constant: lhs.constant - rhs)
+    static func - (lhs: LinearFunction, rhs: Double) -> LinearFunction {
+        LinearFunction(terms: lhs.terms, constant: lhs.constant - rhs)
     }
     
-    static func - (lhs: Self, rhs: Variable) -> Self {
-        Self(terms: lhs.terms + [rhs.withFactor(-1)], constant: lhs.constant)
+    static func - (lhs: LinearFunction, rhs: Variable) -> LinearFunction {
+        LinearFunction(terms: lhs.terms + [rhs.withFactor(-1)], constant: lhs.constant)
     }
     
-    static func - (lhs: Self, rhs: Self) -> Self {
-        Self(terms: lhs.terms + rhs.terms.map(\.negated), constant: lhs.constant - rhs.constant)
+    static func - (lhs: LinearFunction, rhs: LinearFunction) -> LinearFunction {
+        LinearFunction(terms: lhs.terms + rhs.terms.map(\.negated), constant: lhs.constant - rhs.constant)
     }
     
 }
