@@ -57,6 +57,10 @@ public struct LinearFunction {
             self.variable = variable
         }
         
+        func withFactor(_ factor: Double) -> Term {
+            Term(variable: variable, factor: factor * self.factor)
+        }
+        
         // MARK: Evaluating
         
         // Answers the result of applying the term to given values dictionary.
@@ -71,10 +75,10 @@ public struct LinearFunction {
     
     // Terms of the linear function.
     // May be empty.
-    let terms: [Term]
+    public let terms: [Term]
     
     // Minimal element of a linear function.
-    let constant: Double
+    public let constant: Double
     
     // MARK: Initializing
     
@@ -88,7 +92,7 @@ public struct LinearFunction {
     
     /// Creates a linear function with given variable.
     public init(variable: Variable) {
-        self.terms = [variable.withFactor(1)]
+        self.terms = variable.terms
         self.constant = 0
     }
     
@@ -103,117 +107,76 @@ public struct LinearFunction {
 
 
 /**
- Covenience functions to compose linear functions using basic arithmetic operators.
+ Represents linear functions and variables.
+ Simplifies definition of shared operators for building linear functions.
  */
-public extension Double {
+public protocol LinearExpression {
     
-    // MARK: Building linear functions
+    var terms: [LinearFunction.Term] { get }
     
-    static func * (lhs: Double, rhs: Variable) -> LinearFunction {
-        LinearFunction(terms: [rhs.withFactor(lhs)])
-    }
-     
-    static func * (lhs: Double, rhs: LinearFunction) -> LinearFunction {
-        func applyFactor(_ term: LinearFunction.Term) -> LinearFunction.Term {
-            LinearFunction.Term(variable: term.variable, factor: lhs * term.factor)
-        }
-        
-        return LinearFunction(terms: rhs.terms.map(applyFactor), constant: lhs * rhs.constant)
-    }
-     
+    var constant: Double { get }
+    
 }
 
 
 /**
- Covenience functions to compose linear functions using basic arithmetic operators.
+ Variable adopts LinearExpression.
  */
-public extension Variable {
+extension Variable: LinearExpression {
     
-    // MARK: Arithmetic operators building linear functions
+    // MARK: Computed properties
     
-    static prefix func + (variable: Variable) -> LinearFunction {
-        LinearFunction(terms: [variable.withFactor(1)])
-    }
-     
-    static prefix func - (variable: Variable) -> LinearFunction {
-        LinearFunction(terms: [variable.withFactor(-1)])
-    }
-     
-    static func + (lhs: Variable, rhs: Double) -> LinearFunction {
-        LinearFunction(terms: [lhs.withFactor(1)], constant: rhs)
-    }
-     
-    static func + (lhs: Variable, rhs: Variable) -> LinearFunction {
-        LinearFunction(terms: [lhs.withFactor(1), rhs.withFactor(1)])
-    }
-     
-    static func + (lhs: Variable, rhs: LinearFunction) -> LinearFunction {
-        LinearFunction(terms: [lhs.withFactor(1)] + rhs.terms, constant: rhs.constant)
-    }
-
-    static func - (lhs: Variable, rhs: Double) -> LinearFunction {
-        LinearFunction(terms: [lhs.withFactor(1)], constant: -rhs)
-    }
-     
-    static func - (lhs: Variable, rhs: Variable) -> LinearFunction {
-        LinearFunction(terms: [lhs.withFactor(1), rhs.withFactor(-1)])
-    }
-     
-    static func - (lhs: Variable, rhs: LinearFunction) -> LinearFunction {
-        LinearFunction(terms: [lhs.withFactor(1)] + rhs.terms.map(\.negated), constant: -rhs.constant)
+    /// Answers the constant of the variable viewed as a linear function.
+   public var constant: Double {
+        0
     }
     
-    // MARK: Building linear functions
-    
-    // Answesr a Term with the variable and given factor.
-    func withFactor(_ factor: Double = 1) -> LinearFunction.Term {
-        LinearFunction.Term(variable: self, factor: factor)
+    /// Answers the terms of the variable viewed as a linear function.
+    public var terms: [LinearFunction.Term] {
+        [LinearFunction.Term(variable: self, factor: 1)]
     }
-
+    
 }
 
 
 /**
- Covenience functions to compose linear functions using basic arithmetic operators.
+ LinearFunction adopts LinearExpression.
  */
-public extension LinearFunction {
-    
-    // MARK: Building linear functions
-    
-    static prefix func + (function: LinearFunction) -> LinearFunction {
-        function
-    }
-     
-    static prefix func - (function: LinearFunction) -> LinearFunction {
-        LinearFunction(terms: function.terms.map(\.negated), constant: -function.constant)
-    }
-     
-    static func + (lhs: LinearFunction, rhs: Double) -> LinearFunction {
-        LinearFunction(terms: lhs.terms, constant: lhs.constant + rhs)
-    }
-    
-    static func + (lhs: LinearFunction, rhs: Variable) -> LinearFunction {
-        LinearFunction(terms: lhs.terms + [rhs.withFactor(1)], constant: lhs.constant)
-    }
-    
-    static func + (lhs: LinearFunction, rhs: LinearFunction) -> LinearFunction {
-        LinearFunction(terms: lhs.terms + rhs.terms, constant: lhs.constant + rhs.constant)
-    }
-    
-    static func - (lhs: LinearFunction, rhs: Double) -> LinearFunction {
-        LinearFunction(terms: lhs.terms, constant: lhs.constant - rhs)
-    }
-    
-    static func - (lhs: LinearFunction, rhs: Variable) -> LinearFunction {
-        LinearFunction(terms: lhs.terms + [rhs.withFactor(-1)], constant: lhs.constant)
-    }
-    
-    static func - (lhs: LinearFunction, rhs: LinearFunction) -> LinearFunction {
-        LinearFunction(terms: lhs.terms + rhs.terms.map(\.negated), constant: lhs.constant - rhs.constant)
-    }
-    
+extension LinearFunction: LinearExpression {}
+
+
+/**
+ Operators for building linear functions.
+ Intentionally not modelled as static functions (e.g. on LinearExpression extension).
+ */
+public prefix func + (expression: LinearExpression) -> LinearFunction {
+    LinearFunction(terms: expression.terms, constant: expression.constant)
 }
 
+public prefix func - (expression: LinearExpression) -> LinearFunction {
+    LinearFunction(terms: expression.terms.map(\.negated), constant: -expression.constant)
+}
+
+public func + (lhs: LinearExpression, rhs: LinearExpression) -> LinearFunction {
+    LinearFunction(terms: lhs.terms + rhs.terms, constant: lhs.constant + rhs.constant)
+}
+
+public func - (lhs: LinearExpression, rhs: LinearExpression) -> LinearFunction {
+    LinearFunction(terms: lhs.terms + rhs.terms.map(\.negated), constant: lhs.constant - rhs.constant)
+}
+
+public func + (lhs: LinearExpression, rhs: Double) -> LinearFunction {
+    LinearFunction(terms: lhs.terms, constant: lhs.constant + rhs)
+}
+
+public func - (lhs: LinearExpression, rhs: Double) -> LinearFunction {
+    LinearFunction(terms: lhs.terms, constant: lhs.constant - rhs)
+}
+
+public func * (lhs: Double, rhs: LinearExpression) -> LinearFunction {
+    LinearFunction(terms: rhs.terms.map { $0.withFactor(lhs) }, constant: lhs * rhs.constant )
+}
+    
 
 /**
  Covenience functions to compose linear functions.

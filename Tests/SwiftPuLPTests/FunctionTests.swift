@@ -20,9 +20,7 @@ final class FunctionTests: XCTestCase {
         let x = (0..<5).map { Variable("x_\($0)") }
         let sum = Function.sum(x)
 
-        // Without the leading + prefix the compiler gets confused.
-        // The + prefix 'uplifts' the variable to a linear function.
-        XCTAssertEqual(sum, +x[0] + x[1] + x[2] + x[3] + x[4])
+        XCTAssertEqual(sum, x[0] + x[1] + x[2] + x[3] + x[4])
     }
     
 }

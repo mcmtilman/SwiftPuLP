@@ -100,16 +100,16 @@ final class LinearFunctionTests: XCTestCase {
 
     func testPlusFunction() {
         let x = Variable("x")
-        let function = 2 * x
+        let function = +(2 * x)
         
-        XCTAssertEqual(+function, LinearFunction(terms: [Term(variable: x, factor: 2)]))
+        XCTAssertEqual(function, LinearFunction(terms: [Term(variable: x, factor: 2)]))
     }
 
     func testMinusFunction() {
         let x = Variable("x")
-        let function = 2 * x
+        let function = -(2 * x)
         
-        XCTAssertEqual(-function, LinearFunction(terms: [Term(variable: x, factor: -2)]))
+        XCTAssertEqual(function, LinearFunction(terms: [Term(variable: x, factor: -2)]))
     }
     
     func testFunctionPlusConstant() {
@@ -162,27 +162,11 @@ final class LinearFunctionTests: XCTestCase {
         XCTAssertEqual(function, (2 * x + 10) + (3 * y + 5))
     }
     
-    func testResolveTypeAmbiguity() {
+    func testMultipleVariableSum() {
         let (x, y, z) = (Variable("x"), Variable("y"), Variable("z"))
         let function = LinearFunction(terms: [Term(variable: x, factor: 1), Term(variable: y, factor: 1), Term(variable: z, factor: 1)])
         
-        // Compiler does not like 'x + y + z', so a bit of help is needed.
-        XCTAssertEqual(function, x + y + z + 0)
-        XCTAssertEqual(function, 1 * x + y + z)
-        XCTAssertEqual(function, +x + y + z)
-        XCTAssertEqual(function, x - -y + z)
-    }
-    
-    func testResolveWeirdTypeAmbiguity() {
-        let (x, y, z) = (Variable("x"), Variable("y"), Variable("z"))
-        let function = LinearFunction(terms: [Term(variable: x, factor: 1), Term(variable: y, factor: 1), Term(variable: z, factor: 1)])
-        var altFunction = x + y
-
-        XCTAssertNotEqual(function, altFunction)
-
-        // Now it works.
-        altFunction = x + y + z
-        XCTAssertEqual(function, altFunction)
+        XCTAssertEqual(function, x + y + z)
     }
     
     // MARK: Filtering and merging terms tests

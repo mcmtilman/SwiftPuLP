@@ -115,18 +115,6 @@ Also note that the compiler does not recognize the following constructs as linea
     
     10
 
-The compiler may also get confused when using sums of multiple variables.
-
-    x + y + z
-    
-This does not work, so a little help is needed.
-
-    x + y + z + 0
-    
-    1 * x + y + z
-    
-    +x + y + z
-
 ### LinearConstraint
 
 A Linear Constraint imposes a restriction by comparing a linear function with a constant, where the comparison can be:
