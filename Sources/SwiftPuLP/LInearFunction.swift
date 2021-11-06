@@ -19,22 +19,6 @@ import PythonKit
  */
 public struct LinearFunction {
     
-    // Merges terms with same variable, respecting the original order of terms.
-    static private func mergeTerms(_ terms: [Term]) -> [Term] {
-        guard terms.count > 1 else { return terms }
-        let groups = OrderedDictionary<ObjectIdentifier, [Term]>(grouping: terms) {
-            ObjectIdentifier($0.variable)
-        }
-        guard groups.count < terms.count else { return terms }
-
-        return groups.values.map { terms in
-            let term = terms[0]
-            guard terms.count > 1 else { return term }
-
-            return Term(variable: term.variable, factor: terms.map(\.factor).reduce(0, +))
-        }
-    }
-    
     /// A term is a variable multiplied by a factor (i.e. its coefficient).
     public struct Term {
         
@@ -42,12 +26,12 @@ public struct LinearFunction {
         
         // The factor.
         // Default = 1.
-        let factor: Double
+        public let factor: Double
         
         // The variable of a term.
         // When creating a linear function, terms with same variable are merged,
         // with the combined factor.
-        let variable: Variable
+        public let variable: Variable
 
         // MARK: Initializing
         
@@ -83,10 +67,8 @@ public struct LinearFunction {
     // MARK: Initializing
     
     /// Creates a linear function with given terms and constant.
-    /// Merges terms with the same variable name into one, using the first encountered variable's properties.
-    /// Ignores merged terms with factor 0.
-    public init(terms: [Term], constant: Double = 0) {
-        self.terms = Self.mergeTerms(terms).filter { $0.factor != 0 }
+    public init(terms: [Term] = [], constant: Double = 0) {
+        self.terms = terms
         self.constant = constant
     }
     
@@ -101,6 +83,31 @@ public struct LinearFunction {
     /// Answers the result of applying the function to given values.
     public func callAsFunction(_ values: [String: Double]) -> Double {
         terms.reduce(constant) { total, term in total + term(values) }
+    }
+    
+    // MARK: Normalizing
+    
+    /// Answers the result of merging terms with same variables, ignoring merged terms with factor 0.
+    /// Keeps original order of first occurrence of variables.
+    public func normalized() -> Self {
+        guard terms.count > 0 else { return self }
+        guard terms.count > 1 else { return terms[0].factor == 0 ? Self() : self }
+        var groups = OrderedDictionary<ObjectIdentifier, [Term]>()
+        
+        for term in terms where term.factor != 0 {
+            groups[ObjectIdentifier(term.variable), default: []].append(term)
+        }
+
+        guard groups.count < terms.count else { return self }
+        let mergedTerms: [Term] = groups.values.compactMap { terms in
+            let term = terms[0]
+            guard terms.count > 1 else { return term }
+            let factor = terms.reduce(0) { total, term in total + term.factor }
+            
+            return factor == 0 ? nil : Term(variable: term.variable, factor: factor)
+        }
+        
+        return Self(terms: mergedTerms, constant: constant)
     }
     
 }
@@ -148,9 +155,16 @@ extension LinearFunction: LinearExpression {}
 /**
  Operators for building linear functions.
  Intentionally not modelled as static functions (e.g. on LinearExpression extension).
+ These operators combine factors and constants, but do not otherwise normalize the resulting function.
  */
 public prefix func + (expression: LinearExpression) -> LinearFunction {
-    LinearFunction(terms: expression.terms, constant: expression.constant)
+    switch expression {
+    case let function as LinearFunction:
+        return function
+    default:
+        return LinearFunction(terms: expression.terms, constant: expression.constant)
+    }
+    
 }
 
 public prefix func - (expression: LinearExpression) -> LinearFunction {

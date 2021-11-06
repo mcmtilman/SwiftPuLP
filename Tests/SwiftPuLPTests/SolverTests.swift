@@ -48,7 +48,7 @@ final class SolverTests: XCTestCase {
     // MARK: Solver tests
     
     func testSolveOptimalModel() {
-        let model = Model("Optimal", objective: Objective(LinearFunction(terms: [])))
+        let model = Model("Optimal", objective: Objective(LinearFunction()))
         guard let result = Solver().solve(model) else { return XCTFail("Nil result") }
         
         XCTAssertEqual(result.status, .optimal)

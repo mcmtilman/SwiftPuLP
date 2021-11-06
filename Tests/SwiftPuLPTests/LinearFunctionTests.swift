@@ -17,13 +17,27 @@ final class LinearFunctionTests: XCTestCase {
         
     let PuLP = Python.import("pulp")
     
-    // MARK: Variable as function tests
+    // MARK: Linear function tests
+    
+    func testDefaultTermFactor() {
+        let x = Variable("x")
+        let term = Term(variable: x)
+        
+        XCTAssertEqual(term.factor, 1)
+    }
+    
+    func testDefaultsFunction() {
+        let function = LinearFunction()
+        
+        XCTAssertEqual(function.terms, [])
+        XCTAssertEqual(function.constant, 0)
+    }
     
     func testVariableAsFunction() {
         let x = Variable("x")
         let function = LinearFunction(variable: x)
         
-        XCTAssertEqual(function, LinearFunction(terms: [Term(variable: x, factor: 1)], constant: 0))
+        XCTAssertEqual(function, LinearFunction(terms: [Term(variable: x)]))
     }
     
     // MARK: Arithmetic operators tests
@@ -164,32 +178,35 @@ final class LinearFunctionTests: XCTestCase {
     
     func testMultipleVariableSum() {
         let (x, y, z) = (Variable("x"), Variable("y"), Variable("z"))
-        let function = LinearFunction(terms: [Term(variable: x, factor: 1), Term(variable: y, factor: 1), Term(variable: z, factor: 1)])
+        let function = LinearFunction(terms: [Term(variable: x), Term(variable: y), Term(variable: z)])
         
         XCTAssertEqual(function, x + y + z)
     }
     
-    // MARK: Filtering and merging terms tests
+    // MARK: Normalizing linear function tests
     
     func testFilterZeroFactorVariable() {
         let x = Variable("x")
         let function = 0 * x
         
-        XCTAssertEqual(function, LinearFunction(terms: []))
+        XCTAssertEqual(function, LinearFunction(terms: [Term(variable: x, factor: 0)]))
+        XCTAssertEqual(function.normalized(), LinearFunction())
     }
     
     func testMergeFactors() {
         let (x, y) = (Variable("x"), Variable("y"))
         let function = (2 * x) + (3 * y) - x
         
-        XCTAssertEqual(function, LinearFunction(terms: [Term(variable: x, factor: 1), Term(variable: y, factor: 3)]))
+        XCTAssertEqual(function, LinearFunction(terms: [Term(variable: x, factor: 2), Term(variable: y, factor: 3), Term(variable: x, factor: -1)]))
+        XCTAssertEqual(function.normalized(), LinearFunction(terms: [Term(variable: x, factor: 1), Term(variable: y, factor: 3)]))
     }
     
     func testMergeAndFilterFactors() {
         let x = Variable("x")
         let function = (2 * x) - (2 * x)
         
-        XCTAssertEqual(function, LinearFunction(terms: []))
+        XCTAssertEqual(function, LinearFunction(terms: [Term(variable: x, factor: 2), Term(variable: x, factor: -2)]))
+        XCTAssertEqual(function.normalized(), LinearFunction())
     }
     
     func testMergeSameVariables() {
@@ -197,7 +214,8 @@ final class LinearFunctionTests: XCTestCase {
         let z = x
         let function = (2 * x) + (3 * y) - z
         
-        XCTAssertEqual(function, LinearFunction(terms: [Term(variable: x), Term(variable: y, factor: 3)]))
+        XCTAssertEqual(function, LinearFunction(terms: [Term(variable: x, factor: 2), Term(variable: y, factor: 3), Term(variable: z, factor: -1)]))
+        XCTAssertEqual(function.normalized(), LinearFunction(terms: [Term(variable: x), Term(variable: y, factor: 3)]))
     }
     
     func testMergeSameNameVariables() {

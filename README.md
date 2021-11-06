@@ -101,11 +101,15 @@ Arithmetic operators may be used in a more intuitive way to build linear functio
     
     2 * x + 3 * y + z - 10
     
-    2 * x - 3 * (y + z - 10)
+    2 * x - 3 * (y + z - x - 10)
 
-The LinearFunction initializer normalizes the last function as follows.
+Combining functions with operators affects factors and constants. For instance the last function becomes as follows.
 
-    2 * x - 3 * y - 3 * z + 30
+    2 * x - 3 * y - 3 * z + 3 * x + 30
+
+Further *normalizing* this function results in the following expression.
+
+    5 * x - 3 * y - 3 * z + 30
 
 Note that coefficients must be placed to the left of variables and nested linear functions.
 
