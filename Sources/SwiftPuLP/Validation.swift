@@ -76,9 +76,9 @@ extension LinearFunction {
     // MARK: Validating
     
     // Collects the term variables.
-    func collectVariables(into variables: inout [ObjectIdentifier: Variable]) {
+    func collectVariables(into variables: inout [Variable.Id: Variable]) {
         for term in terms {
-            variables[ObjectIdentifier(term.variable)] = term.variable
+            variables[term.variable.id] = term.variable
         }
     }
     
@@ -93,7 +93,7 @@ extension LinearConstraint {
     // MARK: Validating
     
     // Delegates collection of variables to the linear function.
-    func collectVariables(into variables: inout [ObjectIdentifier: Variable]) {
+    func collectVariables(into variables: inout [Variable.Id: Variable]) {
         function.collectVariables(into: &variables)
     }
 
@@ -141,7 +141,7 @@ extension Model {
     
     // Verifies that variables are valid and that distinct variables have different names.
     func collectVariableErrors(into errors: inout [ValidationError]) {
-        var variables = [ObjectIdentifier: Variable]()
+        var variables = [Variable.Id: Variable]()
         var variableMap = [String: Variable]()
 
         collectVariables(into: &variables)
@@ -154,7 +154,7 @@ extension Model {
     }
     
     // Collects all unique variables from its nested elements.
-    func collectVariables(into variables: inout [ObjectIdentifier: Variable]) {
+    func collectVariables(into variables: inout [Variable.Id: Variable]) {
         objective?.function.collectVariables(into: &variables)
         for (constraint, _) in constraints {
             constraint.collectVariables(into: &variables)

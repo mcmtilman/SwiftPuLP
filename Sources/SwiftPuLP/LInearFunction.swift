@@ -92,10 +92,10 @@ public struct LinearFunction {
     public func normalized() -> Self {
         guard terms.count > 0 else { return self }
         guard terms.count > 1 else { return terms[0].factor == 0 ? Self() : self }
-        var groups = OrderedDictionary<ObjectIdentifier, [Term]>()
+        var groups = OrderedDictionary<Variable.Id, [Term]>()
         
         for term in terms where term.factor != 0 {
-            groups[ObjectIdentifier(term.variable), default: []].append(term)
+            groups[term.variable.id, default: []].append(term)
         }
 
         guard groups.count < terms.count else { return self }

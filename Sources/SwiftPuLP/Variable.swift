@@ -15,6 +15,9 @@ import PythonKit
  */
 public class Variable {
     
+    /// Type of a variable id.
+    public typealias Id = ObjectIdentifier
+    
     /**
      A domain identifies the range of values of a variable:
      - binary (values 0 and 1).
@@ -44,6 +47,13 @@ public class Variable {
     /// Domain  of values for this variable.
     /// Default = real.
     public let domain: Domain
+    
+    // MARK: Computed properties
+    
+    /// Answers a unique id for the variable.
+    var id: Id {
+        ObjectIdentifier(self)
+    }
     
     // MARK: Initializing
     
@@ -107,7 +117,7 @@ extension Variable: PythonConvertible {
     func pythonObject(withCache cache: VariableCache?) -> PythonObject {
         guard let cache = cache else { return pythonObject }
 
-        return cache[ObjectIdentifier(self), default: pythonObject]
+        return cache[self.id, default: pythonObject]
     }
     
 }
@@ -123,7 +133,7 @@ public class VariableCache {
     // MARK: Stored properties
     
     // Links variable names to generated PuLP variables.
-    private var cache = [ObjectIdentifier: PythonObject]()
+    private var cache = [Variable.Id: PythonObject]()
     
     // MARK: Initializing
     
@@ -134,7 +144,7 @@ public class VariableCache {
     
     /// Answers the cached PuLP variable.
     /// If none found, generates a new one and caches it.
-    public subscript(key: ObjectIdentifier, default defaultValue: @autoclosure () -> PythonObject) -> PythonObject {
+    public subscript(key: Variable.Id, default defaultValue: @autoclosure () -> PythonObject) -> PythonObject {
         get {
             return cache[key] ?? {
                 let value = defaultValue()
