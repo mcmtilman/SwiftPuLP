@@ -19,20 +19,6 @@ final class LinearFunctionTests: XCTestCase {
     
     // MARK: Linear function tests
     
-    func testDefaultTermFactor() {
-        let x = Variable("x")
-        let term = Term(variable: x)
-        
-        XCTAssertEqual(term.factor, 1)
-    }
-    
-    func testDefaultsFunction() {
-        let function = LinearFunction()
-        
-        XCTAssertEqual(function.terms, [])
-        XCTAssertEqual(function.constant, 0)
-    }
-    
     func testVariableAsFunction() {
         let x = Variable("x")
         let function = LinearFunction(variable: x)
@@ -176,7 +162,7 @@ final class LinearFunctionTests: XCTestCase {
         XCTAssertEqual(function, (2 * x + 10) + (3 * y + 5))
     }
     
-    func testMultipleVariableSum() {
+    func testAddMultipleVariables() {
         let (x, y, z) = (Variable("x"), Variable("y"), Variable("z"))
         let function = LinearFunction(terms: [Term(variable: x), Term(variable: y), Term(variable: z)])
         
