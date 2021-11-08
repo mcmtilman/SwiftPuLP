@@ -2,9 +2,11 @@
 
 SwiftPuLP wraps the Python Linear Programming PuLP module, using a similar style to create and solve models.
 
-## Core model
+## Overview
 
-The building blocks are:
+Solving a Linear Programming consists of creating a model of the problem using variables, linear functions and constraints, solving this model and returning a result.
+
+The building blocks of the core model are:
 
 * **Variable**, having a unique name, a domain, and optional minimum and maximum bounds.
 
@@ -14,7 +16,9 @@ The building blocks are:
 
 * The **Model**, consisting of an optional *Objective* (a linear function and an optimization goal: minimize or maximize) and zero or more linear constraints.
 
-* The **Solver**, using the default solver from PuLP to realize the model's objective and return an optional *Result* with a status and a dictionary of variable - value pairs.
+The **Solver**, using the default solver from PuLP, realizes the model's objective and return an optional result.
+
+The **Result** contains a status and a dictionary of variable name - value pairs.
 
 ### Variable
 
@@ -30,7 +34,7 @@ To create a variable use the following public initializer.
 
     }
 
-The real domain corresponds *continuous* variables in PuLP.
+The *real* domain corresponds to *continuous* variables in PuLP.
 
 #### Invalid variables
 

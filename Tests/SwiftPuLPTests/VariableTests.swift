@@ -8,7 +8,12 @@
 
 import XCTest
 import PythonKit
-import SwiftPuLP
+
+#if DEBUG
+    @testable import SwiftPuLP
+#else
+    import SwiftPuLP
+#endif
 
 /**
  Tests creating and converting a variable.
@@ -16,6 +21,8 @@ import SwiftPuLP
 final class VariableTests: XCTestCase {
     
     let PuLP = Python.import("pulp")
+    
+#if DEBUG
     
     // MARK: Variable tests
        
@@ -37,14 +44,6 @@ final class VariableTests: XCTestCase {
         XCTAssertEqual(variable.domain, .real)
     }
 
-    func testBinaryVariable() {
-        let variable = Variable("x", minimum: 0, maximum: 1, domain: .binary)
-
-        XCTAssertEqual(variable.minimum, 0)
-        XCTAssertEqual(variable.maximum, 1)
-        XCTAssertEqual(variable.domain, .binary)
-    }
-
     func testDefaultBinaryVariable() {
         let variable = Variable("x", domain: .binary)
 
@@ -53,6 +52,28 @@ final class VariableTests: XCTestCase {
         XCTAssertEqual(variable.maximum, 1)
     }
     
+    // MARK: Invalid variable tests
+       
+    func testInvalidVariable() {
+        let variable = Variable("x y", minimum: 3, maximum: 1, domain: .integer)
+        
+        XCTAssertEqual(variable.name, "x y")
+        XCTAssertEqual(variable.minimum, 3)
+        XCTAssertEqual(variable.maximum, 1)
+        XCTAssertEqual(variable.domain, .integer)
+    }
+
+    func testInvalidBinaryVariable() {
+        let variable = Variable("x", minimum: -1, maximum: 2, domain: .binary)
+        
+        XCTAssertEqual(variable.name, "x")
+        XCTAssertEqual(variable.minimum, -1)
+        XCTAssertEqual(variable.maximum, 2)
+        XCTAssertEqual(variable.domain, .binary)
+    }
+
+#endif
+
     // MARK: Conversion to PuLP tests
     
     func testVariableToPuLP() {

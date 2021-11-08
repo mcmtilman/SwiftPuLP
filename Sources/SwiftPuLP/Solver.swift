@@ -56,11 +56,12 @@ public struct Solver {
     // MARK: Solving
     
     /// Solves given model and returns a result with status and computed variables.
-    public func solve(_ model: Model) -> Result? {
+    /// Optionally log the solver's messages.
+    public func solve(_ model: Model, logging: Bool = false) -> Result? {
         let pythonModel = model.pythonObject
         let solver = PuLP.LpSolverDefault.copy()
         
-        solver.msg = false
+        solver.msg = logging.pythonObject
         solver.solve(pythonModel)
         
         return Result(pythonModel)
@@ -104,7 +105,7 @@ extension Solver.Result: ConvertibleFromPython {
         return (name, value)
     }
     
-   // MARK: Initializing
+    // MARK: Initializing
 
     /// Creates a result from given python model.
     public init?(_ object: PythonObject) {

@@ -61,11 +61,9 @@ public struct Model {
     /// The linear constraints.
     public let constraints: [(constraint: LinearConstraint, name: String)]
     
-   // MARK: Initializing
+    // MARK: Initializing
     
-    /**
-     Creates a model with given name, optional objective and constraints.
-     */
+    /// Creates a model with given name, optional objective and constraints.
     public init(_ name: String, objective: Objective? = nil, constraints: [(constraint: LinearConstraint, name: String)] = []) {
         self.name = name
         self.objective = objective

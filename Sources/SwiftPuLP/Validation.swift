@@ -37,6 +37,7 @@ extension Variable {
     // MARK: Computed properties
     
     /// Returns validation errors.
+    /// If not empty, the PuLP solver may fail.
     public var validationErrors: [ValidationError] {
         var errors = [ValidationError]()
         
@@ -109,6 +110,7 @@ extension Model {
     // MARK: Computed properties
 
     /// Returns validation errors.
+    /// If not empty, the PuLP solver may fail.
     public var validationErrors: [ValidationError] {
         var errors = [ValidationError]()
         

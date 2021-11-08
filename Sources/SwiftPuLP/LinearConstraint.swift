@@ -123,14 +123,17 @@ public extension Variable {
     
     // MARK: Building linear constraints
     
+    /// Converts lhs variable x and rhs constant c into constraint 1 * x <= c.
     static func <= (lhs: Variable, rhs: Double) -> LinearConstraint {
         LinearConstraint(variable: lhs, comparison: .lte, constant: rhs)
     }
     
+    /// Converts lhs variable x and rhs constant c into constraint 1 * x = c.
     static func == (lhs: Variable, rhs: Double) -> LinearConstraint {
         LinearConstraint(variable: lhs, comparison: .eq, constant: rhs)
     }
     
+    /// Converts lhs variable x and rhs constant c into constraint 1 * x >= c.
     static func >= (lhs: Variable, rhs: Double) -> LinearConstraint {
         LinearConstraint(variable: lhs, comparison: .gte, constant: rhs)
     }
