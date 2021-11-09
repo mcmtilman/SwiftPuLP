@@ -56,7 +56,7 @@ The variable is not valid if:
 
 ### LinearFunction
 
-A linear function is a linear combination of zero or more weighted variables (aka *terms*))and an optional constant. The most basic cases consist of:
+A linear function is a linear combination of zero or more weighted variables (aka *terms*)) and an optional constant. The most basic cases consist of:
 
 * a single variable without coefficient
 * a single constant.
@@ -147,7 +147,7 @@ To create a constraint use on of the following public initializers.
 
 #### Use arithmethic and comparison operators to build a linear constraint
 
-Arithmetic and comparison operators may be used in a more intuitive way to build linear constraints, as illustrated in the following examples.
+Arithmetic and comparison operators may be used in a more intuitive way to build linear constraints, as illustrated by the following examples.
 
     x <= 20
     
@@ -186,7 +186,7 @@ To create an objective use one of the following public initializers.
 
 A model is not valid if:
 
-* the variable's name contains spaces;
+* the model's name contains spaces;
 * its objective function and constraints use invalid variables or distinct variables with the same name
 * it uses multiple constraints with the same label.
 
@@ -207,7 +207,7 @@ The following example illustrates how to create a simple valid model.
 
 ### Solver
 
-The Solver takes no parameters and uses the default PuLP solver, disabling logging of messages to standard output.
+The Solver uses the default PuLP solver, disabling logging of messages to standard output by default.
 
 The solve a model use the following method.
 
