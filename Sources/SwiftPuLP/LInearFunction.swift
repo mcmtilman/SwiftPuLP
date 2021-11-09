@@ -10,96 +10,113 @@ import Collections
 import PythonKit
 
 /**
- Linear functions are linear combinations of variables and (double) factors and constants.
+ A linear function is the sum of zero or more terms and a constant, where each term is the product of a variable with a coefficient (aka factor).
 
- They have the canonical format: a * x + b * y + ... + c, where:
-    * factors a, b, ... represent non-zero double coefficients which may be omitted in most cases when 1;
-    * the trailing double constant c may be omitted when 0.
-    * x, y, ... represent different variables.
+ Linear functions have the canonical form a * x + b * y + ... + c, where:
+    * x, y, ... represent different variables;
+    * factors a, b, ... represent non-zero double coefficients (which may be omitted in most cases when 1);
+    * the trailing double constant c may typically be omitted when 0.
  
- Note. Expressions consisting of a single variable or a single constant are not recognized as linear functions by the compiler.
- To use variable x as a function, the + prefix operator serves as a shortcut for 1 * x.
+ Overloading the arithmetic operators allows us to construct linear functions as in the following example.
+ 
+        let (x, y) = (Variable("x"), Variable("y"))
+        let function = 2 * x + 3 * y + 10
+
+ Note that expressions consisting of a single variable or a single constant are not recognized as linear functions by the compiler. To use a variable x as a linear function, apply the + prefix operator (as a shortcut for 1 * x).
  
         let x = Variable("x")
- 
         let function = +x
  
  */
 public struct LinearFunction {
     
-    /// A term is a variable multiplied by a factor (its coefficient).
+    // MARK: -
+    
+    ////// A term is a variable multiplied by a factor.
     public struct Term {
         
-        // MARK: Stored properties
+        // MARK: -
         
-        // The variable of a term.
-        // When creating a linear function, terms with same variable are merged,
-        // with the combined factor.
+        /// The variable of a term.
         let variable: Variable
 
-        // The factor.
-        // Default = 1.
+        /// The factor.
         let factor: Double
         
-        // MARK: Initializing
+        // MARK: -
         
         /// Creates a term consisting of a variable with optional factor.
+        ///
+        /// - Parameters:
+        ///   - variable: Variable of the term.
+        ///   - factor: Coefficient of the variable (default = 1).
         public init(variable: Variable, factor: Double = 1) {
             self.factor = factor
             self.variable = variable
         }
         
-        // MARK: Evaluating
+        // MARK: -
         
-        // Answers the result of applying the term to given values dictionary.
-        // Ignores variables with name not listed in the dictionary.
-        func callAsFunction(_ values: [String: Double]) -> Double {
-            (values[variable.name] ?? 0) * factor
+        /// Answers the result of applying the term to given parameters.
+        ///
+        /// - Parameter parameters: Parameter values keyed by variable names. If the variable name is not found in the dictionary, a value of 0 is assumed.
+        /// - Returns: Parameter value * factor.
+        func callAsFunction(_ parameters: [String: Double]) -> Double {
+            (parameters[variable.name] ?? 0) * factor
         }
         
     }
     
-    // MARK: Stored properties
+    // MARK: -
     
-    // Terms of the linear function.
-    // May be empty.
+    /// Terms of the linear function.
+    /// May be empty.
     let terms: [Term]
     
-    // Minimal element of a linear function.
+    /// Constant of a linear function.
     let constant: Double
     
-    // MARK: Initializing
+    // MARK: -
     
     /// Creates a linear function with given terms and constant of the form Σ ai * xi + c.
+    /// 
     /// - Parameters:
     ///   - terms: List of variable - factor terms. May be empty (default).
-    ///   - constant: constant c (default = 0).
+    ///   - constant: Constant c (default = 0).
     public init(terms: [Term] = [], constant: Double = 0) {
         self.terms = terms
         self.constant = constant
     }
     
     /// Creates a linear function consisting of a single term with given variable and factor 1.
-    /// - Parameter variable: The variable,
+    ///
+    /// - Parameter variable: The variable (implicit factor 1).
     public init(variable: Variable) {
         self.init(terms: [variable.term()])
     }
     
-    // MARK: Evaluating
+    // MARK: -
     
-    /// Answers the result of applying the function to given parameters.
+    /// Answers the result of applying the function to given parameters. Allows client code to calculate the objective function applied to the variables computed by the solver.
     ///
-    /// If a variable is not present in the parameter dictionary, value 0 is assumed.
-    public func callAsFunction(_ values: [String: Double]) -> Double {
-        terms.reduce(constant) { total, term in total + term(values) }
+    /// - Parameter parameters: Parameter values keyed by variable names. If a variable name is not found in the dictionary, a value of 0 is assumed
+    /// - Returns: Total sum of the terms applied to the parameters + constant.
+    public func callAsFunction(_ parameters: [String: Double]) -> Double {
+        terms.reduce(constant) { total, term in total + term(parameters) }
     }
     
-    // MARK: Normalizing
-    
     /// Answers the result of merging terms with same variables, ignoring merged terms with factor 0.
-    /// Keeps original order of first occurrence of variables.
+    /// Keeps original order of first occurrence of variables. The result is a linear function in canonical form.
     ///
-    /// EXample: 2 * x + 3 * y - 5 * z + x - 4 * y + y + 10 becomes 3 * x - 5 * z + 10 after normalization,
+    /// Before normalization.
+    ///
+    ///     2 * x + 3 * y - 5 * z + x - 4 * y + y + 10
+    ///
+    /// After normalization.
+    ///
+    ///     3 * x - 5 * z + 10
+    ///
+    /// - Returns: A linear function calculating the same result as the receiver. Every variable occurs only once in the terms.
     public func normalized() -> Self {
         guard terms.count > 0 else { return self }
         guard terms.count > 1 else { return terms[0].factor == 0 ? Self() : self }
@@ -123,45 +140,58 @@ public struct LinearFunction {
     
 }
 
+// MARK: - LinearExpression -
 
 /**
- Represents linear functions and variables.
+ LinearExpression represents linear functions and variables.
  Simplifies the definition of some operations for building linear functions.
  
  Without ``Variable`` and ``LinearFunction`` adopting this protocol, the compiler runs into problems when adding 3 or more variables:
 
         let (x, y, z) = (Variable("x"), Variable("y"), Variable("z"))
-        let function = x + y + z
+        let function = x + y + z // does not compile
  
  Type-annotating the function or adding parentheses does not help, while the following does work:
  
         let (x, y, z) = (Variable("x"), Variable("y"), Variable("z"))
         var function = x + y
  
-        function = x + y + z
- 
+        function = x + y + z // compiles
  */
 public protocol LinearExpression {}
+
+
+// MARK: -
 
 /**
  Variable adopts LinearExpression.
  */
 extension Variable: LinearExpression {}
 
+
+// MARK: -
+
 /**
  LinearFunction adopts LinearExpression.
  */
 extension LinearFunction: LinearExpression {}
 
+// MARK: -
+
 /**
- Operator for adding lhs (variable | linear function) and rhs (variable | linear function).
+ Operator for adding the lhs and rhs expressions
  Combines constants, but does not otherwise normalize the resulting function.
  For instance: adding function 2 * x + 5 and function 3 * x + 10 yields 2 * x + 3 * x + 15. Use ``LinearFunction/normalized()`` to merge the x variables into 5 * x.
- Handles case where compiler get confused (sddition of three variables or more in initializer).
+ Handles case where compiler get confused (addition of three variables or more in initializer).
  
  Switches over the four possible combinations to improve performance and make requirements of adopting types simpler.
  
  Intentionally not modelled as a static function on a LinearExpression extension.
+ 
+ - Parameters:
+    - lhs: Variable or LinearFunction.
+    - rhs: Variable or LinearFunction.
+ - Returns: Non-normalized linear function representng the sum of lhs and rhs.
  */
 public func + (lhs: LinearExpression, rhs: LinearExpression) -> LinearFunction {
     switch (lhs, rhs) {
@@ -179,12 +209,14 @@ public func + (lhs: LinearExpression, rhs: LinearExpression) -> LinearFunction {
 }
 
 
+// MARK: - Arithmetic operators
+
 /**
  Covenience functions to multiply linear functions with a factor.
  */
 public extension Double {
     
-    // MARK: Building linear functions
+    // MARK: -
     
     /// Converts lhs factor a and rhs variable x into linear function a * x + 0.
     static func * (lhs: Double, rhs: Variable) -> LinearFunction {
@@ -203,13 +235,15 @@ public extension Double {
 }
 
 
+// MARK: -
+
 /**
  Covenience functions to compose linear functions using basic arithmetic operators.
  The resulting functions are not normalized: if a variable appears multiple times in the result, its occurences are not merged. For instance:
  */
 public extension Variable {
     
-    // MARK: Arithmetic operators building linear functions
+    // MARK: -
     
     /// Converts lhs variable x into linear function 1 * x + 0
     static prefix func + (variable: Variable) -> LinearFunction {
@@ -251,7 +285,7 @@ public extension Variable {
         LinearFunction(terms: [lhs.term()] + rhs.terms.map(\.negated), constant: -rhs.constant)
     }
     
-    // MARK: Private building linear functions
+    // MARK: -
     
     // Answers a Term with the variable and given factor.
     fileprivate func term(factor: Double = 1) -> LinearFunction.Term {
@@ -261,54 +295,66 @@ public extension Variable {
 }
 
 
+// MARK: -
+
 /**
  Covenience functions to compose linear functions using basic arithmetic operators.
  The resulting functions are not ``LinearFunction.normalized()``: if a variable appears multiple times in the result, its occurences are not merged.
  */
 public extension LinearFunction {
     
-    // MARK: Building linear functions
+    // MARK: -
     
+    /// Returns the function as is.
     static prefix func + (function: LinearFunction) -> LinearFunction {
         function
     }
      
+    /// Converts function Σ ai * xi + c into Σ -ai * xi - c.
     static prefix func - (function: LinearFunction) -> LinearFunction {
         LinearFunction(terms: function.terms.map(\.negated), constant: -function.constant)
     }
      
+    /// Converts lhs function Σ ai * xi + c and rhs constant d into Σ ai * xi + (c + d).
     static func + (lhs: LinearFunction, rhs: Double) -> LinearFunction {
         LinearFunction(terms: lhs.terms, constant: lhs.constant + rhs)
     }
     
+    /// Converts lhs function Σ ai * xi + c and rhs variable x into Σ ai * xi + 1 * x + c.
     static func + (lhs: LinearFunction, rhs: Variable) -> LinearFunction {
         LinearFunction(terms: lhs.terms + [rhs.term()], constant: lhs.constant)
     }
     
+    /// Converts lhs function Σ ai * xi + c and rhs function Σ bi * yi + d into Σ ai * xi + Σ bi * yi + (c + d).
     static func + (lhs: LinearFunction, rhs: LinearFunction) -> LinearFunction {
         LinearFunction(terms: lhs.terms + rhs.terms, constant: lhs.constant + rhs.constant)
     }
     
+    /// Converts lhs function Σ ai * xi + c and rhs constant d into Σ ai * xi + (c - d).
     static func - (lhs: LinearFunction, rhs: Double) -> LinearFunction {
         LinearFunction(terms: lhs.terms, constant: lhs.constant - rhs)
     }
     
+    /// Converts lhs function Σ ai * xi + c and rhs variable x into Σ ai * xi - 1 * x + c.
     static func - (lhs: LinearFunction, rhs: Variable) -> LinearFunction {
         LinearFunction(terms: lhs.terms + [rhs.term(factor: -1)], constant: lhs.constant)
     }
     
+    /// Converts lhs function Σ ai * xi + c and rhs function Σ bi * yi + d into Σ ai * xi + Σ -bi * yi + (c - d).
     static func - (lhs: LinearFunction, rhs: LinearFunction) -> LinearFunction {
         LinearFunction(terms: lhs.terms + rhs.terms.map(\.negated), constant: lhs.constant - rhs.constant)
     }
     
 }
 
+// MARK: -
+
 /**
  Covenience functions to compose linear functions.
  */
 extension LinearFunction.Term {
     
-    // MARK: Private computed properties
+    // MARK: -
     
     // Answers the term with negated factor.
     fileprivate var negated: Self {
@@ -318,21 +364,26 @@ extension LinearFunction.Term {
 }
 
 
+// MARK: - PythonConvertible -
+
 /**
  Linear function adopts PythonConvertible.
  */
 extension LinearFunction: PythonConvertible {
 
-    // MARK: Computed properties
+    // MARK: -
     
     /// Converts the linear function into a PuLP LpAffineExpression.
     public var pythonObject: PythonObject {
         pythonObject(withCache: nil)
     }
 
-    // MARK: Converting to Python
+    // MARK: -
     
-    // Converts the function into an LpAffineExpression, optionally caching PuLP variables.
+    // Converts the function into a LpAffineExpression, optionally caching PuLP variables.
+    //
+    // - Parameter cache: Cache of generated Python LpVariable instances for each SwithPuLP variable.
+    // - Returns: Python LpAffineExpression.
     func pythonObject(withCache cache: VariableCache?) -> PythonObject {
         func pythonTuple(_ term: Term) -> PythonObject {
             PythonObject(tupleOf: term.variable.pythonObject(withCache: cache), term.factor)
@@ -344,8 +395,13 @@ extension LinearFunction: PythonConvertible {
 }
 
 
+// MARK: - Equatable -
+
 /**
  LinearFunction adopts Equatable with default behaviour.
  */
 extension LinearFunction.Term: Equatable {}
+
+// MARK: -
+
 extension LinearFunction: Equatable {}

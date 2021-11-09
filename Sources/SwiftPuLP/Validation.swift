@@ -10,7 +10,7 @@ import Foundation
 
 /**
  Single validation error, such as an invalid variable name or a duplicate constraint name.
- Each error identifies the model element in error and the reason for the error.
+ An error identifies the model element in error, and, if necessary, more details.
  */
 public enum ValidationError {
     
@@ -24,20 +24,22 @@ public enum ValidationError {
 }
 
 
+// MARK: - Validating -
+
 /**
  Variable supports validation.
  */
 extension Variable {
     
-    // MARK: Constants
+    // MARK: -
     
     // Characters in this set may not be used in variable names.
     static let specialChars = CharacterSet(charactersIn: "-+[] ->/")
     
-    // MARK: Computed properties
-    
     /// Returns validation errors.
     /// If not empty, the PuLP solver may fail.
+    ///
+    /// Does not return validation errors related to other variables, such as duplicate name errors.
     public var validationErrors: [ValidationError] {
         var errors = [ValidationError]()
         
@@ -46,7 +48,7 @@ extension Variable {
         return errors
     }
     
-    // MARK: Validating
+    // MARK: -
 
     // Generates errors for:
     // - Empty names or names containing one or more special characters.
@@ -69,12 +71,14 @@ extension Variable {
 }
 
 
+// MARK: -
+
 /**
  LinearFunction supports validation.
  */
 extension LinearFunction {
     
-    // MARK: Validating
+    // MARK: -
     
     // Collects the term variables.
     func collectVariables(into variables: inout [Variable.Id: Variable]) {
@@ -86,12 +90,14 @@ extension LinearFunction {
 }
 
 
+// MARK: -
+
 /**
  LinearConstraint supports validation,
  */
 extension LinearConstraint {
     
-    // MARK: Validating
+    // MARK: -
     
     // Delegates collection of variables to the linear function.
     func collectVariables(into variables: inout [Variable.Id: Variable]) {
@@ -101,13 +107,15 @@ extension LinearConstraint {
 }
 
 
+// MARK: -
+
 /**
  Model supports validation, delegating variable validation to its objective function and constraints.
  Additionally the model is responsible for detecting name conflicts in the variables and in the constraints.
  */
 extension Model {
     
-    // MARK: Computed properties
+    // MARK: -
 
     /// Returns validation errors.
     /// If not empty, the PuLP solver may fail.
@@ -119,7 +127,7 @@ extension Model {
         return errors
     }
     
-    // MARK: Validating
+    // MARK: -
     
     // Collects all errors from its nested elements and verifies that variable / constraint names are unique.
     func collectErrors(into errors: inout [ValidationError]) {
@@ -165,6 +173,8 @@ extension Model {
 
 }
 
+
+// MARK: - Equatable -
 
 /**
  ValidationError adopts Equatable.

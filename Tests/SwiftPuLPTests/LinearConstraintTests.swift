@@ -8,7 +8,12 @@
 
 import XCTest
 import PythonKit
-import SwiftPuLP
+
+#if DEBUG
+    @testable import SwiftPuLP
+#else
+    import SwiftPuLP
+#endif
 
 /**
  Tests building linear constraints.
@@ -17,6 +22,8 @@ final class LinearConstraintTests: XCTestCase {
 
     let PuLP = Python.import("pulp")
     
+#if DEBUG
+
     // MARK: Comparison tests
     
     func testVariableLessThanConstraint() {
@@ -72,6 +79,8 @@ final class LinearConstraintTests: XCTestCase {
         XCTAssertEqual(constraint.comparison, .gte)
         XCTAssertEqual(constraint.constant, 5)
     }
+
+#endif
     
     // Evaluation tests
     

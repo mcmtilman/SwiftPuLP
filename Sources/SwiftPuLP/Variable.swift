@@ -22,9 +22,13 @@ import PythonKit
  */
 public class Variable {
     
-    // Type of a variable id.
+    // MARK: -
+    
+    ////// Type of a variable id.
     typealias Id = ObjectIdentifier
     
+    // MARK: -
+
     /**
      A domain specifies the range of (Double) values a variable can take.
      
@@ -39,39 +43,38 @@ public class Variable {
 
     }
 
-    // MARK: Stored properties
+    // MARK: -
     
     /// The unique name of the variable.
     ///
     /// Should not be empty and should not contain special characters.
     public let name: String
     
-    // Optional lower bound for the values (inclusive).
-    
-    // If present must not exceed a non-nil maximum.
-    // If present must be 0 for binary variables.
+    /// Optional lower bound for the values (inclusive).
+    ///
+    /// If present must not exceed a non-nil maximum.
+    /// If present must be 0 for binary variables.
     let minimum: Double?
     
-    // Optional upper bound for the values (inclusive).
-    
-    // If present must be 1 for binary variables.
+    /// Optional upper bound for the values (inclusive).
+    ///
+    /// If present must be 1 for binary variables.
     let maximum: Double?
     
-    // Domain  of values for this variable.
+    /// Domain of values for this variable.
     let domain: Domain
     
-    // MARK: Computed properties
-    
-    // Answers a unique id for the variable.
+    /// Answers a unique id for the variable.
     var id: Id {
         ObjectIdentifier(self)
     }
     
-    // MARK: Initializing
+    // MARK: -
     
     /// Creates a variable with given name and ``Domain``.
     /// The variable may optionally specify a lower and / or upper bound for its values.
     /// Invalid names or invalid bounds / domain combinations may result in ``validationErrors``.
+    /// 
     /// - Parameters:
     ///   - name: Unique name of the variable. Should not be empty and should not contain any of the characters "-+[] ->/"
     ///   - minimum: Specifies a lower bound for the variable if present. If present should not exceed a non-nil maximum.= and must be 0 for binary variables.
@@ -86,54 +89,7 @@ public class Variable {
 
 }
 
-
-/**
- Variable domain adopts PythonConvertible.
- */
-extension Variable.Domain: PythonConvertible {
-
-    // MARK: Computed properties
-    
-    /// Converts the domain into a PuLP category.
-    public var pythonObject: PythonObject {
-        switch self {
-        case .binary:
-            return PuLP.LpBinary
-        case .real:
-            return PuLP.LpContinuous
-        case .integer:
-            return PuLP.LpInteger
-        }
-    }
-    
-}
-
-
-/**
- Variable adopts PythonConvertible.
- */
-extension Variable: PythonConvertible {
-    
-    // MARK: Computed properties
-    
-    /// Converts the variable into a PuLP LpVariable.
-    public var pythonObject: PythonObject {
-        PuLP.LpVariable(name: name, lowBound: minimum, upBound: maximum, cat: domain.pythonObject)
-    }
-    
-    // MARK: Converting to Python
-    
-    // Converts the variable into a PuLP LpAffineExpression, optionally caching PuLP variables.
-    // - Parameter cache: If present caches a generated Python LpVariable instance for each SwithPuLP variable.
-    // - Returns: Cached or newly generated Python LpVariable.
-    func pythonObject(withCache cache: VariableCache?) -> PythonObject {
-        guard let cache = cache else { return pythonObject }
-
-        return cache[self.id, default: pythonObject]
-    }
-    
-}
-
+// MARK: -
 
 /**
  PuLP expects only one object for all similarly-named variables.
@@ -142,12 +98,12 @@ extension Variable: PythonConvertible {
  */
 class VariableCache {
     
-    // MARK: Private stored properties
+    // MARK: -
     
     // Links variable names to generated PuLP variables.
     private var cache = [Variable.Id: PythonObject]()
     
-    // MARK: Accessing
+    // MARK: -
     
     // Answers the cached PuLP variable.
     // If none found, generates a new one and caches it.
@@ -163,15 +119,72 @@ class VariableCache {
 }
 
 
+// MARK: - PythonConvertible -
+
+/**
+ Converting Variable into Python.
+ */
+extension Variable: PythonConvertible {
+    
+    // MARK: -
+    
+    /// Converts the variable into a PuLP LpVariable.
+    public var pythonObject: PythonObject {
+        PuLP.LpVariable(name: name, lowBound: minimum, upBound: maximum, cat: domain.pythonObject)
+    }
+    
+    // MARK: -
+
+    /// Converts the variable into a PuLP LpVariable, optionally caching generated PuLP variables.
+    ///
+    /// - Parameter cache: If present caches a generated Python LpVariable instance for each SwithPuLP variable.
+    /// - Returns: Cached or newly generated Python LpVariable.
+    func pythonObject(withCache cache: VariableCache?) -> PythonObject {
+        guard let cache = cache else { return pythonObject }
+
+        return cache[self.id, default: pythonObject]
+    }
+    
+}
+
+
+// MARK: -
+
+/**
+ Converting Variable.Domain into Python.
+ */
+extension Variable.Domain: PythonConvertible {
+
+    // MARK: -
+
+    /// Converts the domain into a PuLP category.
+    public var pythonObject: PythonObject {
+        switch self {
+        case .binary:
+            return PuLP.LpBinary
+        case .real:
+            return PuLP.LpContinuous
+        case .integer:
+            return PuLP.LpInteger
+        }
+    }
+    
+}
+
+
+// MARK: - Equatable -
+
 /**
  Variable adopts Equatable.
  */
 extension Variable: Equatable {
  
+    // MARK: -
+
     /// Returns true if the lhs and rhs variables are the same content-wise, false otherwise.
     /// Mainly used for testing.
     ///
-    /// Not needed if Variable were a struct.
+    /// - Returns: True if name, minimum, maximum and domain are equal.
     public static func == (lhs: Variable, rhs: Variable) -> Bool {
         lhs.name == rhs.name
             && lhs.minimum == rhs.minimum

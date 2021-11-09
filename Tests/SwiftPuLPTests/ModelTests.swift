@@ -8,7 +8,12 @@
 
 import XCTest
 import PythonKit
-import SwiftPuLP
+
+#if DEBUG
+    @testable import SwiftPuLP
+#else
+    import SwiftPuLP
+#endif
 
 /**
  Tests creating and converting a model.
@@ -17,6 +22,8 @@ final class ModelTests: XCTestCase {
     
     let PuLP = Python.import("pulp")
     
+#if DEBUG
+
     // MARK: Objective tests
     
     func testVariableObjective() {
@@ -45,18 +52,13 @@ final class ModelTests: XCTestCase {
     
     // MARK: Model tests
 
-    func testModel() {
-        let x = Variable("x")
-        let model = Model("XYZ", objective: Objective(x))
-        
-        XCTAssertNotNil(model)
-    }
-
     func testDefaultModel() {
         let model = Model("XYZ")
         
         XCTAssertNil(model.objective)
     }
+
+#endif
 
     // MARK: Conversion to PuLP tests
     

@@ -17,7 +17,7 @@ let PuLP = Python.import("pulp")
  */
 public extension PythonObject {
     
-    // MARK: Computed properties
+    // MARK: -
     
     /// Answers the id of the object.
     var id: Double? {
@@ -32,9 +32,12 @@ public extension PythonObject {
         self.isInstance(of: Python.type(Python.None))
     }
     
-    // MARK: Testing
+    // MARK: -
     
     /// Answers true if the object is an instance of given type.
+    ///
+    /// - Parameter type: Python type object.
+    /// - Returns: True if the object is an instance of type.
     func isInstance(of type: PythonObject) -> Bool {
         Python.isinstance(self, type) == true
     }

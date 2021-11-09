@@ -10,9 +10,10 @@ import PythonKit
 
 /*
  Represents an LP problem consisting of an objective and a list of contraints.
- A model should have a non-empty name containing no spaces.
  */
 public struct Model {
+    
+    // MARK: -
     
     /// Specifies if the objective function must be maximized or minimized.
     public enum Optimization {
@@ -21,27 +22,37 @@ public struct Model {
         
     }
     
+    // MARK: -
+
     /// Represent the objective of a linear programming problem: maximize or minimize a linear expression.
     public struct Objective {
         
-        // MARK: Stored properties
+        // MARK: -
         
         /// The linear function to be optimized.
-        public let function: LinearFunction
+        let function: LinearFunction
             
         /// The optimization to be performed.
         /// Default = minimize.
-        public let optimization: Optimization
+        let optimization: Optimization
             
-        // MARK: Initializing
+        // MARK: -
         
-        /// Creates an objective to optimize given linear expression.
+        /// Creates an objective to optimize given linear function.
+        ///
+        /// - Parameters:
+        ///   - function: Linear function to be optimized.
+        ///   - optimization: Type of optimization: .minimize or .maximize (default = .minimize).
         public init(_ function: LinearFunction, optimization: Optimization = .minimize) {
             self.function = function
             self.optimization = optimization
         }
         
         /// Creates an objective to optimize given linear variable.
+        ///
+        /// - Parameters:
+        ///   - variable: Variable to be optimized.
+        ///   - optimization: Type of optimization: .minimize or .maximize (default = .minimize).
         public init(_ variable: Variable, optimization: Optimization = .minimize) {
             self.function = LinearFunction(variable: variable)
             self.optimization = optimization
@@ -49,21 +60,25 @@ public struct Model {
         
     }
 
-    // MARK: Stored properties
+    // MARK: -
     
-    /// The name of the model. May not be empty and may not contain spaces.
-    public let name: String
+    /// The name of the model. Should not contain spaces.
+    let name: String
     
     /// The optional objective of the model.
-    /// Default = nil.
-    public let objective: Objective?
+    let objective: Objective?
     
-    /// The linear constraints.
-    public let constraints: [(constraint: LinearConstraint, name: String)]
+    /// Labeled linear constraints. The labels may be empty.
+    let constraints: [(constraint: LinearConstraint, name: String)]
     
-    // MARK: Initializing
+    // MARK: -
     
     /// Creates a model with given name, optional objective and constraints.
+    ///
+    /// - Parameters:
+    ///   - name: Name of the model. May be empty but should not contains spaces.
+    ///   - objective: Optional objective (default = nil).
+    ///   - constraints: Possibly empty list of labeled constraints. The labels may be empty.
     public init(_ name: String, objective: Objective? = nil, constraints: [(constraint: LinearConstraint, name: String)] = []) {
         self.name = name
         self.objective = objective
@@ -72,14 +87,17 @@ public struct Model {
     
 }
 
+
+// MARK: - PythonConvertible -
+
 /**
  Objective optimization adopts PythonConvertible.
  */
 extension Model.Optimization: PythonConvertible {
 
-    // MARK: Computed properties
+    // MARK: -
     
-    /// Converts the optimization into a PuLP sense.
+    /// Converts the optimization into a PuLP 'sense'.
     public var pythonObject: PythonObject {
         switch self {
         case .maximize:
@@ -92,14 +110,18 @@ extension Model.Optimization: PythonConvertible {
 }
 
 
+// MARK: -
+
 /**
  Model adopts PythonConvertible.
  */
 extension Model: PythonConvertible {
     
-    // MARK: Computed properties
+    // MARK: -
     
-    /// Converts the model into a PuLP problem, caching generated PuLP variables per Variable.
+    /// Converts the model into a PuLP problem.
+    ///
+    /// Caches and reuses the generated PuLP variable for each SwiftPuLP variable.
     public var pythonObject: PythonObject {
         var problem = PuLP.LpProblem(name: name, sense: objective?.optimization ?? .minimize) // set sense, even without an objective.
         let cache = VariableCache()
@@ -117,12 +139,20 @@ extension Model: PythonConvertible {
 }
 
 
+// MARK: - Equatable -
+
 /**
  Model adopts Equatable.
  */
 extension Model.Objective: Equatable {}
+
+// MARK: -
+
 extension Model: Equatable {
     
+    /// Answers if the lhs and rhs models are equal.
+    ///
+    /// - Returns: True if name, objective and (ordered) list of constraints are equal, false otherwise.
     public static func == (lhs: Model, rhs: Model) -> Bool {
         lhs.name == rhs.name
             && lhs.objective == rhs.objective
