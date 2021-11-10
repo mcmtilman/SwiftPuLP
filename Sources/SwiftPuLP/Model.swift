@@ -8,8 +8,8 @@
 
 import PythonKit
 
-/*
- Represents an LP problem consisting of an objective and a list of contraints.
+/**
+ Represents a linear programming problem consisting of an objective and a list of contraints.
  */
 public struct Model {
     
