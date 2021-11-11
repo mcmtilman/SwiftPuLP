@@ -95,7 +95,7 @@ print(f(parameters))
 
 > Note: If a variable is missing from the parameters, its value is assumed to be 0.
 
-> Warning: This function application is not optimized for handling large numbers of variables.
+> Warning: This function application is not optimized for handling large amounts of variables.
 
 ## Topics
 
