@@ -49,7 +49,7 @@ guard errors.isEmpty else { ... }
 The following example illustrates how to create a simple and valid model.
 
 ```swift
-let (x, y) = (Variable("x"), Variable("y"))    
+let (x, y) = (Variable("x", domain: .integer), Variable("y"))    
 let function = x + 2 * y    
 let objective = Objective(function, optimization: .maximize)    
 let constraints = [    
