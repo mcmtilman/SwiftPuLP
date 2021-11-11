@@ -4,7 +4,7 @@ A ``LinearFunction`` represents a linear combination of zero or more variables.
 
 ## Overview
 
-If x, y, z represent variables, then a linear combination of these variables has the canonical form.
+If x, y, z represent different variables, then a linear combination of these variables has the canonical form.
 
 ```swift
 a * x + b * y + c * z + d
@@ -12,14 +12,14 @@ a * x + b * y + c * z + d
 
 The weight factors a, b and c are the *coefficients*, and d is the *constant*.
 
-An expression like *a * x* is a term of the linear function. 
+An expression like *a \* x* is a *term* of the linear function. 
 
 ### Creating linear functions
 
 To create a linear function use one of the following public initializers.
 
 ```swift
-init(terms: [LinearFunction.Term], constant: Double = 0)
+init(terms: [Term], constant: Double = 0)
 
 init(variable: Variable)
 ```
@@ -32,7 +32,7 @@ LinearFunction.Term(variable: Variable, factor: Double = 1)
 
 ### Using arithmethic operators to build a linear function
 
-Arithmetic operators may be used in a more intuitive way to build linear functions, and parentheses may be used to alter precedence.
+Arithmetic operators may be used to build linear functions. Parentheses can be used to alter precedence.
 
 In the following examples x, y, z represent variables.
 
@@ -54,23 +54,48 @@ let function7 = 2 * x + 3 * y + z - 10
 let function8 = 2 * x - 3 * (y + z - x - 10)
 ```
 
+> Note: Expressions consisting of a single variable or a single constant are not recognized as linear functions by the compiler. To use a variable x as a linear function, either one of functions 1 through 3 will do.
+
 ### Normalizing a linear function
 
-When creating linear functions, the same variable may appear multiple times in the result. Only constants are combined into one value.
+When creating linear functions, the same variable may appear multiple times, and a term may have a zero factor. When using operators to build functions, some additional processing is required: constants are combined into a single value, while parentheses are removed and factors are propagated if needed.
 
-For instance, function8 is represented as follows.
+*Normalizing* a function is the process of reducing the function into its canonical form, whereby each variable appears only once, and whereby terms with 0 factor are removed.
 
-```swift
-2 * x - 3 * y - 3 * z + 3 * x + 30
-```
-
-*Normalizing* a function is the process of reducing the function into its canonical form, where each variable appears only once.
-
-For instance, normalizing function8 results in the following expression.
+For instance, the following function contains 2 terms with variables x and y each.
 
 ```swift
-5 * x - 3 * y - 3 * z + 30
+2 * x + 3 * y - 5 * z + x - 4 * y + y + 10
 ```
+
+Normalizing this function results in the following expression.
+
+```swift
+3 * x - 5 * z + 10
+```
+
+If z is an alias for x, then the normalized function becomes even simpler.
+
+```swift
+-2 * x + 10
+```
+
+### Applying a linear function
+
+Given a linear function f with variables x, y and z, then we can apply f on values for these variables. To do so, provide the parameters to f as a dictionary mapping variable names to values, as illustrated in the following example.
+
+```swift
+let (x, y, z) = (Variable("x"), Variable("y"), Variable("z"))
+let f = 2 * x + 3 * y - z
+let parameters = ["x": 5, "y": 1, "z": 2]
+
+print(f(parameters))
+// prints 11
+```
+
+> Note: If a variable is missing from the parameters, its value is assumed to be 0.
+
+> Warning: This function application is not optimized for handling large numbers of variables.
 
 ## Topics
 
