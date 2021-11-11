@@ -4,7 +4,7 @@ A ``Model`` represents an linear programming problem to be solved by one of the 
 
 ## Overview
 
-The model has an optional ``Model/Objective`` consisting of a linear function and an ``Model/Optimization`` goal, and zero or more labeled linear constraints.
+The model has an optional ``Model/Objective`` consisting of a linear function and a ``Model/Optimization`` goal, and zero or more labeled linear constraints.
 
 The optimization goal is one of:
 * minimize
@@ -32,7 +32,7 @@ init(_ variable: Variable, optimization: Optimization = .minimize)
 
 A model is not valid if:
 * the model's name contains spaces;
-* its objective function and constraints use invalid variables or distinct variables with the same name
+* its objective function or constraints use invalid variables or distinct variables with the same name
 * it uses multiple constraints with the same label.
 
 To verify that an individual model is valid check if the ``Model/validationErrors`` property returns an empty list.
@@ -44,9 +44,9 @@ let errors = model.validationErrors
 guard errors.isEmpty else { ... }
 ```
 
-### Example of a valid model
+#### Example of a valid model
 
-The following example illustrates creating a simple valid model.
+The following example illustrates how to create a simple and valid model.
 
 ```swift
 let (x, y) = (Variable("x"), Variable("y"))    
