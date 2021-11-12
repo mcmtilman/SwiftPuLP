@@ -14,7 +14,7 @@ The building blocks of the core model are:
 
     See: [Using Variables](Sources/SwiftPuLP/Documentation.docc/UsingVariables.md)
 
-* A **LinearFunction** represents a linear combination of zero or more variables, i.e. it has a form like *a \* x + b \* y + c*, where x and y denote variables, a and b are the coefficients (aka factors) and c is the constant.
+* A **LinearFunction** represents a linear combination of zero or more variables, i.e. it has a form like *a \* x + b \* y + c*, where *x* and *y* denote variables, *a* and *b* are the coefficients (aka factors) and *c* is the constant.
 
     A **Term** refers to a variable with its factor.
     
@@ -99,7 +99,7 @@ Much of the code is similar (apart from some refactoring to make it more testabl
     ]
     ```
 
-    This is both concise and readable: variables 'i' and 'j' identify a box in the sudoku grid, while variables 'k' and 'l' identify cells within the boxes.
+    This is both concise and readable: variables *i* and *j* identify a box in the Sudoku grid, while variables *k* and *l* identify cells within the boxes.
     
     Attempting to mirror this declaratively in Swift yields something like this (using zero-based coordinates).
     

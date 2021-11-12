@@ -14,7 +14,7 @@ The building blocks of the core model are:
     A ``Variable/Domain`` specifies a range of values (real, integer or binary), subject to optional bounds restrictions.
 
 - term **Linear function**:
-    A ``LinearFunction`` represents a linear combination of zero or more variables, i.e. it has a form like *a \* x + b \* y + c*, where x and y represent variables, a and b are the coefficients (aka factors) and c is the constant.
+    A ``LinearFunction`` represents a linear combination of zero or more variables, i.e. it has a form like *a \* x + b \* y + c*, where *x* and *y* denote variables, *a* and *b* are the coefficients (aka factors) and *c* is the constant.
 
     A ``LinearFunction/Term`` refers to a variable with its factor.
 
