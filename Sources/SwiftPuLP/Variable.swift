@@ -128,23 +128,23 @@ class VariableCache {
 // MARK: - PythonConvertible -
 
 /**
- Converting a Variable into a Python object.
+ Converting a Variable into a Python (PuLP) object.
  */
 extension Variable: PythonConvertible {
     
     // MARK: -
     
-    /// Converts the variable into a PuLP LpVariable.
+    /// Converts the variable into a LpVariable PythonObject.
     public var pythonObject: PythonObject {
         PuLP.LpVariable(name: name, lowBound: minimum, upBound: maximum, cat: domain.pythonObject)
     }
     
     // MARK: -
 
-    /// Converts the variable into a PuLP LpVariable, optionally caching generated PuLP variables.
+    /// Converts the variable into a LpVariable PythonObject, optionally caching variables.
     ///
-    /// - Parameter cache: If present caches the first generated PuLP LpVariable instance for each Variable.
-    /// - Returns: Cached or newly generated PuLP LpVariable.
+    /// - Parameter cache: If present, caches the first generated LpVariable PythonObject per Variable.
+    /// - Returns: Cached or newly generated LpVariable PythonObject.
     func pythonObject(withCache cache: VariableCache?) -> PythonObject {
         guard let cache = cache else { return pythonObject }
 
@@ -157,7 +157,7 @@ extension Variable: PythonConvertible {
 // MARK: -
 
 /**
- Converting Variable.Domain into a Python object.
+ Converting a Variable.Domain into a Python (PuLP) object.
  */
 extension Variable.Domain: PythonConvertible {
 

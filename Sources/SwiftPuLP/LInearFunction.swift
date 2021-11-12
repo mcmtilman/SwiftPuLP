@@ -12,7 +12,7 @@ import PythonKit
 /**
  A linear function is the sum of zero or more terms and a constant, where each term is the product of a variable with a coefficient (aka factor).
 
- Linear functions have the form *a \* x + b \* y + ... + c*, where:
+ Linear functions have the form *a ∗ x + b ∗ y + ... + c*, where:
  * x, y, ... denote variables;
  * a, b, ... are coefficients;
  * c is the constant of the function.
@@ -61,7 +61,7 @@ public struct LinearFunction {
         /// Answers the result of applying the term to given parameters.
         ///
         /// - Parameter parameters: Parameter values keyed by variable names. If the term's variable name is not found in the dictionary, a value of 0 is assumed.
-        /// - Returns: Parameter value \* factor.
+        /// - Returns: Parameter value ∗ factor.
         func callAsFunction(_ parameters: [String: Double]) -> Double {
             (parameters[variable.name] ?? 0) * factor
         }
@@ -79,7 +79,7 @@ public struct LinearFunction {
     
     // MARK: -
     
-    /// Creates a linear function summing given terms and constant, i.e. Σ ai \* xi + c.
+    /// Creates a linear function summing given terms and constant, i.e. Σ ai ∗ xi + c.
     /// 
     /// - Parameters:
     ///   - terms: List of terms (default = []).
@@ -216,12 +216,12 @@ public extension Double {
     
     // MARK: -
     
-    /// Converts lhs factor a and rhs variable x into linear function a \* x + 0.
+    /// Converts lhs factor a and rhs variable x into linear function a ∗ x + 0.
     static func * (lhs: Double, rhs: Variable) -> LinearFunction {
         LinearFunction(terms: [rhs.term(factor: lhs)])
     }
      
-    /// Converts lhs factor a and rhs function Σ bi \* xi + c into linear function Σ a \* bi \* xi + a \* c.
+    /// Converts lhs factor f and rhs function Σ aᵢ ∗ xᵢ + c into linear function Σ f ∗ aᵢ ∗ xᵢ + f ∗ c.
     static func * (lhs: Double, rhs: LinearFunction) -> LinearFunction {
         func applyFactor(_ term: LinearFunction.Term) -> LinearFunction.Term {
             LinearFunction.Term(variable: term.variable, factor: lhs * term.factor)
@@ -246,42 +246,42 @@ public extension Variable {
     
     // MARK: -
     
-    /// Converts variable x into linear function 1 \* x + 0
+    /// Converts variable x into linear function 1 ∗ x + 0
     static prefix func + (variable: Variable) -> LinearFunction {
         LinearFunction(terms: [variable.term()])
     }
      
-    /// Converts lhs variable x into linear function -1 \* x + 0.
+    /// Converts lhs variable x into linear function -1 ∗ x + 0.
     static prefix func - (variable: Variable) -> LinearFunction {
         LinearFunction(terms: [variable.term(factor: -1)])
     }
      
-    /// Combines  lhs variable x and rhs constant c into linear function 1 \* x + c.
+    /// Combines  lhs variable x and rhs constant c into linear function 1 ∗ x + c.
     static func + (lhs: Variable, rhs: Double) -> LinearFunction {
         LinearFunction(terms: [lhs.term()], constant: rhs)
     }
      
-    /// Combines  lhs variable x and rhs variable y into linear function 1 \* x + 1 \* y + 0.
+    /// Combines  lhs variable x and rhs variable y into linear function 1 ∗ x + 1 ∗ y + 0.
     static func + (lhs: Variable, rhs: Variable) -> LinearFunction {
         LinearFunction(terms: [lhs.term(), rhs.term()])
     }
      
-    /// Combines  lhs variable x and rhs function Σ ai \* xi + c into 1 \* x + Σ ai \* xi + c.
+    /// Combines  lhs variable x and rhs function Σ aᵢ ∗ xᵢ + c into 1 ∗ x + Σ aᵢ ∗ xᵢ + c.
     static func + (lhs: Variable, rhs: LinearFunction) -> LinearFunction {
         LinearFunction(terms: [lhs.term()] + rhs.terms, constant: rhs.constant)
     }
 
-    /// Combines  lhs variable x and rhs constant c into linear function 1 \* x + -c.
+    /// Combines  lhs variable x and rhs constant c into linear function 1 ∗ x + -c.
     static func - (lhs: Variable, rhs: Double) -> LinearFunction {
         LinearFunction(terms: [lhs.term()], constant: -rhs)
     }
      
-    /// Combines  lhs variable x and rhs variable y into linear function 1 \* x  + -1 \* y + 0.
+    /// Combines  lhs variable x and rhs variable y into linear function 1 ∗ x  + -1 ∗ y + 0.
     static func - (lhs: Variable, rhs: Variable) -> LinearFunction {
         LinearFunction(terms: [lhs.term(), rhs.term(factor: -1)])
     }
      
-    /// Combines  lhs variable x and rhs function Σ ai \* xi + c into 1 \* x + Σ -ai \* xi + -c.
+    /// Combines  lhs variable x and rhs function Σ aᵢ ∗ xᵢ + c into 1 ∗ x + Σ -aᵢ ∗ xᵢ + -c.
     static func - (lhs: Variable, rhs: LinearFunction) -> LinearFunction {
         LinearFunction(terms: [lhs.term()] + rhs.terms.map(\.negated), constant: -rhs.constant)
     }
@@ -314,37 +314,37 @@ public extension LinearFunction {
         function
     }
      
-    /// Converts function Σ ai \* xi + c into Σ -ai \* xi + -c.
+    /// Converts function Σ aᵢ ∗ xᵢ + c into Σ -aᵢ ∗ xᵢ + -c.
     static prefix func - (function: LinearFunction) -> LinearFunction {
         LinearFunction(terms: function.terms.map(\.negated), constant: -function.constant)
     }
      
-    /// Combines lhs function Σ ai \* xi + c and rhs constant d into Σ ai \* xi + (c + d).
+    /// Combines lhs function Σ aᵢ ∗ xᵢ + c and rhs constant d into Σ aᵢ ∗ xᵢ + (c + d).
     static func + (lhs: LinearFunction, rhs: Double) -> LinearFunction {
         LinearFunction(terms: lhs.terms, constant: lhs.constant + rhs)
     }
     
-    /// Combines lhs function Σ ai \* xi + c and rhs variable x into Σ ai \* xi + 1 \* x + c.
+    /// Combines lhs function Σ aᵢ ∗ xᵢ + c and rhs variable x into Σ aᵢ ∗ xᵢ + 1 ∗ x + c.
     static func + (lhs: LinearFunction, rhs: Variable) -> LinearFunction {
         LinearFunction(terms: lhs.terms + [rhs.term()], constant: lhs.constant)
     }
     
-    /// Combines lhs function Σ ai \* xi + c and rhs function Σ bi \* yi + d into Σ ai \* xi + Σ bi \* yi + (c + d).
+    /// Combines lhs function Σ aᵢ ∗ xᵢ + c and rhs function Σ bᵢ ∗ yᵢ + d into Σ aᵢ ∗ xᵢ + Σ bᵢ ∗ yᵢ + (c + d).
     static func + (lhs: LinearFunction, rhs: LinearFunction) -> LinearFunction {
         LinearFunction(terms: lhs.terms + rhs.terms, constant: lhs.constant + rhs.constant)
     }
     
-    /// Combines lhs function Σ ai \* xi + c and rhs constant d into Σ ai \* xi + (c - d).
+    /// Combines lhs function Σ aᵢ ∗ xᵢ + c and rhs constant d into Σ aᵢ ∗ xᵢ + (c - d).
     static func - (lhs: LinearFunction, rhs: Double) -> LinearFunction {
         LinearFunction(terms: lhs.terms, constant: lhs.constant - rhs)
     }
     
-    /// Combines lhs function Σ ai \* xi + c and rhs variable x into Σ ai \* xi + -1 \* x + c.
+    /// Combines lhs function Σ aᵢ ∗ xᵢ + c and rhs variable x into Σ aᵢ ∗ xᵢ + -1 ∗ x + c.
     static func - (lhs: LinearFunction, rhs: Variable) -> LinearFunction {
         LinearFunction(terms: lhs.terms + [rhs.term(factor: -1)], constant: lhs.constant)
     }
     
-    /// Combines lhs function Σ ai \* xi + c and rhs function Σ bi \* yi + d into Σ ai \* xi + Σ -bi \* yi + (c - d).
+    /// Combines lhs function Σ aᵢ ∗ xᵢ + c and rhs function Σ bᵢ ∗ yᵢ + d into Σ aᵢ ∗ xᵢ + Σ -bᵢ ∗ yᵢ + (c - d).
     static func - (lhs: LinearFunction, rhs: LinearFunction) -> LinearFunction {
         LinearFunction(terms: lhs.terms + rhs.terms.map(\.negated), constant: lhs.constant - rhs.constant)
     }
@@ -371,23 +371,23 @@ extension LinearFunction.Term {
 // MARK: - PythonConvertible -
 
 /**
- Linear function adopts PythonConvertible.
+ Converting a LinearFunction into a Python (PuLP) object.
  */
 extension LinearFunction: PythonConvertible {
 
     // MARK: -
     
-    /// Converts the linear function into a PuLP LpAffineExpression.
+    /// Converts the linear function into a LpAffineExpression PythonObject.
     public var pythonObject: PythonObject {
         pythonObject(withCache: nil)
     }
 
     // MARK: -
     
-    // Converts the function into a LpAffineExpression, optionally caching PuLP variables.
-    //
-    // - Parameter cache: Cache with a generated LpVariable PythonObject per Variable.
-    // - Returns: LpAffineExpression PythonObject.
+    /// Converts the function into a LpAffineExpression PythonObject, optionally caching variables.
+    ///
+    /// - Parameter cache: If present, caches the first generated LpVariable PythonObject per Variable.
+    /// - Returns: LpAffineExpression PythonObject.
     func pythonObject(withCache cache: VariableCache?) -> PythonObject {
         func pythonTuple(_ term: Term) -> PythonObject {
             PythonObject(tupleOf: term.variable.pythonObject(withCache: cache), term.factor)
@@ -405,6 +405,7 @@ extension LinearFunction: PythonConvertible {
  LinearFunction adopts Equatable with default behaviour.
  */
 extension LinearFunction.Term: Equatable {}
+
 
 // MARK: -
 

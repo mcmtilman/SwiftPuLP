@@ -11,21 +11,26 @@ import PythonKit
 /**
  A linear constraint compares a linear function with a constant.
  
- Linear constraints have one of the following canonical forms.
- 
-        a * x + b * y + ... + c <= d
- 
-        a * x + b * y + ... + c == d
- 
-        a * x + b * y + ... + c >= d
- 
- Like the function constant c, constant d represents a double value.
- 
- Overloading the comparison operators allows us to construct linear constraints as in the following example.
- 
-        let (x, y) = (Variable("x"), Variable("y"))
-        let constraint = 2 * x + 3 * y <= 10
+ For instance, given variables x and y, the following expressions represent linear constraints.
 
+ ```swift
+ a * x + b * y + c <= d
+
+ a * x + b * y == d
+
+ a * x + b * y - d >= 0
+ ```
+
+ Like the function constant *c*, constraint constant *d* is a Double value.
+ 
+ Comparison operators allows us to construct linear constraints as in the following example.
+ 
+ ```swift
+let (x, y) = (Variable("x"), Variable("y"))
+let constraint = 2 * x + 3 * y <= 10
+```
+ 
+ See also: <doc:UsingLinearConstraints>.
  */
 public struct LinearConstraint {
     
@@ -41,7 +46,14 @@ public struct LinearConstraint {
      */
     public enum Comparison {
         
-        case lte, eq, gte
+        /// Less than or equal to.
+        case lte
+        
+        /// Equal to.
+        case eq
+        
+        /// Greater than or equal to.
+        case gte
         
     }
     
@@ -58,13 +70,13 @@ public struct LinearConstraint {
     
     // MARK: -
     
-    /// Creates a linear constraint.
+    /// Creates a linear constraint by comparing a linear function with a constant.
     ///
-    /// A constraint has no name, but may be labeled when added to a model.
+    /// > Note: A constraint has no name, but may be labeled when added to a model.
     ///
     /// - Parameters:
-    ///   - function: Linear function to be compared with a constant.
-    ///   - comparison: less than or equal | equal to | greater than or equal. Default = equal to.
+    ///   - function: Linear function to be compared.
+    ///   - comparison: less than or equal | equal to | greater than or equal (default = equal to).
     ///   - constant: Default = 0.
     public init(function: LinearFunction, comparison: Comparison = .eq, constant: Double = 0) {
         self.function = function
@@ -72,13 +84,13 @@ public struct LinearConstraint {
         self.constant = constant
     }
 
-    /// Creates a linear constraint.
+    /// Creates a linear constraint by comparing a a variable with a constant.
     ///
-    /// A constraint has no name, but may be labeled when added to a model.
+    /// > Note: A constraint has no name, but may be labeled when added to a model.
     ///
     /// - Parameters:
-    ///   - variable: Variable to be compared with a constant.
-    ///   - comparison: less than or equal | equal to | greater than or equal. Default = equal to.
+    ///   - variable: Variable to be compared.
+    ///   - comparison: less than or equal | equal to | greater than or equal (default = equal to).
     ///   - constant: Default = 0.
     public init(variable: Variable, comparison: Comparison = .eq, constant: Double = 0) {
         self.init(function: LinearFunction(variable: variable), comparison: comparison, constant: constant)
@@ -117,7 +129,7 @@ public extension Variable {
         LinearConstraint(variable: lhs, comparison: .lte, constant: rhs)
     }
     
-    /// Converts lhs variable x and rhs constant c into constraint 1 * x = c.
+    /// Converts lhs variable x and rhs constant c into constraint 1 * x == c.
     static func == (lhs: Variable, rhs: Double) -> LinearConstraint {
         LinearConstraint(variable: lhs, comparison: .eq, constant: rhs)
     }
@@ -139,17 +151,17 @@ public extension LinearFunction {
     
     // MARK: -
     
-    /// Converts lhs function Σ ai * xi + c and rhs constant d into constraint Σ ai * xi + c <= d.
+    /// Converts lhs function Σ aᵢ ∗ xᵢ + c and rhs constant d into constraint Σ aᵢ ∗ xᵢ + c <= d.
     static func <= (lhs: LinearFunction, rhs: Double) -> LinearConstraint {
         LinearConstraint(function: lhs, comparison: .lte, constant: rhs)
     }
     
-    /// Converts lhs function Σ ai * xi + c and rhs constant d into constraint Σ ai * xi + c == d.
+    /// Converts lhs function Σ aᵢ ∗ xᵢ + c and rhs constant d into constraint Σ aᵢ ∗ xᵢ + c == d.
     static func == (lhs: LinearFunction, rhs: Double) -> LinearConstraint {
         LinearConstraint(function: lhs, comparison: .eq, constant: rhs)
     }
     
-    /// Converts lhs function Σ ai * xi + c and rhs constant d into constraint Σ ai * xi + c >= d.
+    /// Converts lhs function Σ aᵢ ∗ xᵢ + c and rhs constant d into constraint Σ aᵢ ∗ xᵢ + c >= d.
     static func >= (lhs: LinearFunction, rhs: Double) -> LinearConstraint {
         LinearConstraint(function: lhs, comparison: .gte, constant: rhs)
     }
@@ -160,7 +172,34 @@ public extension LinearFunction {
 // MARK: - PythonConvertible -
 
 /**
- Constraint comparison adopts PythonConvertible.
+ Converting a LinearConstraint into a Python (PuLP) object.
+ */
+extension LinearConstraint: PythonConvertible {
+    
+    // MARK: -
+    
+    /// Converts the linear constraint into a LpConstraint PythonObject.
+    public var pythonObject: PythonObject {
+        pythonObject(withCache: nil)
+    }
+    
+    // MARK: -
+    
+    /// Converts the constraint into a LpConstraint PythonObject, optionally caching variables.
+    ///
+    /// - Parameter cache: Cache with a generated LpVariable PythonObject per Variable.
+    /// - Returns: Python LpConstraint.
+    func pythonObject(withCache cache: VariableCache?) -> PythonObject {
+        PuLP.LpConstraint(function.pythonObject(withCache: cache), sense: comparison, rhs: constant)
+    }
+        
+}
+
+
+// MARK: -
+
+/**
+ Converting a LinearConstraint.Comparison into a Python (PuLP) object.
  */
 extension LinearConstraint.Comparison: PythonConvertible {
 
@@ -178,33 +217,6 @@ extension LinearConstraint.Comparison: PythonConvertible {
         }
     }
     
-}
-
-
-// MARK: -
-
-/**
- LinearConstraint adopts PythonConvertible.
- */
-extension LinearConstraint: PythonConvertible {
-    
-    // MARK: -
-    
-    /// Converts the linear constraint into a PuLP constraint.
-    public var pythonObject: PythonObject {
-        pythonObject(withCache: nil)
-    }
-    
-    // MARK: -
-    
-    /// Converts the constraint into a LpConstraint, optionally caching PuLP variables.
-    ///
-    /// - Parameter cache: Cache of generated Python LpVariable instances for each SwithPuLP variable.
-    /// - Returns: Python LpConstraint.
-    func pythonObject(withCache cache: VariableCache?) -> PythonObject {
-        PuLP.LpConstraint(function.pythonObject(withCache: cache), sense: comparison, rhs: constant)
-    }
-        
 }
 
 
