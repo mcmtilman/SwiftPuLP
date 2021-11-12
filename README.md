@@ -10,6 +10,8 @@ The building blocks of the core model are:
 
 * **Variable**, having a unique name, a domain, and optional minimum and maximum bounds.
 
+    See: [Using Variables](Sources/SwiftPuLP/Documentation.docc/UsingVariables.md)
+
 * **LinearFunction**, summing zero or more variables, each weighted with a factor (aka coefficient), and a constant.
 
 * **LinearConstraint**, comparing a linear function with a constant (less than or equal to, equal to or greather than or equal to).
@@ -17,10 +19,6 @@ The building blocks of the core model are:
 * The **Model**, consisting of an optional *Objective* (a linear function and an optimization goal: minimize or maximize) and zero or more linear constraints.
 
 * The **Solver**, using a solver from PuLP, realizes the model's objective and returns an optional **Result** containing a status and a dictionary of variable name - value pairs.
-
-### Variable
-
-See: [Using Variables](Sources/SwiftPuLP/Documentation.docc/UsingVariables.md)
 
 ### LinearFunction
 
