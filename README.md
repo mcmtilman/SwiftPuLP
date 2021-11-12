@@ -16,43 +16,11 @@ The building blocks of the core model are:
 
 * The **Model**, consisting of an optional *Objective* (a linear function and an optimization goal: minimize or maximize) and zero or more linear constraints.
 
-The **Solver**, using the default solver from PuLP, realizes the model's objective and return an optional result.
-
-The **Result** contains a status and a dictionary of variable name - value pairs.
+* The **Solver**, using a solver from PuLP, realizes the model's objective and returns an optional **Result** containing a status and a dictionary of variable name - value pairs.
 
 ### Variable
 
-To create a variable use the following public initializer.
-
-    init(_ name: String, minimum: Double? = nil, maximum: Double? = nil, domain: Domain = .real)
-
-*Domain* is defined as follows.
-
-    public enum Domain {
-
-        case binary, real, integer
-
-    }
-
-The *real* domain corresponds to *continuous* variables in PuLP.
-
-#### Invalid variables
-
-The variable is not valid if:
-
-* the variable's name is empty or contains any of the following characters: *-+[] ->/*;
-* a non-nil minimum value exceeds a non-nil maximum value;
-* in case of a binary domain, the mimimum value is not nil or 0, or the maximum value is not nil or 1.
-
-#### Examples
-
-1. Create a continuous variable named *x* without lower and upper bounds.
-
-        let x = Variable("x")
-
-2. Create a list of 100 binary variables named *x_0* through *x_99*.
-
-        let x = (0..<100).map { Variable("x_\($0)", domain: .binary) }
+See: [Using Variables](Sources/SwiftPuLP/Documentation.docc/UsingVariables.md)
 
 ### LinearFunction
 
@@ -78,7 +46,7 @@ A linear function is a linear combination of zero or more weighted variables (ak
 4. Multiple weighted variables and a constant.
 
     2 * x + 3 * y + 10
-
+````
 To create a linear function use one of the following public initializers.
 
     init(terms: [Term], constant: Double = 0)
