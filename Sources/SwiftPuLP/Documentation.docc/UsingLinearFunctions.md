@@ -12,7 +12,7 @@ a * x + b * y + c * z + d
 
 The weight factors a, b and c are the *coefficients*, and d is the *constant*.
 
-An expression like *a \* x* is a *term* of the linear function. 
+An expression like *a ∗ x* is a *term* of the linear function. 
 
 ### Creating linear functions
 
