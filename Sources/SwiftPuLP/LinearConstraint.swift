@@ -76,7 +76,7 @@ public struct LinearConstraint {
     ///
     /// - Parameters:
     ///   - function: Linear function to be compared.
-    ///   - comparison: less than or equal | equal to | greater than or equal (default = equal to).
+    ///   - comparison: less than or equal | equal to | greater than or equal (default = .eq).
     ///   - constant: Default = 0.
     public init(function: LinearFunction, comparison: Comparison = .eq, constant: Double = 0) {
         self.function = function

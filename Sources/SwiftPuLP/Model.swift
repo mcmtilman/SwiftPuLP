@@ -10,12 +10,14 @@ import PythonKit
 
 /**
  Represents a linear programming problem consisting of an objective and a list of contraints.
+ 
+ See also: <doc:UsingModels>.
  */
 public struct Model {
     
     // MARK: -
     
-    /// Specifies if the objective function must be maximized or minimized.
+    /// Specifies if the (optional) objective function must be maximized or minimized.
     public enum Optimization {
         
         case minimize, maximize
@@ -24,7 +26,7 @@ public struct Model {
     
     // MARK: -
 
-    /// Represent the objective of a linear programming problem: maximize or minimize a linear expression.
+    /// Represents the objective of a linear programming problem: maximize or minimize a linear function.
     public struct Objective {
         
         // MARK: -
@@ -33,12 +35,11 @@ public struct Model {
         let function: LinearFunction
             
         /// The optimization to be performed.
-        /// Default = minimize.
         let optimization: Optimization
             
         // MARK: -
         
-        /// Creates an objective to optimize given linear function.
+        /// Creates an objective to optimize a linear function.
         ///
         /// - Parameters:
         ///   - function: Linear function to be optimized.
@@ -91,7 +92,36 @@ public struct Model {
 // MARK: - PythonConvertible -
 
 /**
- Objective optimization adopts PythonConvertible.
+ Converting a Model into a Python (PuLP) object.
+ */
+extension Model: PythonConvertible {
+    
+    // MARK: -
+    
+    /// Converts the model into a LpProblem PythonObject.
+    ///
+    /// caches the first generated LpVariable PythonObject per Variable.
+    public var pythonObject: PythonObject {
+        var problem = PuLP.LpProblem(name: name, sense: objective?.optimization ?? .minimize) // set sense, even without an objective.
+        let cache = VariableCache()
+        
+        if let objective = objective {
+            problem += objective.function.pythonObject(withCache: cache)
+        }
+        for (constraint, name) in constraints {
+            problem += PythonObject(tupleOf: constraint.pythonObject(withCache: cache), name)
+        }
+        
+        return problem
+    }
+        
+}
+
+
+// MARK: -
+
+/**
+ Converting a Model.Optimization into a Python (PuLP) object.
  */
 extension Model.Optimization: PythonConvertible {
 
@@ -107,35 +137,6 @@ extension Model.Optimization: PythonConvertible {
         }
     }
 
-}
-
-
-// MARK: -
-
-/**
- Model adopts PythonConvertible.
- */
-extension Model: PythonConvertible {
-    
-    // MARK: -
-    
-    /// Converts the model into a PuLP problem.
-    ///
-    /// Caches and reuses the generated PuLP variable for each SwiftPuLP variable.
-    public var pythonObject: PythonObject {
-        var problem = PuLP.LpProblem(name: name, sense: objective?.optimization ?? .minimize) // set sense, even without an objective.
-        let cache = VariableCache()
-        
-        if let objective = objective {
-            problem += objective.function.pythonObject(withCache: cache)
-        }
-        for (constraint, name) in constraints {
-            problem += PythonObject(tupleOf: constraint.pythonObject(withCache: cache), name)
-        }
-        
-        return problem
-    }
-        
 }
 
 
