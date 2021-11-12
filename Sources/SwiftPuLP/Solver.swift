@@ -11,12 +11,19 @@ import PythonKit
 
 /**
  Solver for a linear programming model.
+ 
+ Solving a model consists in the following steps:
+ 1. Convert the model into a Python (PuLP) LpProblem.
+ 2. Solve the problem with the default PuLP solver.
+ 3. Construct a ``Solver/Result`` from the (Pulp) problem data.
 */
 public struct Solver {
 
     // MARK: -
     
     /// Status of the solver result.
+    ///
+    /// Raw enum values map one-to-one onto PuLP status values.
     public enum Status: Double {
         
         case unsolved = 0
@@ -43,7 +50,7 @@ public struct Solver {
         
         // MARK: -
         
-        /// Initializes a result with given status and variable bindings.
+        /// Createa a result with given status and variable bindings.
         ///
         /// - Parameters:
         ///   - status: Status of the solver result.
@@ -86,37 +93,14 @@ public struct Solver {
 // MARK: - ConvertibleFromPython -
 
 /**
- Creates a Result status from a Python float.
- */
-extension Solver.Status: ConvertibleFromPython {
-
-    // MARK: -
-
-    /// Creates a status from given Python object.
-    /// 
-    /// Fails if the object is not a Python float or does not correspond to a known case value.
-    ///
-    /// - Parameter object: Python object representing a PuLP status value.
-    public init?(_ object: PythonObject) {
-        guard let value = Double(object), let status = Self(rawValue: value) else { return nil }
-
-        self = status
-    }
-    
-}
-
-
-// MARK: -
-
-/**
- Creates a Result from a Python LpProblem.
+ Creating a Result from a LpProblem Python object.
  */
 extension Solver.Result: ConvertibleFromPython {
     
     // MARK: -
 
-    // Returns a name - value tuple for the Python object representing a PuLP variable.
-    // Returns nil if the input is not a LpVariable, or if name or value cannot be extracted.
+    // Returns a name - value tuple for the Python object representing a resolved PuLP LpVariable.
+    // Returns nil if given Python object does not reference a LpVariable, or if the name or the value cannot be extracted.
     private static func asTuple(object: PythonObject) -> (name: String, value: Double)? {
         guard object.isInstance(of: PuLP.LpVariable),
                 let name = String(object.name),
@@ -127,11 +111,13 @@ extension Solver.Result: ConvertibleFromPython {
     
     // MARK: -
 
-    /// Creates a result from the PuLP LpProblem.
+    /// Creates a result from the Python object representing a resolved PuLP LpProblem.
     ///
-    /// Fails if the Python object is not a LpProblem, the problem status is unknown, or the problem variables cannot be converted into a dictionary of name - value pairs.
+    /// Fails if given Python object does not reference a LpProblem, or if the problem status cannot be resolved.
     ///
-    /// - Parameter object: Python object representing a PuLP problem.
+    /// > Note: Problem variables that cannot be converted into name - value pairs are skipped.
+    ///
+    /// - Parameter object: Python object referencing a PuLP LpProblem.
     public init?(_ object: PythonObject) {
         guard object.isInstance(of: PuLP.LpProblem),
               let status = Solver.Status(object.status),
@@ -142,3 +128,27 @@ extension Solver.Result: ConvertibleFromPython {
     }
     
 }
+
+
+// MARK: -
+
+/**
+ Creating Result.Status from a Python float.
+ */
+extension Solver.Status: ConvertibleFromPython {
+
+    // MARK: -
+
+    /// Creates a status from given Python object.
+    ///
+    /// Fails if the object is not a Python float or does not correspond to a known raw case value.
+    ///
+    /// - Parameter object: Python object representing a PuLP status value.
+    public init?(_ object: PythonObject) {
+        guard let value = Double(object), let status = Self(rawValue: value) else { return nil }
+
+        self = status
+    }
+    
+}
+
