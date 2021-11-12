@@ -31,29 +31,29 @@ The building blocks of the core model are:
 ### Type overview
 
 ```swift
-Variable
+class Variable
+
+struct LinearFunction
+
+struct LinearFunction.Term
     
-Variable.Domain
+struct LinearConstraint
 
-LinearFunction
+struct Model
 
-LinearFunction.Term
+struct Model.Objective
+
+struct Solver
+
+struct Solver.Result
+
+enum Variable.Domain
     
-LinearConstraint
-
-LinearConstraint.Comparison
+enum LinearConstraint.Comparison
     
-Model
+enum Model.Optimization
 
-Model.Objective
-
-Model.Optimization
-
-Solver
-
-Solver.Status
-
-Solver.Result
+enum Solver.Status
 ```
 
 ## Helper functions
