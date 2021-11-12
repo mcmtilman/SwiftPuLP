@@ -8,23 +8,33 @@ Solving a Linear Programming consists of creating a model of the problem using v
 
 The building blocks of the core model are:
 
-* **Variable**, having a unique name, a domain, and optional minimum and maximum bounds.
+* A **Variable** has a unique name, a domain, and optional minimum and maximum bounds.
+    
+    A **Domain** specifies a range of values (real, integer or binary), subject to optional bounds restrictions.
 
     See: [Using Variables](Sources/SwiftPuLP/Documentation.docc/UsingVariables.md)
 
-* **LinearFunction**, summing zero or more variables, each weighted with a factor (aka coefficient), and a constant.
+* A **LinearFunction** represents a linear combination of zero or more variables, i.e. it has a form like *a \* x + b \* y + c*, where x and y denote variables, a and b are the coefficients (aka factors) and c is the constant.
 
+    A **Term** refers to a variable with its factor.
+    
     See: [Using linear functions](Sources/SwiftPuLP/Documentation.docc/UsingLinearFunctions.md)
 
-* **LinearConstraint**, comparing a linear function with a constant (less than or equal to, equal to or greather than or equal to).
+* A **LinearConstraint**  compares a linear function with a constant.
 
+    The **Comparison** operators include: less than or equal to, equal to, greater than or equal to.
+    
     See: [Using linear constraints](Sources/SwiftPuLP/Documentation.docc/UsingLinearConstraints.md)
 
-* The **Model**, consisting of an optional *Objective* (a linear function and an optimization goal: minimize or maximize) and zero or more linear constraints.
+* A **Model** has an optional **Objective**, which specifies a linear function and an optimization goal. A model may also specify zero or more linear constraints.
+
+    The **Optimization** goals include: minimize and maximize.
 
     See: [Using models](Sources/SwiftPuLP/Documentation.docc/UsingModels.md)
 
-* The **Solver**, using a solver from PuLP, realizes the model's objective and returns an optional **Result** containing a status and a dictionary of variable name - value pairs.
+* A **Solver** computes the best values for the decision variables based on the model's objective and constraints.
+
+    The solver returns an optional **Result** with a **Status** and a dictionary of variable name - value pairs.
 
     See: [Using solvers](Sources/SwiftPuLP/Documentation.docc/UsingSolvers.md)
 
