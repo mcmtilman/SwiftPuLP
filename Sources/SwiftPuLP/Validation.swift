@@ -10,15 +10,27 @@ import Foundation
 
 /**
  Single validation error, such as an invalid variable name or a duplicate constraint name.
- An error identifies the model element in error, and, if necessary, more details.
+ An error specifies the model element in error, and, if necessary, includes extra details.
+ 
+ Validation of a ``Variable`` or ``Model``is not performed automatically upon creation time.
+ To check if a variable or a model has validation errors use property **validationErrors**.
  */
 public enum ValidationError {
     
+    /// The model has multiple constraints with the same non-empty label.
+    /// The additional associated value identifies the offending constraint label.
     case duplicateConstraintName(LinearConstraint, String)
-    case invalidModelName(Model)
+    
+    /// The model has multiple variables with the same name.
     case duplicateVariableName(Variable)
-    case emptyVariableName(Variable)
+
+    /// The model name contains spaces.
+    case invalidModelName(Model)
+
+    /// The variable has invalid bounds / domain combinations.
     case invalidVariableBounds(Variable)
+ 
+    /// The variable name is empty or contains invalid characters.
     case invalidVariableName(Variable)
 
 }
@@ -27,19 +39,18 @@ public enum ValidationError {
 // MARK: - Validating -
 
 /**
- Variable supports validation.
+ Validating a single variable.
  */
 extension Variable {
     
     // MARK: -
     
-    // Characters in this set may not be used in variable names.
+    /// Characters in this set may not be used in variable names.
     static let specialChars = CharacterSet(charactersIn: "-+[] ->/")
     
     /// Returns validation errors.
+    /// 
     /// If not empty, the PuLP solver may fail.
-    ///
-    /// Does not return validation errors related to other variables, such as duplicate name errors.
     public var validationErrors: [ValidationError] {
         var errors = [ValidationError]()
         
@@ -50,12 +61,14 @@ extension Variable {
     
     // MARK: -
 
+    // Collects errors for this variable.
+    //
     // Generates errors for:
     // - Empty names or names containing one or more special characters.
     // - Invalid bounds / domain combinations.
-    func collectErrors(into errors: inout [ValidationError]) {
+    fileprivate func collectErrors(into errors: inout [ValidationError]) {
         if name.isEmpty {
-            errors.append(.emptyVariableName(self))
+            errors.append(.invalidVariableName(self))
         }
         else if !CharacterSet(charactersIn: name).isDisjoint(with: Self.specialChars) {
             errors.append(.invalidVariableName(self))
@@ -74,14 +87,14 @@ extension Variable {
 // MARK: -
 
 /**
- LinearFunction supports validation.
+ Validating a linear function.
  */
 extension LinearFunction {
     
     // MARK: -
     
-    // Collects the term variables.
-    func collectVariables(into variables: inout [Variable.Id: Variable]) {
+    // Collects the different variables used in the function.
+    fileprivate func collectVariables(into variables: inout [Variable.Id: Variable]) {
         for term in terms {
             variables[term.variable.id] = term.variable
         }
@@ -93,14 +106,14 @@ extension LinearFunction {
 // MARK: -
 
 /**
- LinearConstraint supports validation,
+ Validating a linear constraint.
  */
 extension LinearConstraint {
     
     // MARK: -
     
     // Delegates collection of variables to the linear function.
-    func collectVariables(into variables: inout [Variable.Id: Variable]) {
+    fileprivate func collectVariables(into variables: inout [Variable.Id: Variable]) {
         function.collectVariables(into: &variables)
     }
 
@@ -110,14 +123,15 @@ extension LinearConstraint {
 // MARK: -
 
 /**
- Model supports validation, delegating variable validation to its objective function and constraints.
- Additionally the model is responsible for detecting name conflicts in the variables and in the constraints.
+ Model supports validation. Delegates variable validation to its objective function and constraints.
+ Additionally the model detects name conflicts in variables and in constraints.
  */
 extension Model {
     
     // MARK: -
 
     /// Returns validation errors.
+    ///
     /// If not empty, the PuLP solver may fail.
     public var validationErrors: [ValidationError] {
         var errors = [ValidationError]()
@@ -129,8 +143,8 @@ extension Model {
     
     // MARK: -
     
-    // Collects all errors from its nested elements and verifies that variable / constraint names are unique.
-    func collectErrors(into errors: inout [ValidationError]) {
+    // Validates name correctnes, collects errors from nested elements and verifies that variable names respectively constraint labels are unique in this model.
+    fileprivate func collectErrors(into errors: inout [ValidationError]) {
         if name.contains(" ") {
             errors.append(.invalidModelName(self))
         }
@@ -138,8 +152,8 @@ extension Model {
         collectConstraintErrors(into: &errors)
     }
     
-    // Verifies that distinct constraints have different names.
-    func collectConstraintErrors(into errors: inout [ValidationError]) {
+    // Verifies that distinct constraints have empty or different labels.
+    fileprivate func collectConstraintErrors(into errors: inout [ValidationError]) {
         var constraintMap = [String: LinearConstraint]()
         
         for (constraint, name) in constraints {
@@ -150,7 +164,7 @@ extension Model {
     }
     
     // Verifies that variables are valid and that distinct variables have different names.
-    func collectVariableErrors(into errors: inout [ValidationError]) {
+    fileprivate func collectVariableErrors(into errors: inout [ValidationError]) {
         var variables = [Variable.Id: Variable]()
         var variableMap = [String: Variable]()
 
@@ -163,8 +177,8 @@ extension Model {
         }
     }
     
-    // Collects all unique variables from its nested elements.
-    func collectVariables(into variables: inout [Variable.Id: Variable]) {
+    // Collects all unique variables from nested elements.
+    fileprivate func collectVariables(into variables: inout [Variable.Id: Variable]) {
         objective?.function.collectVariables(into: &variables)
         for (constraint, _) in constraints {
             constraint.collectVariables(into: &variables)

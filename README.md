@@ -66,6 +66,9 @@ enum LinearConstraint.Comparison {}
 enum Model.Optimization {}
 
 enum Solver.Status {}
+
+enum ValidationError {}
+
 ```
 
 ## Helper functions
