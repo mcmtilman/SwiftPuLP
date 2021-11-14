@@ -21,7 +21,7 @@ final class PerformanceTests: XCTestCase {
         block()
     }
 #else
-    let iterations = 1000000
+    let iterations = 100000
 #endif
 
     func testBuildFunction() {
@@ -53,6 +53,20 @@ final class PerformanceTests: XCTestCase {
             
             if sum != 0 { return XCTFail("Invalid sum")}
         }
+    }
+    
+    func testNormalizedFunction() {
+        let (x, y, z) = (Variable("x"), Variable("y"), Variable("z"))
+        let function = x + 2 * y - z - x
+        var f = function
+        
+        measure {
+            for _ in 1...iterations {
+               f = function.normalized()
+            }
+        }
+        
+        XCTAssertEqual(f, 2 * y - z)
     }
     
 }
