@@ -149,15 +149,15 @@ Much of the code is similar (apart from some refactoring to make it more testabl
 
 ## Dependencies
 
-SwiftPulp depends on the *Collections* and *PythonKit* packages.
+SwiftPuLP depends on the *Collections* and *PythonKit* packages. It also uses *CharacterSet* from *Foundation*.
 
 ## Requirements
 
-SwiftPulp needs PuLP to be installed and may require the PYTHON_LIBRARY environment variable to be set.
+SwiftPuLP needs PuLP to be installed and may require the PYTHON_LIBRARY environment variable to be set.
 
 ## Compatibility
 
-SwiftPulp was tested on macOS Big Sur 11.6 with XCode 13.1, Python 3.9.7 and PuLP 2.5.1.
+SwiftPuLP was tested on macOS Big Sur 11.6 with XCode 13.1, Python 3.9.7 and PuLP 2.5.1.
 
 ## Status
 
