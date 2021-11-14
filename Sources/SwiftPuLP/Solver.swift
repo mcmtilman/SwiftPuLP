@@ -6,7 +6,6 @@
 //  Licensed under Apache License v2.0.
 //
 
-import Foundation
 import PythonKit
 
 /**

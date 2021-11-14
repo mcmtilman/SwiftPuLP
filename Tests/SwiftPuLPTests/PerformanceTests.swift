@@ -1,4 +1,4 @@
-////
+//
 //  PerformanceTests.swift
 //  
 //  Created by Michel Tilman on 08/11/2021.
@@ -7,7 +7,6 @@
 //
 
 import XCTest
-import PythonKit
 import SwiftPuLP
 
 final class PerformanceTests: XCTestCase {

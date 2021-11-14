@@ -6,8 +6,6 @@
 //  Licensed under Apache License v2.0.
 //
 
-import Foundation
-
 /**
  A variable represents a linear programming decision variable and may appear in the objective function and / or in linear constraints of a linear programming model.
  
