@@ -93,6 +93,20 @@ final class ModelTests: XCTestCase {
         XCTAssertEqual(pythonModel.sense, PuLP.LpMinimize)
     }
     
+    func testAliasedVariablesToPuLP() {
+        let (x, y) = (Variable("x"), Variable("y"))
+        let z = x
+        let model = Model("Alias", constraints: [(x + y + z <= 10, "alias")])
+        let variables = model.pythonObject.variables()
+        let ids = variables.map(\.id)
+        
+        XCTAssertEqual(variables.count, 2)
+        XCTAssertEqual(variables[0].name, "x")
+        XCTAssertEqual(variables[1].name, "y")
+        XCTAssertEqual(Set(ids).count, 2)
+    }
+
+
 }
 
 

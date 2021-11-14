@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import Collections
 
 /**
  Single validation error, such as an invalid variable name or a duplicate constraint name.
@@ -94,9 +95,9 @@ extension LinearFunction {
     // MARK: -
     
     // Collects the different variables used in the function.
-    fileprivate func collectVariables(into variables: inout [Variable.Id: Variable]) {
+    fileprivate func collectVariables(into variables: inout OrderedSet<Variable>) {
         for term in terms {
-            variables[term.variable.id] = term.variable
+            variables.append(term.variable)
         }
     }
     
@@ -113,7 +114,7 @@ extension LinearConstraint {
     // MARK: -
     
     // Delegates collection of variables to the linear function.
-    fileprivate func collectVariables(into variables: inout [Variable.Id: Variable]) {
+    fileprivate func collectVariables(into variables: inout OrderedSet<Variable>) {
         function.collectVariables(into: &variables)
     }
 
@@ -154,10 +155,10 @@ extension Model {
     
     // Verifies that distinct constraints have empty or different labels.
     fileprivate func collectConstraintErrors(into errors: inout [ValidationError]) {
-        var constraintMap = [String: LinearConstraint]()
+        var names = Set<String>()
         
         for (constraint, name) in constraints {
-            if !name.isEmpty, constraintMap.updateValue(constraint, forKey: name) != nil {
+            if !name.isEmpty, !names.insert(name).inserted {
                 errors.append(.duplicateConstraintName(constraint, name))
             }
         }
@@ -165,20 +166,20 @@ extension Model {
     
     // Verifies that variables are valid and that distinct variables have different names.
     fileprivate func collectVariableErrors(into errors: inout [ValidationError]) {
-        var variables = [Variable.Id: Variable]()
-        var variableMap = [String: Variable]()
+        var variables = OrderedSet<Variable>()
+        var names = Set<String>()
 
         collectVariables(into: &variables)
-        for variable in variables.values {
+        for variable in variables {
             variable.collectErrors(into: &errors)
-            if !name.isEmpty, variableMap.updateValue(variable, forKey: variable.name) != nil {
+            if !name.isEmpty, !names.insert(variable.name).inserted {
                 errors.append(.duplicateVariableName(variable))
             }
         }
     }
     
     // Collects all unique variables from nested elements.
-    fileprivate func collectVariables(into variables: inout [Variable.Id: Variable]) {
+    fileprivate func collectVariables(into variables: inout OrderedSet<Variable>) {
         objective?.function.collectVariables(into: &variables)
         for (constraint, _) in constraints {
             constraint.collectVariables(into: &variables)

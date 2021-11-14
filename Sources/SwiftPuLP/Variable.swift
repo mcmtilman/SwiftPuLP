@@ -106,14 +106,14 @@ class VariableCache {
     
     // MARK: -
     
-    // Links variable ids to generated PuLP variables.
-    private var cache = [Variable.Id: PythonObject]()
+    // Links variable instances to generated PuLP variables.
+    private var cache = [Variable: PythonObject]()
     
     // MARK: -
     
     // Answers the cached PuLP LpVariable.
     // If none is found, generates a new one and caches it.
-    fileprivate subscript(key: Variable.Id, default defaultValue: @autoclosure () -> PythonObject) -> PythonObject {
+    fileprivate subscript(key: Variable, default defaultValue: @autoclosure () -> PythonObject) -> PythonObject {
         get {
             return cache[key] ?? {
                 let value = defaultValue()
@@ -148,7 +148,7 @@ extension Variable: PythonConvertible {
     func pythonObject(withCache cache: VariableCache?) -> PythonObject {
         guard let cache = cache else { return pythonObject }
 
-        return cache[self.id, default: pythonObject]
+        return cache[self, default: pythonObject]
     }
     
 }
@@ -184,17 +184,31 @@ extension Variable.Domain: PythonConvertible {
  Variable adopts Equatable.
  */
 extension Variable: Equatable {
- 
+
     // MARK: -
 
-    /// Returns true if the lhs and rhs variables are the same content-wise, false otherwise.
+    /// Returns true if the lhs and rhs variables are the same objects, false otherwise.
     ///
-    /// - Returns: True if name, minimum, maximum and domain are equal.
+    /// - Returns: lhs === rhs.
     public static func == (lhs: Variable, rhs: Variable) -> Bool {
-        lhs.name == rhs.name
-            && lhs.minimum == rhs.minimum
-            && lhs.maximum == rhs.maximum
-            && lhs.domain == rhs.domain
+        lhs === rhs
+    }
+
+}
+
+
+// MARK: - Hashable -
+
+/**
+ Variable adopts Hashable.
+ */
+extension Variable: Hashable {
+    
+    /// Hashes the object id.
+    ///
+    /// - Parameter hasher: See ``Hashable``
+    public func hash(into hasher: inout Hasher) {
+        id.hash(into: &hasher)
     }
     
 }

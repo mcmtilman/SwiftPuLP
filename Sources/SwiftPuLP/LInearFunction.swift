@@ -109,27 +109,17 @@ public struct LinearFunction {
     /// Answers the result of merging terms with same variables, ignoring merged terms with factor 0.
     /// The result is a linear function in canonical form.
     ///
-    /// Keeps original order of first occurrence of variables.
+    /// Keeps original order of first occurrence of each variable.
     ///
     /// - Returns: A linear function representing the same mathematical function as the receiver, with every variable instance occuring at most once.
     public func normalized() -> Self {
         guard terms.count > 0 else { return self }
-        guard terms.count > 1 else { return terms[0].factor == 0 ? Self() : self }
-        var groups = OrderedDictionary<Variable.Id, [Term]>()
         
-        for term in terms where term.factor != 0 {
-            groups[term.variable.id, default: []].append(term)
-        }
+        let tuples = terms.map { ($0.variable, $0) }
+        let mergedTerms = OrderedDictionary(tuples) { t1, t2 in
+            Term(variable: t1.variable, factor: t1.factor + t2.factor)
+        }.values.filter { $0.factor != 0 }
 
-        guard groups.count < terms.count else { return self }
-        let mergedTerms: [Term] = groups.values.compactMap { terms in
-            let term = terms[0]
-            guard terms.count > 1 else { return term }
-            let factor = terms.reduce(0) { total, term in total + term.factor }
-            
-            return factor == 0 ? nil : Term(variable: term.variable, factor: factor)
-        }
-        
         return Self(terms: mergedTerms, constant: constant)
     }
     

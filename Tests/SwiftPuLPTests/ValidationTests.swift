@@ -47,7 +47,7 @@ final class ValidationTests: XCTestCase {
         let errors = variable.validationErrors
         
         XCTAssertEqual(errors.count, 1)
-        XCTAssertEqual(errors[0], .emptyVariableName(variable))
+        XCTAssertEqual(errors[0], .invalidVariableName(variable))
     }
 
     func testInvalidNameVariable() {
@@ -89,7 +89,7 @@ final class ValidationTests: XCTestCase {
         let errors = variable.validationErrors
         
         XCTAssertEqual(errors.count, 2)
-        XCTAssertEqual(errors[0], .emptyVariableName(variable))
+        XCTAssertEqual(errors[0], .invalidVariableName(variable))
         XCTAssertEqual(errors[1], .invalidVariableBounds(variable))
     }
 
@@ -126,7 +126,7 @@ final class ValidationTests: XCTestCase {
         XCTAssertTrue(model.validationErrors.isEmpty)
     }
 
-    func testDuplicateVariablesModel() {
+    func testAliasedVariablesModel() {
         let x = Variable("x")
         let y = x
         let function = x + 2 * y

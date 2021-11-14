@@ -6,8 +6,6 @@
 //  Licensed under Apache License v2.0.
 //
 
-#if !DEBUG
-
 import XCTest
 import PythonKit
 import SwiftPuLP
@@ -16,6 +14,16 @@ final class PerformanceTests: XCTestCase {
     
     // MARK: Linear function tests
     
+#if DEBUG
+    let iterations = 10000
+    
+    override func measure(_ block: () -> Void) {
+        block()
+    }
+#else
+    let iterations = 1000000
+#endif
+
     func testBuildFunction() {
         let (x, y, z) = (Variable("x"), Variable("y"), Variable("z"))
         let parameters = ["x": 1.0, "y": 2.0, "z": 3]
@@ -23,7 +31,7 @@ final class PerformanceTests: XCTestCase {
         measure {
             var function = LinearFunction()
 
-            for _ in 1...1000000 {
+            for _ in 1...iterations {
                 function = x + y - z
             }
             
@@ -39,7 +47,7 @@ final class PerformanceTests: XCTestCase {
         measure {
             var sum = 0.0
         
-            for _ in 1...1000000 {
+            for _ in 1...iterations {
                 sum += function(parameters)
             }
             
@@ -48,5 +56,3 @@ final class PerformanceTests: XCTestCase {
     }
     
 }
-
-#endif
