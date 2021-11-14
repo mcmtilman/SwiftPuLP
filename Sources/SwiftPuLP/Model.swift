@@ -6,8 +6,6 @@
 //  Licensed under Apache License v2.0.
 //
 
-import PythonKit
-
 /**
  Represents a linear programming problem consisting of an objective and a list of contraints.
  
@@ -89,66 +87,11 @@ public struct Model {
 }
 
 
-// MARK: - PythonConvertible -
-
-/**
- Converting a Model into a Python (PuLP) object.
- */
-extension Model: PythonConvertible {
-    
-    // MARK: -
-    
-    /// Converts the model into a LpProblem PythonObject.
-    ///
-    /// caches the first generated LpVariable PythonObject per Variable.
-    public var pythonObject: PythonObject {
-        var problem = PuLP.LpProblem(name: name, sense: objective?.optimization ?? .minimize) // set sense, even without an objective.
-        let cache = VariableCache()
-        
-        if let objective = objective {
-            problem += objective.function.pythonObject(withCache: cache)
-        }
-        for (constraint, name) in constraints {
-            problem += PythonObject(tupleOf: constraint.pythonObject(withCache: cache), name)
-        }
-        
-        return problem
-    }
-        
-}
-
-
-// MARK: -
-
-/**
- Converting a Model.Optimization into a Python (PuLP) object.
- */
-extension Model.Optimization: PythonConvertible {
-
-    // MARK: -
-    
-    /// Converts the optimization into a PuLP 'sense'.
-    public var pythonObject: PythonObject {
-        switch self {
-        case .maximize:
-            return PuLP.LpMaximize
-        case .minimize:
-            return PuLP.LpMinimize
-        }
-    }
-
-}
-
-
 // MARK: - Equatable -
 
 /**
  Model adopts Equatable.
  */
-extension Model.Objective: Equatable {}
-
-// MARK: -
-
 extension Model: Equatable {
     
     /// Answers if the lhs and rhs models are equal.
@@ -161,3 +104,11 @@ extension Model: Equatable {
     }
     
 }
+
+
+// MARK: -
+
+/**
+ Model.Objective adopts Equatable with default behaviour.
+ */
+extension Model.Objective: Equatable {}

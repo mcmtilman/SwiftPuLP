@@ -6,8 +6,6 @@
 //  Licensed under Apache License v2.0.
 //
 
-import PythonKit
-
 /**
  A linear constraint compares a linear function with a constant.
  
@@ -169,64 +167,17 @@ public extension LinearFunction {
 }
 
 
-// MARK: - PythonConvertible -
-
-/**
- Converting a LinearConstraint into a Python (PuLP) object.
- */
-extension LinearConstraint: PythonConvertible {
-    
-    // MARK: -
-    
-    /// Converts the linear constraint into a LpConstraint PythonObject.
-    public var pythonObject: PythonObject {
-        pythonObject(withCache: nil)
-    }
-    
-    // MARK: -
-    
-    /// Converts the constraint into a LpConstraint PythonObject, optionally caching variables.
-    ///
-    /// - Parameter cache: Cache with a generated LpVariable PythonObject per Variable.
-    /// - Returns: Python LpConstraint.
-    func pythonObject(withCache cache: VariableCache?) -> PythonObject {
-        PuLP.LpConstraint(function.pythonObject(withCache: cache), sense: comparison, rhs: constant)
-    }
-        
-}
-
-
-// MARK: -
-
-/**
- Converting a LinearConstraint.Comparison into a Python (PuLP) object.
- */
-extension LinearConstraint.Comparison: PythonConvertible {
-
-    // MARK: -
-    
-    /// Converts the comparison into a PuLP comparison.
-    public var pythonObject: PythonObject {
-        switch self {
-        case .lte:
-            return PuLP.LpConstraintLE
-        case .eq:
-            return PuLP.LpConstraintEQ
-        case .gte:
-            return PuLP.LpConstraintGE
-        }
-    }
-    
-}
-
-
 // MARK: - Equatable -
 
 /**
  LinearConstraint adopts Equatable with default behaviour.
  */
-extension LinearConstraint.Comparison: Equatable {}
+extension LinearConstraint: Equatable {}
+
 
 // MARK: -
 
-extension LinearConstraint: Equatable {}
+/**
+ LinearConstraint.Comparison adopts Equatable with default behaviour.
+ */
+extension LinearConstraint.Comparison: Equatable {}

@@ -7,7 +7,6 @@
 //
 
 import Foundation
-import PythonKit
 
 /**
  A variable represents a linear programming decision variable and may appear in the objective function and / or in linear constraints of a linear programming model.
@@ -94,87 +93,6 @@ public class Variable {
         self.domain = domain
     }
 
-}
-
-// MARK: -
-
-/**
- PuLP expects only one Python LpVariable instance for every occurrence of the same Swift variable.
- The variable cache allows clients to create and cache new LpVariables if not yet present, otherwise the cached instance is returned.
- */
-class VariableCache {
-    
-    // MARK: -
-    
-    // Links variable instances to generated PuLP variables.
-    private var cache = [Variable: PythonObject]()
-    
-    // MARK: -
-    
-    // Answers the cached PuLP LpVariable.
-    // If none is found, generates a new one and caches it.
-    fileprivate subscript(key: Variable, default defaultValue: @autoclosure () -> PythonObject) -> PythonObject {
-        get {
-            return cache[key] ?? {
-                let value = defaultValue()
-                cache[key] = value
-                return value
-            }()
-        }
-    }
-}
-
-
-// MARK: - PythonConvertible -
-
-/**
- Converting a Variable into a Python (PuLP) object.
- */
-extension Variable: PythonConvertible {
-    
-    // MARK: -
-    
-    /// Converts the variable into a LpVariable PythonObject.
-    public var pythonObject: PythonObject {
-        PuLP.LpVariable(name: name, lowBound: minimum, upBound: maximum, cat: domain.pythonObject)
-    }
-    
-    // MARK: -
-
-    /// Converts the variable into a LpVariable PythonObject, optionally caching variables.
-    ///
-    /// - Parameter cache: If present, caches the first generated LpVariable PythonObject per Variable.
-    /// - Returns: Cached or newly generated LpVariable PythonObject.
-    func pythonObject(withCache cache: VariableCache?) -> PythonObject {
-        guard let cache = cache else { return pythonObject }
-
-        return cache[self, default: pythonObject]
-    }
-    
-}
-
-
-// MARK: -
-
-/**
- Converting a Variable.Domain into a Python (PuLP) object.
- */
-extension Variable.Domain: PythonConvertible {
-
-    // MARK: -
-
-    /// Converts the domain into a PuLP category.
-    public var pythonObject: PythonObject {
-        switch self {
-        case .binary:
-            return PuLP.LpBinary
-        case .real:
-            return PuLP.LpContinuous
-        case .integer:
-            return PuLP.LpInteger
-        }
-    }
-    
 }
 
 

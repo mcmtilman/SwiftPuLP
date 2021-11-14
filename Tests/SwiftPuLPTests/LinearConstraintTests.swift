@@ -7,7 +7,6 @@
 //
 
 import XCTest
-import PythonKit
 
 #if DEBUG
     @testable import SwiftPuLP
@@ -20,8 +19,6 @@ import PythonKit
  */
 final class LinearConstraintTests: XCTestCase {
 
-    let PuLP = Python.import("pulp")
-    
 #if DEBUG
 
     // MARK: Comparison tests
@@ -97,29 +94,4 @@ final class LinearConstraintTests: XCTestCase {
         }
     }
         
-    // MARK: Conversion to PuLP tests
-    
-    func testConstraintToPuLP() {
-        let (x, y) = (Variable("x"), Variable("y"))
-        let constraint = 2 * x + 3 * y <= 5
-        let pythonConstraint = constraint.pythonObject
-
-        XCTAssertTrue(pythonConstraint.isInstance(of: PuLP.LpConstraint))
-        XCTAssertEqual(pythonConstraint.toDict()["coefficients"], [["name": "x", "value": 2], ["name": "y", "value": 3]])
-        // PuLP internally transforms the constraint into 2 * x + 3 * y - 5 <= 0.
-        // The PuLP constant retrieved from LpConstraint is actually the constant of the
-        // transformed linear function, hence -5.
-        XCTAssertEqual(pythonConstraint.constant, -5)
-        XCTAssertEqual(pythonConstraint.sense, PuLP.LpConstraintLE)
-    }
-
-    func testComparisonToPuLP() {
-        let comparisons = [LinearConstraint.Comparison.lte, .eq, .gte]
-        let senses = [PuLP.LpConstraintLE, PuLP.LpConstraintEQ, PuLP.LpConstraintGE]
-
-        for (comparison, sense) in zip(comparisons, senses) {
-            XCTAssertEqual(comparison.pythonObject, sense)
-        }
-    }
-
 }

@@ -7,7 +7,6 @@
 //
 
 import Collections
-import PythonKit
 
 /**
  A linear function is the sum of zero or more terms and a constant, where each term is the product of a variable with a coefficient (aka factor).
@@ -341,6 +340,7 @@ public extension LinearFunction {
     
 }
 
+
 // MARK: -
 
 /**
@@ -358,45 +358,17 @@ extension LinearFunction.Term {
 }
 
 
-// MARK: - PythonConvertible -
-
-/**
- Converting a LinearFunction into a Python (PuLP) object.
- */
-extension LinearFunction: PythonConvertible {
-
-    // MARK: -
-    
-    /// Converts the linear function into a LpAffineExpression PythonObject.
-    public var pythonObject: PythonObject {
-        pythonObject(withCache: nil)
-    }
-
-    // MARK: -
-    
-    /// Converts the function into a LpAffineExpression PythonObject, optionally caching variables.
-    ///
-    /// - Parameter cache: If present, caches the first generated LpVariable PythonObject per Variable.
-    /// - Returns: LpAffineExpression PythonObject.
-    func pythonObject(withCache cache: VariableCache?) -> PythonObject {
-        func pythonTuple(_ term: Term) -> PythonObject {
-            PythonObject(tupleOf: term.variable.pythonObject(withCache: cache), term.factor)
-        }
-        
-        return PuLP.LpAffineExpression(terms.map(pythonTuple), constant: constant)
-    }
-    
-}
-
-
 // MARK: - Equatable -
 
 /**
  LinearFunction adopts Equatable with default behaviour.
  */
-extension LinearFunction.Term: Equatable {}
+extension LinearFunction: Equatable {}
 
 
 // MARK: -
 
-extension LinearFunction: Equatable {}
+/**
+ LinearFunction.Term adopts Equatable with default behaviour.
+ */
+extension LinearFunction.Term: Equatable {}

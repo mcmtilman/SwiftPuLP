@@ -7,7 +7,6 @@
 //
 
 import XCTest
-import PythonKit
 
 #if DEBUG
     @testable import SwiftPuLP
@@ -16,11 +15,9 @@ import PythonKit
 #endif
 
 /**
- Tests creating and converting a variable.
+ Tests creating a variable.
  */
 final class VariableTests: XCTestCase {
-    
-    let PuLP = Python.import("pulp")
     
 #if DEBUG
     
@@ -73,38 +70,6 @@ final class VariableTests: XCTestCase {
     }
 
 #endif
-
-    // MARK: Conversion to PuLP tests
-    
-    func testVariableToPuLP() {
-        let variable = Variable("x", minimum: 1, maximum: 10, domain: .integer)
-        let pythonVariable = variable.pythonObject
-        
-        XCTAssertTrue(pythonVariable.isInstance(of: PuLP.LpVariable))
-        XCTAssertEqual(pythonVariable.name, "x")
-        XCTAssertEqual(pythonVariable.lowBound, 1)
-        XCTAssertEqual(pythonVariable.upBound, 10)
-        XCTAssertEqual(pythonVariable.cat, PuLP.LpInteger)
-    }
-
-    func testDefaultVariableToPuLP() {
-        let variable = Variable("x")
-        let pythonVariable = variable.pythonObject
-        
-        XCTAssertEqual(pythonVariable.name, "x")
-        XCTAssertEqual(pythonVariable.lowBound, Python.None)
-        XCTAssertEqual(pythonVariable.upBound, Python.None)
-        XCTAssertEqual(pythonVariable.cat, PuLP.LpContinuous)
-    }
-
-    func testDomainToPuLP() {
-        let domains = [Variable.Domain.binary, .real, .integer]
-        let categories = [PuLP.LpBinary, PuLP.LpContinuous, PuLP.LpInteger]
-
-        for (domain, category) in zip(domains, categories) {
-            XCTAssertEqual(domain.pythonObject, category)
-        }
-    }
 
     // MARK: Variable cache tests
     

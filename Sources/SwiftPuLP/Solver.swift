@@ -151,4 +151,3 @@ extension Solver.Status: ConvertibleFromPython {
     }
     
 }
-

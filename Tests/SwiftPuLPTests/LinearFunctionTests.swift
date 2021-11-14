@@ -7,7 +7,6 @@
 //
 
 import XCTest
-import PythonKit
 import SwiftPuLP
 
 /**
@@ -15,8 +14,6 @@ import SwiftPuLP
  */
 final class LinearFunctionTests: XCTestCase {
         
-    let PuLP = Python.import("pulp")
-    
     // MARK: Linear function tests
     
     func testVariableAsFunction() {
@@ -220,18 +217,6 @@ final class LinearFunctionTests: XCTestCase {
         XCTAssertEqual(function(["x": 100, "y": 1000]), 3210)
     }
         
-    // MARK: Conversion to PuLP tests
-    
-    func testFunctionToPuLP() {
-        let (x, y) = (Variable("x"), Variable("y"))
-        let function = 2 * x + 3 * y + 10
-        let pythonObject = function.pythonObject
-
-        XCTAssertTrue(pythonObject.isInstance(of: PuLP.LpAffineExpression))
-        XCTAssertEqual(pythonObject.toDict(), [["name": "x", "value": 2], ["name": "y", "value": 3]])
-        XCTAssertEqual(pythonObject.constant, 10)
-    }
-
 }
 
 
