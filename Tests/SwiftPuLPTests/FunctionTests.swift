@@ -61,9 +61,7 @@ final class FunctionTests: XCTestCase {
     }
 
     func testFlattenNestedPairs() {
-        let triples: [(Int, Int, Int)] = Pairs(Pairs(0...1, 2...3), 0...1).map { xy, z in let (x, y) = xy
-            return (x, y, z)
-        }
+        let triples = Pairs(Pairs(0...1, 2...3), 0...1).map { xy, z in (xy.0, xy.1, z) }
         let expected = [(0, 2, 0), (0, 2, 1), (0, 3, 0), (0, 3, 1), (1, 2, 0), (1, 2, 1), (1, 3, 0), (1, 3, 1)]
 
         XCTAssertTrue(triples.elementsEqual(expected, by: ==))
