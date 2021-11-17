@@ -13,17 +13,15 @@ import SwiftPuLP
  Tests result of a sudoku solver.
  */
 final class SudokuTests: XCTestCase {
-
-    // MARK: Stored properties, common for all 9 by 9 sudokus
+    
+    // MARK: Common properties for 9 by 9 sudokus
     
     // Zero-based ranges and values.
     let (values, rows, columns) = (0...8, 0...8, 0...8)
     
     // Each box lists the row / column indices of its cells.
-    lazy var boxes = rows.map { r in
-        columns.map { c in
-            (r / 3 * 3 + c / 3, r % 3 * 3 + c % 3)
-        }
+    let boxes = Pairs(0...2, 0...2).map { i, j in
+        Pairs(0...2, 0...2).map { k, l in (3 * i + k, 3 * j + l) }
     }
     
     // The variables.

@@ -1,10 +1,10 @@
 # Helper functions
 
-The ``Function`` enum provides access to helper functions.
+The ``Function`` enum and ``Pairs`` struct provide access to helper functions and types.
 
 ## Overview
 
-The helper methods are available as static methods in the Function enum.
+The helper functions are available as static methods in the Function enum.
 
 ### Creating linear functions
 
@@ -16,6 +16,17 @@ The helper methods are available as static methods in the Function enum.
     let x = (0..<100).map { i in Variable("x\(i)", domain: .binary) }
     let constraint = Function.sum(x) == 1
     ```
+
+### Iterating over pairs of sequences
+
+* The ``Pairs`` struct combines two sequences, and implements an iterator that generates all pairwise combinations of elements from each sequence.
+
+    ```swift
+    print(Array(Pairs(["a", "b", "c"], [1, 2])))
+    // outputs [("a", 1), ("a", 2), ("b", 1), ("b", 2), ("c", 1), ("c", 2)]
+    ```
+    
+    > Note:  As Pairs are sequences themselves, they can be nested.
 
 ## Topics
 

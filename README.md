@@ -107,14 +107,6 @@ Much of the code is similar (apart from some refactoring to make it more testabl
     Attempting to mirror this declaratively in Swift yields something like this (using zero-based coordinates).
     
     ```swift
-    (0...2).flatMap { i in (0...2).map { j in (i, j) }}.map { (i, j) in
-        (0...2).flatMap { k in (0...2).map { l in (3 * i + k, 3 * j + l) }}
-    }
-    ```
-    
-    A simpler variant is this one used in SudokuTests.    
-    
-    ```swift
     (0...8).map { r in
         (0...8).map { c in
             (r / 3 * 3 + c / 3, r % 3 * 3 + c % 3) 
@@ -122,10 +114,10 @@ Much of the code is similar (apart from some refactoring to make it more testabl
     }
     ```
     
-    Support in Swift for iterating over multi-dimensional ranges might be another option.
+    Adding support for iterating over pairwise combinations of sequences results in the following.
     
     ```swift
-    let ranges = (0...2) * (0...2)  
+    let ranges = Pairs(0...2, 0...2)
     let boxes = ranges.map { i, j in ranges.map { k, l in (3 * i + k, 3 * j + l) }}
     ```
 
