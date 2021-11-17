@@ -70,14 +70,12 @@ extension Variable {
     fileprivate func collectErrors(into errors: inout [ValidationError]) {
         if name.isEmpty {
             errors.append(.invalidVariableName(self))
-        }
-        else if !CharacterSet(charactersIn: name).isDisjoint(with: Self.specialChars) {
+        } else if !CharacterSet(charactersIn: name).isDisjoint(with: Self.specialChars) {
             errors.append(.invalidVariableName(self))
         }
         if let min = minimum, let max = maximum, min > max {
             errors.append(.invalidVariableBounds(self))
-        }
-        else if domain == .binary, minimum ?? 0 != 0 || maximum ?? 1 != 1 {
+        } else if domain == .binary, minimum ?? 0 != 0 || maximum ?? 1 != 1 {
             errors.append(.invalidVariableBounds(self))
         }
     }
