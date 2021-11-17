@@ -63,11 +63,6 @@ public struct Pairs<S1, S2>: Sequence where S1: Sequence, S2: Sequence {
         // Iterator for the second sequence.
         private var it2: S2.Iterator
 
-        // Current element in the second sequence.
-        //
-        // If nil, we are at the end.
-        private var el2: S2.Element?
-        
         // MARK: -
 
         // Creates an iterator for given sequences.
@@ -76,7 +71,6 @@ public struct Pairs<S1, S2>: Sequence where S1: Sequence, S2: Sequence {
             self.el1 = self.it1.next()
             self.seq2 = seq2
             self.it2 = self.seq2.makeIterator()
-            self.el2 = self.it2.next()
         }
         
         // MARK: -
@@ -85,19 +79,13 @@ public struct Pairs<S1, S2>: Sequence where S1: Sequence, S2: Sequence {
         ///
         /// - Returns: Next pair of elements or nil if at end.
         public mutating func next() -> (S1.Element, S2.Element)? {
-            guard let x = el1, let y = el2 else { return nil }
+            guard let x = el1 else { return nil }
+            if let y = it2.next() { return (x, y) }
             
-            if let next = it2.next() {
-                el2 = next
-            } else {
-                el1 = it1.next()
-                if el1 != nil {
-                    it2 = seq2.makeIterator()
-                    el2 = it2.next()
-                }
-            }
-
-            return (x, y)
+            el1 = it1.next()
+            it2 = seq2.makeIterator()
+                
+            return next()
         }
         
     }
