@@ -114,7 +114,7 @@ Much of the code is similar (apart from some refactoring to make it more testabl
     }
     ```
     
-    Adding support for iterating over pairwise combinations of sequences results in the following.
+    Support for iterating over pairwise combinations of sequences results in the following.
     
     ```swift
     let ranges = Pairs(0...2, 0...2)

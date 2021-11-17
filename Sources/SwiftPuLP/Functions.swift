@@ -55,22 +55,22 @@ public struct Pairs<S1, S2>: Sequence where S1: Sequence, S2: Sequence {
         // Iterator for the first sequence.
         private var it1: S1.Iterator
 
+        // Iterator for the second sequence.
+        private var it2: S2.Iterator
+
         // Current element in the first sequence.
         //
         // If nil, we are at the end.
         private var el1: S1.Element?
-
-        // Iterator for the second sequence.
-        private var it2: S2.Iterator
 
         // MARK: -
 
         // Creates an iterator for given sequences.
         fileprivate init(_ seq1: S1, _ seq2: S2) {
             self.it1 = seq1.makeIterator()
-            self.el1 = self.it1.next()
             self.seq2 = seq2
             self.it2 = self.seq2.makeIterator()
+            self.el1 = self.it1.next()
         }
         
         // MARK: -
@@ -113,7 +113,6 @@ public struct Pairs<S1, S2>: Sequence where S1: Sequence, S2: Sequence {
     // MARK: -
 
     /// Answers an iterator.
-    ///
     ///
     /// - Returns: The iterator.
     public func makeIterator() -> Iterator {
