@@ -89,9 +89,8 @@ public struct Pairs<S1, S2>: Sequence where S1: Sequence, S2: Sequence {
         public mutating func next() -> (S1.Element, S2.Element)? {
             guard let x = el1, let y = el2 else { return nil }
             
-            if let y = it2.next() {
-                el2 = y
-            } else {
+            el2 = it2.next()
+            if el2 == nil {
                 el1 = it1.next()
                 if el1 != nil {
                     it2 = seq2.makeIterator()
