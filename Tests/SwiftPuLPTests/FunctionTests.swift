@@ -53,11 +53,11 @@ final class FunctionTests: XCTestCase {
     }
 
     func testNestedPairs() {
-        let pairs = Array(Pairs(Pairs(0...1, 2...3), 0...1))
-        let expected = [((0, 2), 0), ((0, 2), 1), ((0, 3), 0), ((0, 3), 1), ((1, 2), 0), ((1, 2), 1), ((1, 3), 0), ((1, 3), 1)]
+        let flatten = { (xyz: ((Int, Int), Int)) in (xyz.0.0, xyz.0.1, xyz.1) }
+        let triples = Pairs(Pairs(0...1, 2...3), 0...1).map(flatten)
+        let expected = [(0, 2, 0), (0, 2, 1), (0, 3, 0), (0, 3, 1), (1, 2, 0), (1, 2, 1), (1, 3, 0), (1, 3, 1)]
 
-        XCTAssertTrue(pairs.map(\.0).elementsEqual(expected.map(\.0), by: ==))
-        XCTAssertTrue(pairs.map(\.1).elementsEqual(expected.map(\.1), by: ==))
+        XCTAssertTrue(triples.elementsEqual(expected, by: ==))
     }
 
     func testFlattenNestedPairs() {
