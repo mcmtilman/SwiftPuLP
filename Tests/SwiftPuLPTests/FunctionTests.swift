@@ -52,19 +52,28 @@ final class FunctionTests: XCTestCase {
          XCTAssertTrue(pairs.elementsEqual(expected, by: ==))
     }
 
-    func testNestedPairs() {
-        let flatten = { (xyz: ((Int, Int), Int)) in (xyz.0.0, xyz.0.1, xyz.1) }
-        let triples = Pairs(Pairs(0...1, 2...3), 0...1).map(flatten)
-        let expected = [(0, 2, 0), (0, 2, 1), (0, 3, 0), (0, 3, 1), (1, 2, 0), (1, 2, 1), (1, 3, 0), (1, 3, 1)]
+    func testLeftNestedPairs() {
+        let pairs = Pairs(Pairs(0...1, 2...3), 0...1)
+        let expected = [((0, 2), 0), ((0, 2), 1), ((0, 3), 0), ((0, 3), 1), ((1, 2), 0), ((1, 2), 1), ((1, 3), 0), ((1, 3), 1)]
 
-        XCTAssertTrue(triples.elementsEqual(expected, by: ==))
+        XCTAssertTrue(pairs.map(\.0).elementsEqual(expected.map(\.0), by: ==))
+        XCTAssertTrue(pairs.map(\.1).elementsEqual(expected.map(\.1), by: ==))
+   }
+
+    func testRightNestedPairs() {
+        let pairs = Pairs(0...1, Pairs(2...3, 0...1))
+        let expected = [(0, (2, 0)), (0, (2, 1)), (0, (3, 0)), (0, (3, 1)), (1, (2, 0)), (1, (2, 1)), (1, (3, 0)), (1, (3, 1))]
+
+        XCTAssertTrue(pairs.map(\.0).elementsEqual(expected.map(\.0), by: ==))
+        XCTAssertTrue(pairs.map(\.1).elementsEqual(expected.map(\.1), by: ==))
     }
 
-    func testFlattenNestedPairs() {
-        let triples = Pairs(Pairs(0...1, 2...3), 0...1).map { xy, z in (xy.0, xy.1, z) }
-        let expected = [(0, 2, 0), (0, 2, 1), (0, 3, 0), (0, 3, 1), (1, 2, 0), (1, 2, 1), (1, 3, 0), (1, 3, 1)]
+    func testDoubleNestedPairs() {
+        let pairs = Pairs(Pairs(0...1, 4...5), Pairs(2...3, 0...1))
+        let expected = [((0, 4), (2, 0)), ((0, 4), (2, 1)), ((0, 4), (3, 0)), ((0, 4), (3, 1)), ((0, 5), (2, 0)), ((0, 5), (2, 1)), ((0, 5), (3, 0)), ((0, 5), (3, 1)), ((1, 4), (2, 0)), ((1, 4), (2, 1)), ((1, 4), (3, 0)), ((1, 4), (3, 1)), ((1, 5), (2, 0)), ((1, 5), (2, 1)), ((1, 5), (3, 0)), ((1, 5), (3, 1))]
 
-        XCTAssertTrue(triples.elementsEqual(expected, by: ==))
+        XCTAssertTrue(pairs.map(\.0).elementsEqual(expected.map(\.0), by: ==))
+        XCTAssertTrue(pairs.map(\.1).elementsEqual(expected.map(\.1), by: ==))
     }
 
 }
