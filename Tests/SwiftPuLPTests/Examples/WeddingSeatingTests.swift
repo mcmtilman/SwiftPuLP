@@ -62,8 +62,9 @@ final class WeddingSeatingTests: XCTestCase {
         return constraints
     }
     
-    // Dummy happiness calculation.
-    // Answers the 'happiness' of the table by calculating the maximum distance between the initial letters representing the guests.
+    // Dummy 'happiness' calculation.
+    // Answers the happiness of the table guests by calculating the maximum distance between the initial letters of each guest.
+    // Guests are sorted by name.
     private func happiness(_ table: [String]) -> Double {
         abs(Double(table[0].first?.asciiValue ?? UInt8.min) - Double(table[table.count - 1].first?.asciiValue ?? UInt8.max))
     }
