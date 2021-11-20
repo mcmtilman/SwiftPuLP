@@ -16,7 +16,7 @@ import Algorithms
 final class WeddingSeatingTests: XCTestCase {
 
     // Maximum number of tables
-    let maxTables = 5
+    let maxTables = 5.0
 
     // Maximum number of guests per table
     let maxTableSize = 4
@@ -60,14 +60,13 @@ final class WeddingSeatingTests: XCTestCase {
     // Limits the maximum number of tables.
     // Assigns each guest to one table.
     private func constraints() -> [(LinearConstraint, String)] {
-        var constraints = [(LinearConstraint, String)]()
-        
-        constraints.append((Function.sum(x.map(\.variable)) <= Double(maxTables), "Maximum_tables_\(maxTables)"))
-        for guest in guests {
-            constraints.append((Function.sum(x.filter { $0.table.contains(guest) }.map(\.variable)) == 1, "Must_seat_\(guest)"))
+        func varSum(_ x: [(table: [String], variable: Variable)]) -> LinearFunction {
+            Function.sum(x.map(\.variable))
         }
-
-        return constraints
+        
+        return guests.reduce(into: [(varSum(x) <= maxTables, "Max_tables")]) { constraints, guest in
+            constraints.append((varSum(x.filter { (table, _) in table.contains(guest) }) == 1, "Seat_\(guest)"))
+        }
     }
     
     // Dummy 'happiness' calculation from PuLP example.
