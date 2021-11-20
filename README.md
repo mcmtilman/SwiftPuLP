@@ -86,7 +86,7 @@ Based on the [The Sudoku Problem Formulation for the PuLP Modeller](https://coin
     Authors: Antony Phillips, Dr Stuart Mitchell
     edited by Nathan Sudermann-Merx
 
-The Swift model can be found in [SudokuTests](Tests/Examples/SudokuTests.swift). It closely mirrors the PuLP model. It has no objective function, and only binary constraints.
+The Swift model can be found in [SudokuTests](Tests/SwiftPuLPTests/Examples/SudokuTests.swift). It closely mirrors the PuLP model. It has no objective function, and only binary constraints.
 
 #### Analysis
 
@@ -135,7 +135,7 @@ Based on the [A set partitioning model of a wedding seating problem](https://coi
 
     Authors: Stuart Mitchell 2009
 
-The Swift model can be found in [WeddingSeatingTests](Tests/Examples/WeddingSeatingTests.swift). It mirrors the PuLP model. It has an objective function, and only binary variables.
+The Swift model can be found in [WeddingSeatingTests](Tests/SwiftPuLPTests/Examples/WeddingSeatingTests.swift). It mirrors the PuLP model. It has an objective function, and only binary variables.
 
 ## Dependencies
 
