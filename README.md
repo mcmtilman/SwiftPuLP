@@ -104,17 +104,7 @@ Much of the code is similar (apart from some refactoring to make it more testabl
 
     This is both concise and readable: variables *i* and *j* identify a box in the Sudoku grid, while variables *k* and *l* identify cells within the boxes.
     
-    Attempting to mirror this declaratively in Swift yields something like this (using zero-based coordinates).
-    
-    ```swift
-    (0...8).map { r in
-        (0...8).map { c in
-            (r / 3 * 3 + c / 3, r % 3 * 3 + c % 3) 
-        } 
-    }
-    ```
-    
-    Support for iterating over pairwise combinations of sequences results in the following.
+    Mirroring this declaratively in Swift results in the following (using zero-based coordinates).
     
     ```swift
     let ranges = Pairs(0...2, 0...2)
@@ -139,7 +129,7 @@ Much of the code is similar (apart from some refactoring to make it more testabl
     }
     ```
 
-### Example 2: Wedding seating planning illustrating set partition optimization
+### Example 2: Wedding seating planning illustrating set partitioning optimization
 
 Based on the [A set partitioning model of a wedding seating problem](https://coin-or.github.io/pulp/CaseStudies/a_set_partitioning_problem.html).
 
@@ -150,6 +140,8 @@ The Swift model can be found in *WeddingSeatingTests*. It mirrors the PuLP model
 ## Dependencies
 
 SwiftPuLP depends on the *Collections* and *PythonKit* packages. It also uses *CharacterSet* from *Foundation*.
+
+The test target depends on the *Algorithms* package.
 
 ## Requirements
 
