@@ -31,8 +31,8 @@ public enum Function {
     ///
     /// > Note: Does not normalize the resulting function.
     ///
-    /// - Parameter functions: Sequence of LInearFunction.
-    /// - Returns: Linear function consisting of the concatenation of the terms and the sum of constants.
+    /// - Parameter functions: Sequence of LinearFunction.
+    /// - Returns: Linear function consisting of the concatenation of the terms and the sum of the constants.
     public static func sum<T>(_ functions: T) -> LinearFunction where T: Sequence, T.Element == LinearFunction {
         let (terms, constant) = functions.reduce(into: ([LinearFunction.Term](), 0.0)) { accumulator, function in
             accumulator.0 += function.terms

@@ -8,7 +8,7 @@ The helper functions are available as static methods in the Function enum.
 
 ### Creating linear functions
 
-* The ``Function/sum(_:)`` function converts a sequence of variables into a linear function summing the variables.
+* The ``Function/sum(_:)-4dvok`` function converts a sequence of variables into a linear function summing the variables.
     
     The following example creates the constraint that one and only one of 100 binary variables should have value 1.
 
@@ -16,6 +16,10 @@ The helper functions are available as static methods in the Function enum.
     let x = (0..<100).map { i in Variable("x\(i)", domain: .binary) }
     let constraint = Function.sum(x) == 1
     ```
+
+* The ``Function/sum(_:)-4nffd`` function converts a sequence of linear functions into a linear function summing the variables.
+    
+    The following example creates the constraint that one and only one of 100 binary variables should have value 1.
 
 ### Iterating over pairs of sequences
 
