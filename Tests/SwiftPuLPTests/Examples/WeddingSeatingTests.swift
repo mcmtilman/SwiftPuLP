@@ -24,9 +24,10 @@ final class WeddingSeatingTests: XCTestCase {
     // The guests.
     let guests = ["Athena", "Brienna", "Cordelia", "Darla", "Eliza", "Freya", "Gemma", "Inara", "Jemma", "Kara", "Leia", "Melissa", "Naya", "Olivia", "Paula", "Qira", "Reina"]
     
-    // The binary variables, each representing a possible table assignment.
-    lazy var x = guests.combinations(ofCount: 1...maxTableSize).map { a in
-        (table: a, variable: Variable("table_\(a.joined(separator: "_")))", domain: .binary))
+    // The binary variables, each one representing a possible table assignment.
+    // Use tuples to keep track of the guests for each table.
+    lazy var x = guests.combinations(ofCount: 1...maxTableSize).map { table in
+        (table: table, variable: Variable("table_\(table.joined(separator: "_")))", domain: .binary))
     }
     
     func testSolveWeddingSeatingModel() {
