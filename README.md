@@ -139,6 +139,14 @@ Much of the code is similar (apart from some refactoring to make it more testabl
     }
     ```
 
+### Example 2: Wedding seating planning illustrating set partition optimization
+
+Based on the [A set partitioning model of a wedding seating problem](https://coin-or.github.io/pulp/CaseStudies/a_set_partitioning_problem.html).
+
+    Authors: Stuart Mitchell 2009
+
+The Swift model can be found in *WeddingSeatingTests*. It mirrors the PuLP model. It has an objective function, and only binary constraints.
+
 ## Dependencies
 
 SwiftPuLP depends on the *Collections* and *PythonKit* packages. It also uses *CharacterSet* from *Foundation*.

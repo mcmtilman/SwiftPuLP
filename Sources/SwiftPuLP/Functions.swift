@@ -27,6 +27,24 @@ public enum Function {
         LinearFunction(terms: variables.map { LinearFunction.Term(variable: $0, factor: 1) })
     }
 
+    /// Answers a linear function representing the sum of given sequence of linear functions.
+    ///
+    /// > Note: Does not normalize the resulting function.
+    ///
+    /// - Parameter functions: Sequence of LInearFunction.
+    /// - Returns: Linear function consisting of the concatenation of the terms and the sum of constants.
+    public static func sum<T>(_ functions: T) -> LinearFunction where T: Sequence, T.Element == LinearFunction {
+        var terms = [LinearFunction.Term]()
+        var constant = 0.0
+        
+        for function in functions {
+            terms += function.terms
+            constant += function.constant
+        }
+        
+        return LinearFunction(terms: terms, constant: constant)
+    }
+
 }
 
 

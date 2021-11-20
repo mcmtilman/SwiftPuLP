@@ -16,11 +16,19 @@ final class FunctionTests: XCTestCase {
     
     // MARK: Linear functions tests
     
-    func testSumFunction() {
-        let x = (0..<5).map { Variable("x_\($0)") }
+    func testSumOfVariables() {
+        let x = (0..<5).map { i in Variable("x_\(i)") }
         let sum = Function.sum(x)
 
         XCTAssertEqual(sum, x[0] + x[1] + x[2] + x[3] + x[4])
+    }
+    
+    func testSumOfFunctions() {
+        let x = (0..<5).map { i in Variable("x_\(i)") }
+        let functions = (0..<x.count).map { i in Double(i) * x[i] }
+        let sum = Function.sum(functions)
+
+        XCTAssertEqual(sum, 0 * x[0] + 1 * x[1] + 2 * x[2] + 3 * x[3] + 4 * x[4])
     }
     
     // MARK: Pairs tests
