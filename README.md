@@ -135,7 +135,7 @@ Based on the [A set partitioning model of a wedding seating problem](https://coi
 
     Authors: Stuart Mitchell 2009
 
-The Swift model can be found in *WeddingSeatingTests*. It mirrors the PuLP model. It has an objective function, and only binary constraints.
+The Swift model can be found in *WeddingSeatingTests*. It mirrors the PuLP model. It has an objective function, and only binary variables.
 
 ## Dependencies
 

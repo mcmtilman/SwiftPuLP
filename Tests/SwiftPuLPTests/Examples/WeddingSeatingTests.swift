@@ -44,7 +44,7 @@ final class WeddingSeatingTests: XCTestCase {
 
     // MARK: Utility functions
     
-    // Maximizes total happiness across all tables.
+    // Maximizes total happiness across all table assignments.
     private func objective() -> Model.Objective {
         Model.Objective(Function.sum(x.map { (table, variable) in happiness(table) * variable }), optimization: .maximize)
     }
