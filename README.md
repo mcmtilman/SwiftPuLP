@@ -129,6 +129,8 @@ Much of the code is similar (apart from some refactoring to make it more testabl
     }
     ```
 
+3. Performance compared to native Python PuLP is heavily impacted by the conversion between Swift and Python data structures.
+
 ### Example 2: Wedding seating planning illustrating set partitioning optimization
 
 Based on the [A set partitioning model of a wedding seating problem](https://coin-or.github.io/pulp/CaseStudies/a_set_partitioning_problem.html).
