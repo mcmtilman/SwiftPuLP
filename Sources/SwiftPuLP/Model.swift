@@ -6,6 +6,8 @@
 //  Licensed under Apache License v2.0.
 //
 
+import Collections
+
 /**
  Represents a linear programming problem consisting of an objective and a list of contraints.
  
@@ -117,3 +119,70 @@ extension Model: Equatable {
  Model.Objective adopts Equatable with default behaviour.
  */
 extension Model.Objective: Equatable {}
+
+
+// MARK: -
+
+/**
+ Collecting variables
+ */
+extension Model {
+    
+    // MARK: -
+
+   /// The variables ordered by first occurrence in the objective function followed by the constraints.
+    public var variables: [Variable] {
+        var variables = OrderedSet<Variable>()
+
+        collectVariables(into: &variables)
+        
+        return Array(variables)
+    }
+    
+   // MARK: -
+
+    // Collects all unique variables from nested elements.
+    fileprivate func collectVariables(into variables: inout OrderedSet<Variable>) {
+        objective?.function.collectVariables(into: &variables)
+        for (constraint, _) in constraints {
+            constraint.collectVariables(into: &variables)
+        }
+    }
+    
+}
+
+
+// MARK: -
+
+/**
+ Collecting variables
+ */
+extension LinearFunction {
+    
+    // MARK: -
+    
+    // Collects the different variables used in the function.
+    fileprivate func collectVariables(into variables: inout OrderedSet<Variable>) {
+        for term in terms {
+            variables.append(term.variable)
+        }
+    }
+    
+}
+
+
+// MARK: -
+
+/**
+ Collecting variables
+ */
+extension LinearConstraint {
+    
+    // MARK: -
+    
+    // Delegates collection of variables to the linear function.
+    fileprivate func collectVariables(into variables: inout OrderedSet<Variable>) {
+        function.collectVariables(into: &variables)
+    }
+
+}

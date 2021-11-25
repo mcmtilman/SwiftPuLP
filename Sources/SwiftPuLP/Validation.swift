@@ -7,7 +7,6 @@
 //
 
 import Foundation
-import Collections
 
 /**
  Single validation error, such as an invalid variable name or a duplicate constraint name.
@@ -86,42 +85,6 @@ extension Variable {
 // MARK: -
 
 /**
- Validating a linear function.
- */
-extension LinearFunction {
-    
-    // MARK: -
-    
-    // Collects the different variables used in the function.
-    fileprivate func collectVariables(into variables: inout OrderedSet<Variable>) {
-        for term in terms {
-            variables.append(term.variable)
-        }
-    }
-    
-}
-
-
-// MARK: -
-
-/**
- Validating a linear constraint.
- */
-extension LinearConstraint {
-    
-    // MARK: -
-    
-    // Delegates collection of variables to the linear function.
-    fileprivate func collectVariables(into variables: inout OrderedSet<Variable>) {
-        function.collectVariables(into: &variables)
-    }
-
-}
-
-
-// MARK: -
-
-/**
  Model supports validation. Delegates variable validation to its objective function and constraints.
  Additionally the model detects name conflicts in variables and in constraints.
  */
@@ -138,15 +101,6 @@ extension Model {
         collectErrors(into: &errors)
         
         return errors
-    }
-    
-    /// The variables ordered by first occurrence in the objective function followed by the constraints.
-    public var variables: OrderedSet<Variable> {
-        var variables = OrderedSet<Variable>()
-
-        collectVariables(into: &variables)
-        
-        return variables
     }
     
     // MARK: -
@@ -173,23 +127,13 @@ extension Model {
     
     // Verifies that variables are valid and that distinct variables have different names.
     fileprivate func collectVariableErrors(into errors: inout [ValidationError]) {
-        var variables = OrderedSet<Variable>()
         var names = Set<String>()
 
-        collectVariables(into: &variables)
         for variable in variables {
             variable.collectErrors(into: &errors)
             if !name.isEmpty, !names.insert(variable.name).inserted {
                 errors.append(.duplicateVariableName(variable))
             }
-        }
-    }
-    
-    // Collects all unique variables from nested elements.
-    fileprivate func collectVariables(into variables: inout OrderedSet<Variable>) {
-        objective?.function.collectVariables(into: &variables)
-        for (constraint, _) in constraints {
-            constraint.collectVariables(into: &variables)
         }
     }
     

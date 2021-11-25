@@ -95,7 +95,7 @@ fileprivate struct MPSWriter {
         var writer = FileWriter(fileHandle: fileHandle)
 
         let variables = model.variables
-        let variableNames = (0 ..< variables.count).map { i in String(format: "%08d", i) }
+        let variableNames = (0 ..< variables.count).map { i in String(format: "X%07d", i) }
         let constraintNames = (0 ..< model.constraints.count).map { i in String(format: "C%07d", i) }
         let one = String(format: "%.12e", 1.0) // Factor 1 is often used in several unit test models.
 
