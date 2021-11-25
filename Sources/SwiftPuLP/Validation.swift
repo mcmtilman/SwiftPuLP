@@ -140,6 +140,15 @@ extension Model {
         return errors
     }
     
+    /// The variables ordered by first occurrence in the objective function followed by the constraints.
+    public var variables: OrderedSet<Variable> {
+        var variables = OrderedSet<Variable>()
+
+        collectVariables(into: &variables)
+        
+        return variables
+    }
+    
     // MARK: -
     
     // Validates name correctnes, collects errors from nested elements and verifies that variable names respectively constraint labels are unique in this model.
@@ -183,7 +192,7 @@ extension Model {
             constraint.collectVariables(into: &variables)
         }
     }
-
+    
 }
 
 

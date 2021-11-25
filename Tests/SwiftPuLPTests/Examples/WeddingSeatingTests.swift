@@ -50,6 +50,36 @@ final class WeddingSeatingTests: XCTestCase {
         XCTAssertTrue(tables.elementsEqual(expected, by: ==))
     }
 
+    // Variables are ordered by occurrence rather than by name as in PuLP. Hence we may have a different result with same objective value.
+    // Skip if CBC_PATH not set.
+    func testSolveCBCHappinessModel() {
+        guard let path = ProcessInfo.processInfo.environment["CBC_PATH"] else { return }
+
+        let solver = CBCSolver(commandPath: path)
+        let model = Model("Happiness", objective: objective(happiness), constraints: constraints())
+        guard let result = solver.solve(model) else { return XCTFail("Nil result") }
+        let tables = x.filter { (_, variable) in result.variables[variable.name] == 1 }.map(\.table)
+        let expected = [["Athena", "Kara", "Naya"], ["Cordelia", "Inara", "Olivia"], ["Darla", "Melissa", "Reina"], ["Brienna", "Jasika", "Leia", "Qira"], ["Eliza", "Freya", "Gemma", "Paula"]]
+
+        XCTAssertEqual(result.status, .optimal)
+        XCTAssertTrue(tables.elementsEqual(expected, by: ==))
+    }
+
+    // Variables are ordered by occurrence rather than by name as in PuLP. Hence we may have a different result with same objective value.
+    // Skip if CBC_PATH not set.
+    func testSolveCBCLikesModel() {
+        guard let path = ProcessInfo.processInfo.environment["CBC_PATH"] else { return }
+
+        let solver = CBCSolver(commandPath: path)
+        let model = Model("Happiness", objective: objective(likes), constraints: constraints())
+        guard let result = solver.solve(model) else { return XCTFail("Nil result") }
+        let tables = x.filter { (_, variable) in result.variables[variable.name] == 1 }.map(\.table)
+        let expected = [["Brienna", "Melissa"], ["Cordelia", "Darla", "Eliza"], ["Athena", "Kara", "Paula", "Qira"], ["Freya", "Gemma", "Jasika", "Olivia"], ["Inara", "Leia", "Naya", "Reina"]]
+
+        XCTAssertEqual(result.status, .optimal)
+        XCTAssertTrue(tables.elementsEqual(expected, by: ==))
+    }
+
     // MARK: Utility functions
     
     // Maximizes total score across all table assignments.

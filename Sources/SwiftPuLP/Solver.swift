@@ -49,7 +49,7 @@ public struct Solver {
         
         // MARK: -
         
-        /// Createa a result with given status and variable bindings.
+        /// Creates a result with given status and variable bindings.
         ///
         /// - Parameters:
         ///   - status: Status of the solver result.

@@ -70,6 +70,11 @@ public struct Model {
     /// Labeled linear constraints. The labels may be empty.
     let constraints: [(constraint: LinearConstraint, name: String)]
     
+    /// Objective optimization of minimize if no objective.
+    var optimization: Optimization {
+        objective?.optimization ?? .minimize
+    }
+    
     // MARK: -
     
     /// Creates a model with given name, optional objective and constraints.
