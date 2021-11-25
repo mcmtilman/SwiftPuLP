@@ -121,7 +121,7 @@ extension Model: Equatable {
 extension Model.Objective: Equatable {}
 
 
-// MARK: -
+// MARK: - Collecting variables -
 
 /**
  Collecting variables
