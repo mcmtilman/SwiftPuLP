@@ -21,46 +21,64 @@ final class ModelTests: XCTestCase {
     
 #if DEBUG
 
-    // MARK: Objective tests
-    
-    func testVariableObjective() {
-        let x = Variable("x")
-        let objective = Objective(x, optimization: .maximize)
-
-        XCTAssertEqual(objective.function, x + 0)
-        XCTAssertEqual(objective.optimization, .maximize)
-    }
-    
-    func testFunctionObjective() {
-        let x = Variable("x")
-        let function = 2 * x + 1
-        let objective = Objective(function, optimization: .maximize)
-
-        XCTAssertEqual(objective.function, function)
-        XCTAssertEqual(objective.optimization, .maximize)
-    }
-    
-    func testDefaultObjective() {
-        let x = Variable("x")
-        let objective = Objective(x)
-
-        XCTAssertEqual(objective.optimization, .minimize)
-    }
-    
-    // MARK: Model tests
+    // MARK: Model creation tests
 
     func testDefaultModel() {
         let model = Model("XYZ")
         
         XCTAssertNil(model.objective)
+        XCTAssertEqual(model.optimization, .minimize)
+        XCTAssertTrue(model.constraints.isEmpty)
+    }
+
+    func testModel() {
+        let x = Variable("x")
+        let model = Model("XYZ", objective: x)
+        
+        XCTAssertEqual(model.objective, +x)
+    }
+
+    func testVariableObjective() {
+        let (x, y) = (Variable("x"), Variable("y"))
+        let objective = 2 * x + y
+        let constraints = [(x + y <= 10, "C1"), (3 * y >= 0, "C2")]
+        let model = Model("XYZ", objective: objective, optimization: .maximize, constraints: constraints)
+        
+        XCTAssertEqual(model.objective, 2 * x + y)
+        XCTAssertEqual(model.optimization, .maximize)
+        XCTAssertTrue(model.constraints.elementsEqual(constraints, by: ==))
+    }
+
+    // MARK: Model variable tests
+
+    func testVariables() {
+        let (x, y, z) = (Variable("x"), Variable("y"), Variable("z"))
+        let objective = 2 * x + z
+        let constraints = [(x + y <= 10, "C1")]
+        let model = Model("XYZ", objective: objective, constraints: constraints)
+        
+        XCTAssertTrue(model.variables.elementsEqual([x, z, y]))
+    }
+
+    func testDuplicateVariables() {
+        let (x, y, z) = (Variable("x"), Variable("y"), Variable("x"))
+        let objective = 2 * x + z
+        let constraints = [(x + y <= 10, "C1")]
+        let model = Model("XYZ", objective: objective, constraints: constraints)
+        
+        XCTAssertTrue(model.variables.elementsEqual([x, z, y]))
+    }
+
+    func testAliasedVariables() {
+        let x = Variable("x")
+        let y = x
+        let objective = 2 * x + y
+        let constraints = [(x + y <= 10, "C1")]
+        let model = Model("XYZ", objective: objective, constraints: constraints)
+        
+        XCTAssertTrue(model.variables.elementsEqual([x]))
     }
 
 #endif
 
 }
-
-
-/**
- Utility types.
- */
-fileprivate typealias Objective = Model.Objective

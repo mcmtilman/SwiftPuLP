@@ -31,7 +31,7 @@ final class WeddingSeatingTests: XCTestCase {
     }
     
     func testSolveHappinessModel() {
-        let model = Model("Happiness", objective: objective(happiness), constraints: constraints())
+        let model = Model("Happiness", objective: objective(happiness), optimization: .maximize, constraints: constraints())
         guard let result = Solver().solve(model) else { return XCTFail("Nil result") }
         let tables = x.filter { (_, variable) in result.variables[variable.name] == 1 }.map(\.table)
         let expected = [["Athena", "Melissa", "Qira"], ["Brienna", "Freya", "Paula"], ["Cordelia", "Leia", "Reina"], ["Darla", "Gemma", "Jasika", "Naya"], ["Eliza", "Inara", "Kara", "Olivia"]]
@@ -41,7 +41,7 @@ final class WeddingSeatingTests: XCTestCase {
     }
 
     func testSolveLikesModel() {
-        let model = Model("Likes", objective: objective(likes), constraints: constraints())
+        let model = Model("Likes", objective: objective(likes), optimization: .maximize, constraints: constraints())
         guard let result = Solver().solve(model) else { return XCTFail("Nil result") }
         let tables = x.filter { (_, variable) in result.variables[variable.name] == 1 }.map(\.table)
         let expected = [["Athena", "Kara", "Melissa"], ["Cordelia", "Darla", "Eliza"], ["Paula", "Qira", "Reina"], ["Brienna", "Inara", "Leia", "Naya"], ["Freya", "Gemma", "Jasika", "Olivia"]]
@@ -56,7 +56,7 @@ final class WeddingSeatingTests: XCTestCase {
         guard let path = ProcessInfo.processInfo.environment["CBC_PATH"] else { return }
 
         let solver = CBCSolver(commandPath: path)
-        let model = Model("Happiness", objective: objective(happiness), constraints: constraints())
+        let model = Model("Happiness", objective: objective(happiness), optimization: .maximize, constraints: constraints())
         guard let result = solver.solve(model) else { return XCTFail("Nil result") }
         let tables = x.filter { (_, variable) in result.variables[variable.name] == 1 }.map(\.table)
         let expected = [["Athena", "Kara", "Naya"], ["Cordelia", "Inara", "Olivia"], ["Darla", "Melissa", "Reina"], ["Brienna", "Jasika", "Leia", "Qira"], ["Eliza", "Freya", "Gemma", "Paula"]]
@@ -71,7 +71,7 @@ final class WeddingSeatingTests: XCTestCase {
         guard let path = ProcessInfo.processInfo.environment["CBC_PATH"] else { return }
 
         let solver = CBCSolver(commandPath: path)
-        let model = Model("Happiness", objective: objective(likes), constraints: constraints())
+        let model = Model("Happiness", objective: objective(likes), optimization: .maximize, constraints: constraints())
         guard let result = solver.solve(model) else { return XCTFail("Nil result") }
         let tables = x.filter { (_, variable) in result.variables[variable.name] == 1 }.map(\.table)
         let expected = [["Brienna", "Melissa"], ["Cordelia", "Darla", "Eliza"], ["Athena", "Kara", "Paula", "Qira"], ["Freya", "Gemma", "Jasika", "Olivia"], ["Inara", "Leia", "Naya", "Reina"]]
@@ -83,8 +83,8 @@ final class WeddingSeatingTests: XCTestCase {
     // MARK: Utility functions
     
     // Maximizes total score across all table assignments.
-    private func objective(_ score: ([String]) -> Double) -> Model.Objective {
-        Model.Objective(Function.sum(x.map { (table, variable) in score(table) * variable }), optimization: .maximize)
+    private func objective(_ score: ([String]) -> Double) -> LinearFunction {
+        Function.sum(x.map { (table, variable) in score(table) * variable })
     }
                         
     // Limits the maximum number of tables.

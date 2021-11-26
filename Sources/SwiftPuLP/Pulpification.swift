@@ -174,11 +174,11 @@ extension Model: PythonConvertible {
     ///
     /// Caches the first generated LpVariable PythonObject per Variable.
     public var pythonObject: PythonObject {
-        var problem = PuLP.LpProblem(name: name, sense: objective?.optimization ?? .minimize) // set sense, even without an objective.
+        var problem = PuLP.LpProblem(name: name, sense: optimization) // set sense, even without an objective.
         let cache = VariableCache()
         
         if let objective = objective {
-            problem += objective.function.pythonObject(withCache: cache)
+            problem += objective.pythonObject(withCache: cache)
         }
         for (constraint, name) in constraints {
             problem += PythonObject(tupleOf: constraint.pythonObject(withCache: cache), name)

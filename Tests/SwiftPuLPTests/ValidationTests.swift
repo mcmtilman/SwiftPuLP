@@ -97,31 +97,29 @@ final class ValidationTests: XCTestCase {
     
     func testValidModel() {
         let (x, y) = (Variable("x", domain: .integer), Variable("y"))
-        let function = x + 2 * y
-        let objective = Objective(function, optimization: .maximize)
+        let objective = x + 2 * y
         let constraints = [
             (2 * x + y <= 20, "red"),
             (4 * x - 5 * y >= -10, "blue"),
             (-x + 2 * y >= -2, "yellow"),
             (-x + 5 * y == 15, "green")
         ]
-        let model = Model("Basic", objective: objective, constraints: constraints)
+        let model = Model("Basic", objective: objective, optimization: .maximize, constraints: constraints)
 
         XCTAssertTrue(model.validationErrors().isEmpty)
     }
 
     func testEmptyConstraintsModel() {
         let (x, y) = (Variable("x", domain: .integer), Variable("y"))
-        let function = x + 2 * y
-        let objective = Objective(function, optimization: .maximize)
-        let model = Model("Basic", objective: objective)
+        let objective = x + 2 * y
+        let model = Model("Basic", objective: objective, optimization: .maximize)
 
         XCTAssertTrue(model.validationErrors().isEmpty)
     }
 
     func testEmptyNameModel() {
         let x = Variable("x")
-        let model = Model("", objective: Objective(x))
+        let model = Model("", objective: x)
 
         XCTAssertTrue(model.validationErrors().isEmpty)
     }
@@ -129,8 +127,7 @@ final class ValidationTests: XCTestCase {
     func testAliasedVariablesModel() {
         let x = Variable("x")
         let y = x
-        let function = x + 2 * y
-        let objective = Objective(function, optimization: .maximize)
+        let objective = x + 2 * y
         let constraints = [
             (2 * x + y <= 20, "red"),
             (4 * x - 5 * y >= -10, "blue"),
@@ -144,8 +141,7 @@ final class ValidationTests: XCTestCase {
     
     func testEmptyConstraintNameModel() {
         let (x, y) = (Variable("x", domain: .integer), Variable("y"))
-        let function = x + 2 * y
-        let objective = Objective(function, optimization: .maximize)
+        let objective = x + 2 * y
         let constraints = [
             (2 * x + y <= 20, ""),
             (4 * x - 5 * y >= -10, "blue"),
@@ -161,7 +157,7 @@ final class ValidationTests: XCTestCase {
     
     func testInvalidNameModel() {
         let x = Variable("x")
-        let model = Model("X Y", objective: Objective(x))
+        let model = Model("X Y", objective: x)
         let errors = model.validationErrors()
         
         XCTAssertEqual(errors.count, 1)
@@ -170,8 +166,7 @@ final class ValidationTests: XCTestCase {
 
     func testDuplicateVariableNamesModel() {
         let (x, y) = (Variable("x"), Variable("x"))
-        let function = x + 2 * y
-        let objective = Objective(function, optimization: .maximize)
+        let objective = x + 2 * y
         let constraints = [
             (2 * x + y <= 20, "red"),
             (4 * x - 5 * y >= -10, "blue"),
@@ -187,8 +182,7 @@ final class ValidationTests: XCTestCase {
     
     func testDuplicateConstraintNamesModel() {
         let (x, y) = (Variable("x"), Variable("y"))
-        let function = x + 2 * y
-        let objective = Objective(function, optimization: .maximize)
+        let objective = x + 2 * y
         let constraints = [
             (2 * x + y <= 20, "red"),
             (4 * x - 5 * y >= -10, "red"),
@@ -205,8 +199,7 @@ final class ValidationTests: XCTestCase {
     // Variable errors are listed before constraint errors.
     func testMultipleErrorsModel() {
         let (x, y) = (Variable("x"), Variable("x"))
-        let function = x + 2 * y
-        let objective = Objective(function, optimization: .maximize)
+        let objective = x + 2 * y
         let constraints = [
             (2 * x + y <= 20, "red"),
             (4 * x - 5 * y >= -10, "red"),
@@ -222,9 +215,3 @@ final class ValidationTests: XCTestCase {
     }
 
 }
-
-
-/**
- Utility types.
- */
-fileprivate typealias Objective = Model.Objective

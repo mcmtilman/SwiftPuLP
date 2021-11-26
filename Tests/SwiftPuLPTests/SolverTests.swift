@@ -48,7 +48,7 @@ final class SolverTests: XCTestCase {
     // MARK: Solver tests
     
     func testSolveOptimalModel() {
-        let model = Model("Optimal", objective: Objective(LinearFunction()))
+        let model = Model("Optimal", objective: LinearFunction())
         guard let result = Solver().solve(model) else { return XCTFail("Nil result") }
         
         XCTAssertEqual(result.status, .optimal)
@@ -57,7 +57,7 @@ final class SolverTests: XCTestCase {
 
     func testSolveUnboundedModel() {
         let x = Variable("x")
-        let model = Model("Unbounded", objective: Objective(x))
+        let model = Model("Unbounded", objective: x)
         guard let result = Solver().solve(model) else { return XCTFail("Nil result") }
         
         XCTAssertEqual(result.status, .unbounded)
@@ -67,22 +67,21 @@ final class SolverTests: XCTestCase {
 
     func testSolveBasicModel() {
         let (x, y) = (Variable("x", domain: .integer), Variable("y"))
-        let function = x + 2 * y
-        let objective = Objective(function, optimization: .maximize)
+        let objective = x + 2 * y
         let constraints = [
             (2 * x + y <= 20, "red"),
             (4 * x - 5 * y >= -10, "blue"),
             (-x + 2 * y >= -2, "yellow"),
             (-x + 5 * y == 15, "green")
         ]
-        let model = Model("Basic", objective: objective, constraints: constraints)
+        let model = Model("Basic", objective: objective, optimization: .maximize, constraints: constraints)
         guard let result = Solver().solve(model) else { return XCTFail("Nil result") }
         
         XCTAssertEqual(result.status, .optimal)
         XCTAssertEqual(result.variables.count, 2)
         XCTAssertEqual(result.variables["x"], 7)
         XCTAssertEqual(result.variables["y"], 4.4)
-        XCTAssertEqual(function(result.variables), 15.8)
+        XCTAssertEqual(objective(result.variables), 15.8)
     }
 
     // Temporary.
@@ -91,8 +90,7 @@ final class SolverTests: XCTestCase {
         let y = (0 ... 2).map { i in Variable("y\(i)", domain: .binary) }
         guard x.count == 5, y.count == 3 else { return XCTFail("Nil variable") }
         
-        let function = (20 * x[1] + 12 * x[2]) + (40 * x[3] + 25 * x[4])
-        let objective = Objective(function, optimization: .maximize)
+        let objective = (20 * x[1] + 12 * x[2]) + (40 * x[3] + 25 * x[4])
         let constraints = [
             (Function.sum(x[1...]) <= 50, "manpower"),
             (3 * x[1] + 2 * x[2] + x[3] <= 100, "a"),
@@ -101,7 +99,7 @@ final class SolverTests: XCTestCase {
             (x[3] - 100 * y[2] <= 0, "x3"),
             (y[1] + y[2] <= 1, "y")
         ]
-        let model = Model("Resource-allocation", objective: objective, constraints: constraints)
+        let model = Model("Resource-allocation", objective: objective, optimization: .maximize, constraints: constraints)
         guard let result = Solver().solve(model) else { return XCTFail("Nil result") }
         let variables = result.variables
         
@@ -111,13 +109,7 @@ final class SolverTests: XCTestCase {
         XCTAssertEqual(variables["x4"], 0)
         XCTAssertEqual(variables["y1"], 0)
         XCTAssertEqual(variables["y2"], 1)
-        XCTAssertEqual(function(result.variables), 1800)
+        XCTAssertEqual(objective(result.variables), 1800)
     }
 
 }
-
-
-/**
- Utility types.
- */
-fileprivate typealias Objective = Model.Objective

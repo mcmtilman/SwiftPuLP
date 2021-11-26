@@ -51,16 +51,19 @@ public struct CBCSolver {
     //
     // Returns true if successful.
     private func executeCommand(_ modelPath: String, _ solutionPath: String, _ maximize: Bool = false) -> Bool {
-        let process = Process()
+        #if os(macOS)
+            let process = Process()
         
-        process.launchPath = commandPath
-        process.arguments = [modelPath, maximize ? "max" : "min", "timeMode", "elapsed", "branch", "printingOptions", "normal", "solution", solutionPath] // branch when mip
-        process.launch()
-        process.waitUntilExit()
+            process.launchPath = commandPath
+            process.arguments = [modelPath, maximize ? "max" : "min", "timeMode", "elapsed", "branch", "printingOptions", "normal", "solution", solutionPath] // branch when mip
+            process.launch()
+            process.waitUntilExit()
+            
+            if process.terminationStatus == 0 { return true }
+
+            print("CBC exited with status: \(process.terminationStatus)")
+        #endif
         
-        if process.terminationStatus == 0 { return true }
-        
-        print("CBC exited with status: \(process.terminationStatus)")
         return false
     }
     
@@ -181,7 +184,7 @@ fileprivate struct MPSWriter {
                     factors[term.variable, default: []].append((i, term.factor))
                 }
             }
-            if let function = model.objective?.function {
+            if let function = model.objective {
                 for term in function.terms where term.factor != 0 {
                     factors[term.variable, default: []].append((-1, term.factor))
                 }

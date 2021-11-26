@@ -24,7 +24,7 @@ The building blocks of the core model are:
     The ``LinearConstraint/Comparison`` operators include: less than or equal to, equal to, greater than or equal to.
 
 - term **Model**:
-    A ``Model`` has an optional ``Model/Objective``, which specifies a linear function and an optimization goal. A model may also specify zero or more linear constraints.
+    A ``Model`` has an optional *objective*, which specifies a linear function, and an optimization goal. A model may also specify zero or more linear constraints.
 
     The ``Model/Optimization`` goals include: minimize and maximize.
 

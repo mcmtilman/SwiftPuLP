@@ -99,7 +99,7 @@ final class PulpificationTests: XCTestCase {
     func testModelToPuLP() {
        let (x, y) = (Variable("x"), Variable("y"))
         let function = 2 * x + 3 * y + 10
-        let model = Model("XYZ", objective: Model.Objective(function, optimization: .maximize))
+        let model = Model("XYZ", objective: function, optimization: .maximize)
         let pythonModel = model.pythonObject
         
         XCTAssertTrue(pythonModel.isInstance(of: PuLP.LpProblem))

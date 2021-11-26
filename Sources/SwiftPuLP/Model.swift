@@ -9,7 +9,7 @@
 import Collections
 
 /**
- Represents a linear programming problem consisting of an objective and a list of contraints.
+ Represents a linear programming optimization problem consisting of an objective and a list of contraints.
  
  See also: <doc:UsingModels>.
  */
@@ -25,58 +25,19 @@ public struct Model {
     }
     
     // MARK: -
-
-    /// Represents the objective of a linear programming problem: maximize or minimize a linear function.
-    public struct Objective {
-        
-        // MARK: -
-        
-        /// The linear function to be optimized.
-        let function: LinearFunction
-            
-        /// The optimization to be performed.
-        let optimization: Optimization
-            
-        // MARK: -
-        
-        /// Creates an objective to optimize a linear function.
-        ///
-        /// - Parameters:
-        ///   - function: Linear function to be optimized.
-        ///   - optimization: Type of optimization: .minimize or .maximize (default = .minimize).
-        public init(_ function: LinearFunction, optimization: Optimization = .minimize) {
-            self.function = function
-            self.optimization = optimization
-        }
-        
-        /// Creates an objective to optimize given linear variable.
-        ///
-        /// - Parameters:
-        ///   - variable: Variable to be optimized.
-        ///   - optimization: Type of optimization: .minimize or .maximize (default = .minimize).
-        public init(_ variable: Variable, optimization: Optimization = .minimize) {
-            self.function = LinearFunction(variable: variable)
-            self.optimization = optimization
-        }
-        
-    }
-
-    // MARK: -
     
     /// The name of the model. Should not contain spaces.
     let name: String
     
     /// The optional objective of the model.
-    let objective: Objective?
+    let objective: LinearFunction?
     
+    /// The optimization to be performed.
+   let optimization: Optimization
+
     /// Labeled linear constraints. The labels may be empty.
     let constraints: [(constraint: LinearConstraint, name: String)]
-    
-    /// Objective optimization or minimize if absent.
-    var optimization: Optimization {
-        objective?.optimization ?? .minimize
-    }
-    
+        
     // MARK: -
     
     /// Creates a model with given name, optional objective and constraints.
@@ -84,11 +45,24 @@ public struct Model {
     /// - Parameters:
     ///   - name: Name of the model. May be empty but should not contains spaces.
     ///   - objective: Optional objective (default = nil).
+    ///   - optimization: Optimization goal (default = minimize).
     ///   - constraints: Possibly empty list of labeled constraints. The labels may be empty.
-    public init(_ name: String, objective: Objective? = nil, constraints: [(constraint: LinearConstraint, name: String)] = []) {
+    public init(_ name: String, objective: LinearFunction? = nil, optimization: Optimization = .minimize, constraints: [(constraint: LinearConstraint, name: String)] = []) {
         self.name = name
         self.objective = objective
+        self.optimization = optimization
         self.constraints = constraints
+    }
+    
+    /// Creates a model with given name, variable and constraints.
+    ///
+    /// - Parameters:
+    ///   - name: Name of the model. May be empty but should not contains spaces.
+    ///   - objective: Variable.
+    ///   - optimization: Optimization goal (default = minimize).
+    ///   - constraints: Possibly empty list of labeled constraints. The labels may be empty.
+    public init(_ name: String, objective: Variable, optimization: Optimization = .minimize, constraints: [(constraint: LinearConstraint, name: String)] = []) {
+        self.init(name, objective: LinearFunction(variable: objective), optimization: optimization, constraints: constraints)
     }
     
 }
@@ -113,14 +87,6 @@ extension Model: Equatable {
 }
 
 
-// MARK: -
-
-/**
- Model.Objective adopts Equatable with default behaviour.
- */
-extension Model.Objective: Equatable {}
-
-
 // MARK: - Collecting variables -
 
 /**
@@ -143,7 +109,7 @@ extension Model {
 
     // Collects all unique variables from nested elements.
     fileprivate func collectVariables(into variables: inout OrderedSet<Variable>) {
-        objective?.function.collectVariables(into: &variables)
+        objective?.collectVariables(into: &variables)
         for (constraint, _) in constraints {
             constraint.collectVariables(into: &variables)
         }

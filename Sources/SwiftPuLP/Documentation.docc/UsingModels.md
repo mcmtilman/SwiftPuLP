@@ -4,7 +4,7 @@ A ``Model`` represents an linear programming problem to be solved by one of the 
 
 ## Overview
 
-The model has an optional ``Model/Objective`` consisting of a linear function and a ``Model/Optimization`` goal, and zero or more labeled linear constraints.
+The model has an optional *objective* representing a ``LinearFunction``, and a ``Model/Optimization`` goal, and zero or more labeled linear constraints.
 
 The optimization goal is one of:
 * minimize
@@ -12,21 +12,15 @@ The optimization goal is one of:
 
 ### Creating a model
 
-To create a model use the following public initializer.
+To create a model use one of the following public initializers.
 
 ```swift
-init(_ name: String, objective: Objective? = nil, constraints: [(constraint: LinearConstraint, name: String)]
+init(_ name: String, objective: LinearFunction? = nil, optimization: Optimization = .minimize, constraints: [(constraint: LinearConstraint, name: String)]
+
+init(_ name: String, objective: Variable, optimization: Optimization = .minimize, constraints: [(constraint: LinearConstraint, name: String)]
 ```
 
 Each constraint is associated with a label, which may be empty.
-
-To create an objective use one of the following public initializers.
-
-```swift
-init(_ function: LinearFunction, optimization: Optimization = .minimize)
-    
-init(_ variable: Variable, optimization: Optimization = .minimize)
-```
     
 ### Validating a model
 
@@ -50,15 +44,14 @@ The following example illustrates how to create a simple and valid model.
 
 ```swift
 let (x, y) = (Variable("x", domain: .integer), Variable("y"))    
-let function = x + 2 * y    
-let objective = Objective(function, optimization: .maximize)    
+let objective = x + 2 * y    
 let constraints = [    
     (2 * x + y <= 20, "red"),        
     (4 * x - 5 * y >= -10, "blue"),        
     (-x + 2 * y >= -2, "yellow"),        
     (-x + 5 * y == 15, "green")        
 ]    
-let model = Model("Basic", objective: objective, constraints: constraints)
+let model = Model("Basic", objective: objective, optimization: .maximize, constraints: constraints)
 ```
 
 ## Topics

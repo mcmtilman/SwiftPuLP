@@ -26,13 +26,13 @@ The building blocks of the core model are:
     
     See: [Using linear constraints](Sources/SwiftPuLP/Documentation.docc/UsingLinearConstraints.md)
 
-* A **Model** has an optional **Objective**, which specifies a linear function and an optimization goal. A model may also specify zero or more linear constraints.
+* A **Model** has an optional **Objective**, which is a linear function, and an **Optimization** goal. A model may also specify zero or more linear constraints.
 
-    The **Optimization** goals include: minimize and maximize.
+    The optimization goals include: minimize and maximize.
 
     See: [Using models](Sources/SwiftPuLP/Documentation.docc/UsingModels.md)
 
-* A **Solver** computes the best values for the decision variables based on the model's objective and constraints.
+* A **Solver** computes the best values for the decision variables based on the model's objective, optimization goal and constraints.
 
     The solver returns an optional **Result** with a **Status** and a dictionary of variable name - value pairs.
 
@@ -53,11 +53,11 @@ struct LinearConstraint {}
 
 struct Model {}
 
-struct Model.Objective {}
-
 struct Solver {}
 
 struct Solver.Result {}
+
+struct CBCSolver {}
 
 enum Variable.Domain {}
     
@@ -129,7 +129,7 @@ Much of the code is similar (apart from some refactoring to make it more testabl
     }
     ```
 
-3. Performance compared to native Python PuLP is heavily impacted by the conversion between Swift and Python data structures.
+3. Performance compared to native Python PuLP is heavily impacted by the conversion between Swift and Python data structures. The CBCSolver negates this overhead by directly using PuLP's default CBC solver.
 
 ### Example 2: Wedding seating planning illustrating set partitioning optimization
 
