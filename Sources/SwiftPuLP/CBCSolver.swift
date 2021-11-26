@@ -26,6 +26,8 @@ public struct CBCSolver {
     // MARK: -
     
     /// Create a solver with the path of the executable
+    ///
+    /// - Parameter commandPath: Path to CBC executable.
     public init(commandPath: String) {
         self.commandPath = commandPath
     }
@@ -35,11 +37,14 @@ public struct CBCSolver {
     /// Solves the model by directly accssing the CBC executable and returns the result.
     ///
     /// Returns nil in case of failure.
+    ///
+    /// - Parameter model: Model to solve.
+    /// - Returns: Result or nil in case of failure.
     public func solve(_ model: Model) -> Solver.Result? {
-        guard let tempFolder = try? FileManager.default.url(for: .itemReplacementDirectory, in: .userDomainMask, appropriateFor: URL(fileURLWithPath: NSHomeDirectory()), create: true) else { return nil }
-        let modelPath = tempFolder.appendingPathComponent("model.mps").path
-        let solutionPath = tempFolder.appendingPathComponent("model.sol").path
-        defer { removeFolder(tempFolder) }
+        guard let folder = createTemporaryFolder() else { return nil }
+        let modelPath = folder.appendingPathComponent("model.mps").path
+        let solutionPath = folder.appendingPathComponent("model.sol").path
+        defer { removeFolder(folder) }
         
         guard MPSWriter().writeModel(model, toFile: modelPath),
               executeCommand(modelPath, solutionPath, model.optimization == .maximize) else { return nil }
@@ -47,8 +52,21 @@ public struct CBCSolver {
         return SolutionReader().readResultFromFile(atPath: solutionPath, for: model)
     }
     
+    // MARK: -
+
+    // Returns a URL to a new temporary folder.
+    // 'Logs' an error when the operation fails.
+    private func createTemporaryFolder() -> URL? {
+        do {
+            return try FileManager.default.url(for: .itemReplacementDirectory, in: .userDomainMask, appropriateFor: URL(fileURLWithPath: NSHomeDirectory()), create: true)
+        } catch {
+            print("Could not create temporary folder: \(error)")
+            
+            return nil
+        }
+    }
+    
     // Executes the CBC command.
-    //
     // Returns true if successful.
     private func executeCommand(_ modelPath: String, _ solutionPath: String, _ maximize: Bool = false) -> Bool {
         #if os(macOS)
@@ -56,6 +74,7 @@ public struct CBCSolver {
         
             process.launchPath = commandPath
             process.arguments = [modelPath, maximize ? "max" : "min", "timeMode", "elapsed", "branch", "printingOptions", "normal", "solution", solutionPath] // branch when mip
+            process.standardOutput = nil
             process.launch()
             process.waitUntilExit()
             
@@ -67,7 +86,7 @@ public struct CBCSolver {
         return false
     }
     
-    // Removes the temporary folder.
+    // Removes given folder.
     // 'Logs' a warning when the operation fails.
     private func removeFolder(_ folder: URL) {
         do {
@@ -83,27 +102,28 @@ public struct CBCSolver {
 // MARK: -
 
 /**
- Writes the model to given file in MPS format.
+ Writes the model to a file in MPS format.
  */
-fileprivate struct MPSWriter {
+struct MPSWriter {
     
     // MARK: -
     
-    // Writes the model to given file in MPS format. Answers if successful.
-    
-    // String(format:) is slow, so cache logical variable and constraint names.
+    /// Writes the model to given file in MPS format. Answers if successful.
+    ///
+    /// String(format:) is a bit slow, so cache logical variable and constraint names.
+    ///
+    /// - Parameters:
+    ///   - model: Valid model.
+    ///   - path: Path of MPS file to be created.
+    /// - Returns: True if successful.
     func writeModel(_ model: Model, toFile path: String) -> Bool {
-        guard FileManager.default.createFile(atPath: path, contents: nil, attributes: nil),
-              let fileHandle = FileHandle(forWritingAtPath: path) else { return false }
-        var writer = FileWriter(fileHandle: fileHandle)
+        guard var writer = createFile(atPath: path).map(BufferedWriter.init) else { return false }
 
         let variables = model.variables
         let variableNames = (0 ..< variables.count).map { i in String(format: "X%07d", i) }
         let constraintNames = (0 ..< model.constraints.count).map { i in String(format: "C%07d", i) }
         let one = String(format: "%.12e", 1.0) // Factor 1 is often used in several unit test models.
 
-        // MARK: -
-        
         // Writes the model's optimization.  This is not suffient for CBC.
         // The CBC executable requires an explicit argument reflecting the model's optimization.
         func writeOptimizationLine() {
@@ -236,6 +256,13 @@ fileprivate struct MPSWriter {
         return true
     }
     
+    // MARK: -
+    
+    // Creates a file at given path and returns a filehandle, or nil in case of failure.
+    private func createFile(atPath path: String) -> FileHandle? {
+        return FileManager.default.createFile(atPath: path, contents: nil, attributes: nil) ? FileHandle(forWritingAtPath: path) : nil
+    }
+    
 }
 
 
@@ -244,22 +271,33 @@ fileprivate struct MPSWriter {
 /**
  Buffers lines of strings before writing to file.
  */
-fileprivate struct FileWriter {
+struct BufferedWriter {
     
     // MARK: -
 
     // Valid file handle.
-    let fileHandle: FileHandle
+    private let fileHandle: FileHandle
     
     // Maximum number of lines to buffer.
-    let capacity = 500
+    private let capacity = 500
     
     // Actual buffer.
-    var lines = [String]()
+    private var lines = [String]()
+            
+    // MARK: -
+            
+    /// Creates a writer for given filehandle. (Not really that necessary.)
+    ///
+    /// - Parameter fileHandle: Handle to MPS file.
+    init(fileHandle: FileHandle) {
+        self.fileHandle = fileHandle
+    }
     
     // MARK: -
 
-    // If the buffer is full flush lines to file before buffering a new line.
+    /// If the buffer is full flush lines to file before buffering a new line.
+    ///
+    /// - Parameter line: String to be written.
     mutating func append(_ line: String) {
         if lines.isEmpty {
             lines.reserveCapacity(capacity)
@@ -271,7 +309,7 @@ fileprivate struct FileWriter {
         }
     }
     
-    // FLush the strings currently in the buffer.
+    /// FLush the strings currently in the buffer.
     func flush() {
         if !lines.isEmpty, let data = lines.joined().data(using: .utf8) {
             fileHandle.write(data)
@@ -286,11 +324,16 @@ fileprivate struct FileWriter {
 /**
  Reads the solution generated by CBC.
  */
-fileprivate struct SolutionReader {
+struct SolutionReader {
     
     // MARK: -
 
-    // Returns a result constructed from the CBC output file, or nil in case of failure.
+    /// Returns a result constructed from the CBC output file, or nil in case of failure.
+    ///
+    /// - Parameters:
+    ///   - path: Path to solution file produced by CBC.
+    ///   - model: Solved model.
+    /// - Returns: Result of nil in case of failure.
     func readResultFromFile(atPath path: String, for model: Model) -> Solver.Result? {
         do {
             return try readFromFile(path, model)
@@ -302,7 +345,7 @@ fileprivate struct SolutionReader {
 
     // MARK: -
 
-    // eads the status and variable bindings from the CBC output file.
+    // Reads the status and variable bindings from the CBC output file.
     private func readFromFile(_ path: String, _ model: Model) throws -> Solver.Result? {
         let data = try String(contentsOfFile: path, encoding: .utf8)
         let lines = data.components(separatedBy: .newlines)
@@ -324,7 +367,7 @@ fileprivate struct SolutionReader {
         return Solver.Result(status: status, variables: Dictionary(uniqueKeysWithValues: bindings))
     }
     
-    // Reads the CBC status. Undefined if not recognized.
+    // Returns the CBC status. Undefined status if not recognized.
     private func readStatus(fromString line: String) -> Solver.Status {
         let tokens = line.split(separator: " ")
         guard let status = tokens.first else { return .undefined }
