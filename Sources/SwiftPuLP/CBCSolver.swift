@@ -313,8 +313,8 @@ fileprivate struct SolutionReader {
         let bindings = lines.dropFirst().dropLast().compactMap { (line) -> (String, Double)? in
             let tokens = line.split(separator: " ")
             
-            switch (Int(tokens[0]), Double(tokens[2])) {
-            case (let id?, let value?):
+            switch (Int(tokens[0]), tokens[1], Double(tokens[2])) {
+            case (let id?, let name, let value?) where name.starts(with: "X"):
                 return (variables[id].name, value)
             default:
                 return nil
