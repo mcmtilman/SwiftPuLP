@@ -8,6 +8,7 @@
 
 import XCTest
 import SwiftPuLP
+import PythonKit
 
 final class PerformanceTests: XCTestCase {
     
@@ -23,6 +24,8 @@ final class PerformanceTests: XCTestCase {
     let iterations = 100000
 #endif
 
+    // MARK: Model tests
+    
     func testBuildFunction() {
         let (x, y, z) = (Variable("x"), Variable("y"), Variable("z"))
         let parameters = ["x": 1.0, "y": 2.0, "z": 3]
@@ -66,6 +69,41 @@ final class PerformanceTests: XCTestCase {
         }
         
         XCTAssertEqual(f, 2 * y - z)
+    }
+    
+    func testCreateVariables() {
+        let x = Variable("x")
+        var y: Variable = Variable("y")
+        
+        measure {
+            for _ in 1...iterations {
+                y = y.name == "y" ? Variable("z") : Variable("y")
+            }
+            XCTAssertNotEqual(x, y)
+        }
+    }
+    
+    // MARK: Pulpification tests
+    
+    func testCreatePuLPVariables() {
+        let x = Variable("x").pythonObject
+        var y: PythonObject = Variable("y").pythonObject
+        
+        measure {
+            for _ in 1...iterations {
+                y = y.name == "y" ? Variable("z").pythonObject : Variable("y").pythonObject
+            }
+            XCTAssertNotEqual(x.name, y.name)
+        }
+    }
+    
+    func testCreateLinearConstraints() {
+        measure {
+            let x = (1...1000).map { i in Double(i) * Variable("x_\(i)") }
+            let constraints = Function.sum(x) <= 5.0
+        
+            XCTAssertFalse(constraints.pythonObject.isNone)
+        }
     }
     
 }
