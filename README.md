@@ -149,6 +149,8 @@ The test target depends on the *Algorithms* package.
 
 SwiftPuLP needs PuLP to be installed and may require the PYTHON_LIBRARY environment variable to be set.
 
+To use the CBCSolver the CBC_PATH environment variable must be set to the CBC executable.
+
 ## Compatibility
 
 SwiftPuLP was tested on macOS Big Sur 11.6 with XCode 13.1, Python 3.9.7 and PuLP 2.5.1.
