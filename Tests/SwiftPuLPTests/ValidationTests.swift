@@ -19,32 +19,32 @@ final class ValidationTests: XCTestCase {
     func testValidVariable() {
         let variable = Variable("x", minimum: 1, maximum: 10, domain: .integer)
         
-        XCTAssertTrue(variable.validationErrors.isEmpty)
+        XCTAssertTrue(variable.validationErrors().isEmpty)
     }
 
     func testDefaultVariable() {
         let variable = Variable("x")
         
-        XCTAssertTrue(variable.validationErrors.isEmpty)
+        XCTAssertTrue(variable.validationErrors().isEmpty)
     }
     
     func testFixedVariable() {
         let variable = Variable("x", minimum: 1, maximum: 1, domain: .integer)
         
-        XCTAssertTrue(variable.validationErrors.isEmpty)
+        XCTAssertTrue(variable.validationErrors().isEmpty)
     }
 
     func testBinaryVariable() {
         let variable = Variable("x", minimum: 0, maximum: 1, domain: .binary)
 
-        XCTAssertTrue(variable.validationErrors.isEmpty)
+        XCTAssertTrue(variable.validationErrors().isEmpty)
     }
     
     // MARK: Validating invalid variables
     
     func testEmptyNameVariable() {
         let variable = Variable("")
-        let errors = variable.validationErrors
+        let errors = variable.validationErrors()
         
         XCTAssertEqual(errors.count, 1)
         XCTAssertEqual(errors[0], .invalidVariableName(variable))
@@ -53,7 +53,7 @@ final class ValidationTests: XCTestCase {
     func testInvalidNameVariable() {
         for name in ("-+[] ->/".map { "x\($0)y" }) {
             let variable = Variable(name)
-            let errors = variable.validationErrors
+            let errors = variable.validationErrors()
             
             XCTAssertEqual(errors.count, 1)
             XCTAssertEqual(errors[0], .invalidVariableName(variable))
@@ -62,7 +62,7 @@ final class ValidationTests: XCTestCase {
 
     func testInvalidRangeVariable() {
         let variable = Variable("x", minimum: 3, maximum: 2, domain: .integer)
-        let errors = variable.validationErrors
+        let errors = variable.validationErrors()
         
         XCTAssertEqual(errors.count, 1)
         XCTAssertEqual(errors[0], .invalidVariableBounds(variable))
@@ -70,7 +70,7 @@ final class ValidationTests: XCTestCase {
 
     func testInvalidMinimumBinaryVariable() {
         let variable = Variable("x", minimum: -1, domain: .binary)
-        let errors = variable.validationErrors
+        let errors = variable.validationErrors()
         
         XCTAssertEqual(errors.count, 1)
         XCTAssertEqual(errors[0], .invalidVariableBounds(variable))
@@ -78,7 +78,7 @@ final class ValidationTests: XCTestCase {
 
     func testInvalidMaximumBinaryVariable() {
         let variable = Variable("x", maximum: 2, domain: .binary)
-        let errors = variable.validationErrors
+        let errors = variable.validationErrors()
         
         XCTAssertEqual(errors.count, 1)
         XCTAssertEqual(errors[0], .invalidVariableBounds(variable))
@@ -86,7 +86,7 @@ final class ValidationTests: XCTestCase {
 
     func testMultipleVariableErrors() {
         let variable = Variable("", minimum: 3, maximum: 2, domain: .binary)
-        let errors = variable.validationErrors
+        let errors = variable.validationErrors()
         
         XCTAssertEqual(errors.count, 2)
         XCTAssertEqual(errors[0], .invalidVariableName(variable))
@@ -107,7 +107,7 @@ final class ValidationTests: XCTestCase {
         ]
         let model = Model("Basic", objective: objective, constraints: constraints)
 
-        XCTAssertTrue(model.validationErrors.isEmpty)
+        XCTAssertTrue(model.validationErrors().isEmpty)
     }
 
     func testEmptyConstraintsModel() {
@@ -116,14 +116,14 @@ final class ValidationTests: XCTestCase {
         let objective = Objective(function, optimization: .maximize)
         let model = Model("Basic", objective: objective)
 
-        XCTAssertTrue(model.validationErrors.isEmpty)
+        XCTAssertTrue(model.validationErrors().isEmpty)
     }
 
     func testEmptyNameModel() {
         let x = Variable("x")
         let model = Model("", objective: Objective(x))
 
-        XCTAssertTrue(model.validationErrors.isEmpty)
+        XCTAssertTrue(model.validationErrors().isEmpty)
     }
 
     func testAliasedVariablesModel() {
@@ -139,7 +139,7 @@ final class ValidationTests: XCTestCase {
         ]
         let model = Model("Basic", objective: objective, constraints: constraints)
 
-        XCTAssertTrue(model.validationErrors.isEmpty)
+        XCTAssertTrue(model.validationErrors().isEmpty)
     }
     
     func testEmptyConstraintNameModel() {
@@ -154,7 +154,7 @@ final class ValidationTests: XCTestCase {
         ]
         let model = Model("Basic", objective: objective, constraints: constraints)
 
-        XCTAssertTrue(model.validationErrors.isEmpty)
+        XCTAssertTrue(model.validationErrors().isEmpty)
     }
     
     // MARK: Validating invalid models
@@ -162,7 +162,7 @@ final class ValidationTests: XCTestCase {
     func testInvalidNameModel() {
         let x = Variable("x")
         let model = Model("X Y", objective: Objective(x))
-        let errors = model.validationErrors
+        let errors = model.validationErrors()
         
         XCTAssertEqual(errors.count, 1)
         XCTAssertEqual(errors[0], .invalidModelName(model))
@@ -179,7 +179,7 @@ final class ValidationTests: XCTestCase {
             (-x + 5 * y == 15, "green")
         ]
         let model = Model("Basic", objective: objective, constraints: constraints)
-        let errors = model.validationErrors
+        let errors = model.validationErrors()
         
         XCTAssertEqual(errors.count, 1)
         XCTAssertEqual(errors[0], .duplicateVariableName(y))
@@ -196,7 +196,7 @@ final class ValidationTests: XCTestCase {
             (-x + 5 * y == 15, "green")
         ]
         let model = Model("Basic", objective: objective, constraints: constraints)
-        let errors = model.validationErrors
+        let errors = model.validationErrors()
         
         XCTAssertEqual(errors.count, 1)
         XCTAssertEqual(errors[0], .duplicateConstraintName(constraints[1].0, "red"))
@@ -214,7 +214,7 @@ final class ValidationTests: XCTestCase {
             (-x + 5 * y == 15, "green")
         ]
         let model = Model("Basic", objective: objective, constraints: constraints)
-        let errors = model.validationErrors
+        let errors = model.validationErrors()
         
         XCTAssertEqual(errors.count, 2)
         XCTAssertEqual(errors[0], .duplicateVariableName(y))

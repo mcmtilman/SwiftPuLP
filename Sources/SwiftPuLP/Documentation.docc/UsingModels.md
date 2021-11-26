@@ -35,11 +35,11 @@ A model is not valid if:
 * its objective function or constraints use invalid variables or distinct variables with the same name
 * it uses multiple constraints with the same label.
 
-To verify that an individual model is valid check if the ``Model/validationErrors`` property returns an empty list.
+To verify that an individual model is valid check if the ``Model/validationErrors()`` property returns an empty list.
 
 ```swift
 let model = Model("x", constraints:[])  
-let errors = model.validationErrors
+let errors = model.validationErrors()
 
 guard errors.isEmpty else { ... }
 ```

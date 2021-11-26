@@ -48,10 +48,12 @@ extension Variable {
     /// Characters in this set may not be used in variable names.
     static let specialChars = CharacterSet(charactersIn: "-+[] ->/")
     
+    // MARK: -
+ 
     /// Returns validation errors.
     /// 
-    /// If not empty, the PuLP solver may fail.
-    public var validationErrors: [ValidationError] {
+    /// If not empty, the solver may fail.
+    public func validationErrors() ->  [ValidationError] {
         var errors = [ValidationError]()
         
         collectErrors(into: &errors)
@@ -94,8 +96,8 @@ extension Model {
 
     /// Returns validation errors.
     ///
-    /// If not empty, the PuLP solver may fail.
-    public var validationErrors: [ValidationError] {
+    /// If not empty, the solver may fail.
+    public func validationErrors() -> [ValidationError] {
         var errors = [ValidationError]()
         
         collectErrors(into: &errors)
