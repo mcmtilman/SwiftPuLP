@@ -38,7 +38,7 @@ final class VariableTests: XCTestCase {
         XCTAssertEqual(variable.name, "x")
         XCTAssertNil(variable.minimum)
         XCTAssertNil(variable.maximum)
-        XCTAssertEqual(variable.domain, .real)
+        XCTAssertEqual(variable.domain, .continuous)
     }
 
     func testDefaultBinaryVariable() {

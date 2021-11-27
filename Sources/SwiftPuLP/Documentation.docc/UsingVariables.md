@@ -7,7 +7,7 @@ A ``Variable`` represents a decision variable in a linear programming problem.
 A variable has a name, a domain specifiying its possible values, and optional minimum and maximum bounds.
 
 The ``Variable/Domain`` enum specifies the values that are allowed:
-* real (aka continuous)
+* continuous (i.e. real numbers)
 * integer
 * binary.
 
@@ -18,7 +18,7 @@ Values in these domains are represented by Double numbers. For the binary domain
 To create a variable use the following public initializer.
 
 ```swift
-init(_ name: String, minimum: Double? = nil, maximum: Double? = nil, domain: Domain = .real)
+init(_ name: String, minimum: Double? = nil, maximum: Double? = nil, domain: Domain = .continuous)
 ```
 
 ### Examples

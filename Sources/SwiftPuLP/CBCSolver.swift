@@ -47,9 +47,9 @@ public struct CBCSolver {
         defer { removeFolder(folder) }
         
         guard MPSWriter().writeModel(model, toFile: modelPath),
-              executeCommand(modelPath, solutionPath, model.optimization == .maximize) else { return nil }
+              executeCommand(modelPath, solutionPath, model.optimization) else { return nil }
         
-        return SolutionReader().readResultFromFile(atPath: solutionPath, for: model)
+        return SolutionReader().readResultFromFile(atPath: solutionPath, model: model)
     }
     
     // MARK: -
@@ -68,12 +68,12 @@ public struct CBCSolver {
     
     // Executes the CBC command.
     // Returns true if successful.
-    private func executeCommand(_ modelPath: String, _ solutionPath: String, _ maximize: Bool = false) -> Bool {
+    private func executeCommand(_ modelPath: String, _ solutionPath: String, _ optimization: Model.Optimization) -> Bool {
         #if os(macOS)
             let process = Process()
-        
+
             process.launchPath = commandPath
-            process.arguments = [modelPath, maximize ? "max" : "min", "timeMode", "elapsed", "branch", "printingOptions", "normal", "solution", solutionPath] // branch when mip
+            process.arguments = [modelPath, "\(optimization)", "timeMode", "elapsed", "branch", "printingOptions", "normal", "solution", solutionPath] // branch when mip
             process.standardOutput = nil
             process.launch()
             process.waitUntilExit()
@@ -153,7 +153,7 @@ struct MPSWriter {
             writer.append("COLUMNS\n")
             for (v, variable) in variables.enumerated() {
                 if let factors = factors[variable] {
-                    if variable.domain != .real {
+                    if variable.domain != .continuous {
                         writer.append("    MARK      'MARKER'                 'INTORG'\n")
                     }
                     for (i, factor) in factors {
@@ -161,7 +161,7 @@ struct MPSWriter {
                         
                         writer.append("    \(variableNames[v])  \(name)   \(toMPS(factor))\n")
                     }
-                    if variable.domain != .real {
+                    if variable.domain != .continuous {
                         writer.append("    MARK      'MARKER'                 'INTEND'\n")
                     }
                     
@@ -222,9 +222,9 @@ struct MPSWriter {
         func toMPS(_ optimization: Model.Optimization) -> String {
             switch optimization {
             case .minimize:
-                return "Minimized"
+                return "Minimize"
             case .maximize:
-                return "Maximized"
+                return "Maximize"
             }
         }
 
@@ -242,7 +242,7 @@ struct MPSWriter {
         
         // Answers if the variable behaves like a binary.
         func isBinary(_ variable: Variable) -> Bool {
-            variable.domain != .real && (variable.minimum, variable.maximum) == (0, 1)
+            variable.domain != .continuous && (variable.minimum, variable.maximum) == (0, 1)
         }
 
         writeOptimizationLine()
@@ -334,7 +334,7 @@ struct SolutionReader {
     ///   - path: Path to solution file produced by CBC.
     ///   - model: Solved model.
     /// - Returns: Result of nil in case of failure.
-    func readResultFromFile(atPath path: String, for model: Model) -> Solver.Result? {
+    func readResultFromFile(atPath path: String, model: Model) -> Solver.Result? {
         do {
             return try readFromFile(path, model)
         } catch {

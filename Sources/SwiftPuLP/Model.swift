@@ -44,8 +44,8 @@ public struct Model {
     ///
     /// - Parameters:
     ///   - name: Name of the model. May be empty but should not contains spaces.
-    ///   - objective: Optional objective (default = nil).
-    ///   - optimization: Optimization goal (default = minimize).
+    ///   - objective: Optional objective function (default = nil).
+    ///   - optimization: Optimization goal (default = .minimize).
     ///   - constraints: Possibly empty list of labeled constraints. The labels may be empty.
     public init(_ name: String, objective: LinearFunction? = nil, optimization: Optimization = .minimize, constraints: [(constraint: LinearConstraint, name: String)] = []) {
         self.name = name

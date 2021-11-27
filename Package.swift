@@ -24,6 +24,8 @@ let package = Package(
         .testTarget(
             name: "SwiftPuLPTests",
             dependencies: ["SwiftPuLP",
-                           .product(name: "Algorithms", package: "swift-algorithms")]),
+                           .product(name: "Algorithms", package: "swift-algorithms")],
+            resources: [
+              .copy("Resources")]),
     ]
 )

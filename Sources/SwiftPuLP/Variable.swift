@@ -9,7 +9,7 @@
 /**
  A variable represents a linear programming decision variable and may appear in the objective function and / or in linear constraints of a linear programming model.
  
- The range of values for a variable is defined in the first place by its ``Domain``. A domain represents a subset of Double, such as real numbers, or the binary numbers 0 and 1.
+ The range of values for a variable is defined in the first place by its ``Domain``. A domain represents a subset of Double, such as continuous (real) numbers, or the binary numbers 0 and 1.
  
  In addition, a variable may specify lower and / or upper bounds, for instance to limit the domain values to the integer numbers less than 10.
  
@@ -39,8 +39,7 @@ public class Variable {
         case integer
 
         /// Allowed values are all Double numbers.
-        /// Corresponds to the *continuous* category in PuLP.
-        case real
+        case continuous
         
     }
 
@@ -83,8 +82,8 @@ public class Variable {
     ///   - name: Name of the variable. Should not be empty and should not contain any of the characters "-+[] ->/". Should be unique in a single model.
     ///   - minimum: Specifies a lower bound for the variable if present (default = nil). If not nil should not exceed a non-nil maximum. Should be nil or 0 for binary variables. 
     ///   - maximum: Specifies an upper bound for the variable if present (default = nil). Should be nil or 1 for binary variables.
-    ///   - domain: Specifies the subset of Double values the variable may assume (default = .real).
-    public init(_ name: String, minimum: Double? = nil, maximum: Double? = nil, domain: Domain = .real) {
+    ///   - domain: Specifies the subset of Double values the variable may assume (default = .continuous).
+    public init(_ name: String, minimum: Double? = nil, maximum: Double? = nil, domain: Domain = .continuous) {
         self.name = name
         self.minimum = domain == .binary && minimum == nil ? 0 : minimum
         self.maximum = domain == .binary && maximum == nil ? 1 : maximum

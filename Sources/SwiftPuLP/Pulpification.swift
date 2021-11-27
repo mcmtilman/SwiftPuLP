@@ -75,7 +75,7 @@ extension Variable.Domain: PythonConvertible {
         switch self {
         case .binary:
             return PuLP.LpBinary
-        case .real:
+        case .continuous:
             return PuLP.LpContinuous
         case .integer:
             return PuLP.LpInteger

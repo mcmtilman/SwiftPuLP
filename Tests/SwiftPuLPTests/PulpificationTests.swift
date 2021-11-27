@@ -41,7 +41,7 @@ final class PulpificationTests: XCTestCase {
     }
 
     func testDomainToPuLP() {
-        let domains = [Variable.Domain.binary, .real, .integer]
+        let domains = [Variable.Domain.binary, .continuous, .integer]
         let categories = [PuLP.LpBinary, PuLP.LpContinuous, PuLP.LpInteger]
 
         for (domain, category) in zip(domains, categories) {
