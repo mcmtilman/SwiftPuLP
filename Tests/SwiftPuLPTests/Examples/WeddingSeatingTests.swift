@@ -40,6 +40,8 @@ final class WeddingSeatingTests: XCTestCase {
         XCTAssertTrue(tables.elementsEqual(expected, by: ==))
     }
 
+#if !DEBUG
+    // Only solve previous one in debug mode.
     func testSolveLikesModel() {
         let model = Model("Likes", objective: objective(likes), optimization: .maximize, constraints: constraints())
         guard let result = Solver().solve(model) else { return XCTFail("Nil result") }
@@ -49,8 +51,10 @@ final class WeddingSeatingTests: XCTestCase {
         XCTAssertEqual(result.status, .optimal)
         XCTAssertTrue(tables.elementsEqual(expected, by: ==))
     }
-
-    // Variables are ordered by occurrence rather than by name as in PuLP. Hence we may have a different result with same objective value.
+#endif
+    
+    // Variables are ordered by occurrence rather than by name as in PuLP.
+    // Hence we may have a different result with same objective value.
     // Skip if CBC_PATH not set.
     func testSolveCBCHappinessModel() {
         guard let path = ProcessInfo.processInfo.environment["CBC_PATH"] else { return }
@@ -65,7 +69,10 @@ final class WeddingSeatingTests: XCTestCase {
         XCTAssertTrue(tables.elementsEqual(expected, by: ==))
     }
 
-    // Variables are ordered by occurrence rather than by name as in PuLP. Hence we may have a different result with same objective value.
+#if !DEBUG
+    // Only solve previous one in debug mode.
+    // Variables are ordered by occurrence rather than by name as in PuLP.
+    // Hence we may have a different result with same objective value.
     // Skip if CBC_PATH not set.
     func testSolveCBCLikesModel() {
         guard let path = ProcessInfo.processInfo.environment["CBC_PATH"] else { return }
@@ -79,6 +86,7 @@ final class WeddingSeatingTests: XCTestCase {
         XCTAssertEqual(result.status, .optimal)
         XCTAssertTrue(tables.elementsEqual(expected, by: ==))
     }
+#endif
 
     // MARK: Utility functions
     
