@@ -20,7 +20,7 @@ final class PulpificationTests: XCTestCase {
     // MARK: Variable tests
        
     func testVariableToPuLP() {
-        let variable = Variable("x", minimum: 1, maximum: 10, domain: .integer)
+        let variable = Variable("x", domain: .integer, minimum: 1, maximum: 10)
         let pythonVariable = variable.pythonObject
         
         XCTAssertTrue(pythonVariable.isInstance(of: PuLP.LpVariable))

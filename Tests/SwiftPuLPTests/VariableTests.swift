@@ -24,7 +24,7 @@ final class VariableTests: XCTestCase {
     // MARK: Variable tests
        
     func testVariable() {
-        let variable = Variable("x", minimum: 1, maximum: 10, domain: .integer)
+        let variable = Variable("x", domain: .integer, minimum: 1, maximum: 10)
         
         XCTAssertEqual(variable.name, "x")
         XCTAssertEqual(variable.minimum, 1)
@@ -52,7 +52,7 @@ final class VariableTests: XCTestCase {
     // MARK: Invalid variable tests
        
     func testInvalidVariable() {
-        let variable = Variable("x y", minimum: 3, maximum: 1, domain: .integer)
+        let variable = Variable("x y", domain: .integer, minimum: 3, maximum: 1)
         
         XCTAssertEqual(variable.name, "x y")
         XCTAssertEqual(variable.minimum, 3)
@@ -61,7 +61,7 @@ final class VariableTests: XCTestCase {
     }
 
     func testInvalidBinaryVariable() {
-        let variable = Variable("x", minimum: -1, maximum: 2, domain: .binary)
+        let variable = Variable("x", domain: .binary, minimum: -1, maximum: 2)
         
         XCTAssertEqual(variable.name, "x")
         XCTAssertEqual(variable.minimum, -1)

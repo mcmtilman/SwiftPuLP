@@ -80,10 +80,10 @@ public class Variable {
     ///
     /// - Parameters:
     ///   - name: Name of the variable. Should not be empty and should not contain any of the characters "-+[] ->/". Should be unique in a single model.
+    ///   - domain: Specifies the subset of Double values the variable may assume (default = .continuous).
     ///   - minimum: Specifies a lower bound for the variable if present (default = nil). If not nil should not exceed a non-nil maximum. Should be nil or 0 for binary variables. 
     ///   - maximum: Specifies an upper bound for the variable if present (default = nil). Should be nil or 1 for binary variables.
-    ///   - domain: Specifies the subset of Double values the variable may assume (default = .continuous).
-    public init(_ name: String, minimum: Double? = nil, maximum: Double? = nil, domain: Domain = .continuous) {
+    public init(_ name: String, domain: Domain = .continuous, minimum: Double? = nil, maximum: Double? = nil) {
         self.name = name
         self.minimum = domain == .binary && minimum == nil ? 0 : minimum
         self.maximum = domain == .binary && maximum == nil ? 1 : maximum

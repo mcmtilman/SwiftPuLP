@@ -40,7 +40,7 @@ final class CBCSolverTests: XCTestCase {
     func testBasicNormalSolution() {
         guard let url = Bundle.module.url(forResource: "BasicNormalSolution", withExtension: "sol", subdirectory: "Resources")  else { return XCTFail("Nil resource file") }
         
-        let (x, y) = (Variable("x", minimum: 0, domain: .integer), Variable("y", minimum: 0))
+        let (x, y) = (Variable("x", domain: .integer, minimum: 0), Variable("y", minimum: 0))
         let objective = x + 2 * y
         let constraints = [
             (2 * x + y <= 20, ""),
@@ -61,7 +61,7 @@ final class CBCSolverTests: XCTestCase {
     func testBasicAllSolution() {
         guard let url = Bundle.module.url(forResource: "BasicAllSolution", withExtension: "sol", subdirectory: "Resources")  else { return XCTFail("Nil resource file") }
         
-        let (x, y) = (Variable("x", minimum: 0, domain: .integer), Variable("y", minimum: 0))
+        let (x, y) = (Variable("x", domain: .integer, minimum: 0), Variable("y", minimum: 0))
         let objective = x + 2 * y
         let constraints = [
             (2 * x + y <= 20, ""),

@@ -17,7 +17,7 @@ final class ValidationTests: XCTestCase {
     // MARK: Validating valid variables
     
     func testValidVariable() {
-        let variable = Variable("x", minimum: 1, maximum: 10, domain: .integer)
+        let variable = Variable("x", domain: .integer, minimum: 1, maximum: 10)
         
         XCTAssertTrue(variable.validationErrors().isEmpty)
     }
@@ -29,13 +29,13 @@ final class ValidationTests: XCTestCase {
     }
     
     func testFixedVariable() {
-        let variable = Variable("x", minimum: 1, maximum: 1, domain: .integer)
+        let variable = Variable("x", domain: .integer, minimum: 1, maximum: 1)
         
         XCTAssertTrue(variable.validationErrors().isEmpty)
     }
 
     func testBinaryVariable() {
-        let variable = Variable("x", minimum: 0, maximum: 1, domain: .binary)
+        let variable = Variable("x", domain: .binary, minimum: 0, maximum: 1)
 
         XCTAssertTrue(variable.validationErrors().isEmpty)
     }
@@ -61,7 +61,7 @@ final class ValidationTests: XCTestCase {
     }
 
     func testInvalidRangeVariable() {
-        let variable = Variable("x", minimum: 3, maximum: 2, domain: .integer)
+        let variable = Variable("x", domain: .integer, minimum: 3, maximum: 2)
         let errors = variable.validationErrors()
         
         XCTAssertEqual(errors.count, 1)
@@ -69,7 +69,7 @@ final class ValidationTests: XCTestCase {
     }
 
     func testInvalidMinimumBinaryVariable() {
-        let variable = Variable("x", minimum: -1, domain: .binary)
+        let variable = Variable("x", domain: .binary, minimum: -1)
         let errors = variable.validationErrors()
         
         XCTAssertEqual(errors.count, 1)
@@ -77,7 +77,7 @@ final class ValidationTests: XCTestCase {
     }
 
     func testInvalidMaximumBinaryVariable() {
-        let variable = Variable("x", maximum: 2, domain: .binary)
+        let variable = Variable("x", domain: .binary, maximum: 2)
         let errors = variable.validationErrors()
         
         XCTAssertEqual(errors.count, 1)
@@ -85,7 +85,7 @@ final class ValidationTests: XCTestCase {
     }
 
     func testMultipleVariableErrors() {
-        let variable = Variable("", minimum: 3, maximum: 2, domain: .binary)
+        let variable = Variable("", domain: .binary, minimum: 3, maximum: 2)
         let errors = variable.validationErrors()
         
         XCTAssertEqual(errors.count, 2)

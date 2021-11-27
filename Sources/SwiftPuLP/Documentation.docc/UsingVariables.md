@@ -18,7 +18,7 @@ Values in these domains are represented by Double numbers. For the binary domain
 To create a variable use the following public initializer.
 
 ```swift
-init(_ name: String, minimum: Double? = nil, maximum: Double? = nil, domain: Domain = .continuous)
+init(_ name: String, domain: Domain = .continuous, minimum: Double? = nil, maximum: Double? = nil)
 ```
 
 ### Examples
