@@ -60,7 +60,7 @@ A variable is not valid if:
 * a non-nil minimum value exceeds a non-nil maximum value
 * for a binary domain, the mimimum value is not nil or 0, or the maximum value is not nil or 1.
 
-To verify that an individual variable is valid check if the ``Variable/validationErrors()`` property returns an empty list.
+To verify that an individual variable is valid check if ``Variable/validationErrors()`` returns an empty list.
 
 ```swift
 let x = Variable("x")  
