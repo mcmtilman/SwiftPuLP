@@ -42,7 +42,7 @@ final class CBCSolverTests: XCTestCase {
     func testWriteBinaryModel() {
         guard let url = Bundle.module.url(forResource: "Model", withExtension: "mps", subdirectory: "Resources") else { return XCTFail("Nil resource file") }
         
-        let (x, y) = (Variable("x", domain: .binary), Variable("y", domain: .binary))
+        let (x, y) = (Variable("x", domain: .binary), Variable("y", domain: .integer, minimum: 0, maximum: 1))
         let objective = x + y + 2
         let constraints = [
             (x + 2 * y - 2 <= 8, ""),
