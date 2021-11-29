@@ -133,11 +133,13 @@ Much of the code is similar (apart from some refactoring to make it more testabl
 
 ### Example 2: Wedding seating planning illustrating set partitioning optimization
 
-Based on the [A set partitioning model of a wedding seating problem](https://coin-or.github.io/pulp/CaseStudies/a_set_partitioning_problem.html).
+Based on [A set partitioning model of a wedding seating problem](https://coin-or.github.io/pulp/CaseStudies/a_set_partitioning_problem.html).
 
     Authors: Stuart Mitchell 2009
 
 The Swift model can be found in [WeddingSeatingTests](Tests/SwiftPuLPTests/Examples/WeddingSeatingTests.swift). It mirrors the PuLP model. It has an objective function, and only binary variables.
+
+    This model is also used to test a preliminary version of the CBCSolver.
 
 ## Dependencies
 
