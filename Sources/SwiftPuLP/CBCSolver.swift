@@ -190,7 +190,7 @@ struct MPSWriter {
 
         // Writes closing line.
         func writeEndOfDataLine() {
-            writer.append("ENDATA\n")
+            writer.append("ENDATA")
             writer.flush()
         }
         

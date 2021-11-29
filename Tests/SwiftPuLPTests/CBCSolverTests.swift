@@ -18,6 +18,69 @@ final class CBCSolverTests: XCTestCase {
     
 #if DEBUG
 
+    // MARK: MPS writer tests
+    
+    func testWriteDefaultModel() {
+        guard let url = Bundle.module.url(forResource: "Model", withExtension: "mps", subdirectory: "Resources") else { return XCTFail("Nil resource file") }
+        
+        let model = Model("Empty")
+        guard MPSWriter().writeModel(model, toFile: url.path) else { return XCTFail("Error writing MPS file") }
+        guard let contents = try? String(contentsOfFile: url.path, encoding: .utf8)  else { return XCTFail("Error reading MPS file") }
+        let expected = """
+            *SENSE:Minimize
+            NAME          MODEL
+            ROWS
+            COLUMNS
+            RHS
+            BOUNDS
+            ENDATA
+            """
+
+        XCTAssertEqual(contents, expected)
+    }
+
+    func testWriteBinaryModel() {
+        guard let url = Bundle.module.url(forResource: "Model", withExtension: "mps", subdirectory: "Resources") else { return XCTFail("Nil resource file") }
+        
+        let (x, y) = (Variable("x", domain: .binary), Variable("y", domain: .binary))
+        let objective = x + y + 2
+        let constraints = [
+            (x + 2 * y - 2 <= 8, ""),
+            (2 * x + y >= 2, "")
+        ]
+        let model = Model("Empty", objective: objective, optimization: .maximize, constraints: constraints)
+        guard MPSWriter().writeModel(model, toFile: url.path) else { return XCTFail("Error writing MPS file") }
+        guard let contents = try? String(contentsOfFile: url.path, encoding: .utf8)  else { return XCTFail("Error reading MPS file") }
+        let expected = """
+            *SENSE:Maximize
+            NAME          MODEL
+            ROWS
+             N  OBJ
+             L  C0000000
+             G  C0000001
+            COLUMNS
+                MARK      'MARKER'                 'INTORG'
+                X0000000  C0000000   1.000000000000e+00
+                X0000000  C0000001   2.000000000000e+00
+                X0000000  OBJ        1.000000000000e+00
+                MARK      'MARKER'                 'INTEND'
+                MARK      'MARKER'                 'INTORG'
+                X0000001  C0000000   2.000000000000e+00
+                X0000001  C0000001   1.000000000000e+00
+                X0000001  OBJ        1.000000000000e+00
+                MARK      'MARKER'                 'INTEND'
+            RHS
+                RHS       C0000000   1.000000000000e+01
+                RHS       C0000001   2.000000000000e+00
+            BOUNDS
+             BV BND       X0000000
+             BV BND       X0000001
+            ENDATA
+            """
+
+        XCTAssertEqual(contents, expected)
+    }
+
     // MARK: Solution reader tests
     
     func testAbsentSolutionFile() {
