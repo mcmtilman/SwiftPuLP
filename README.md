@@ -139,7 +139,7 @@ Based on [A set partitioning model of a wedding seating problem](https://coin-or
 
 The Swift model can be found in [WeddingSeatingTests](Tests/SwiftPuLPTests/Examples/WeddingSeatingTests.swift). It mirrors the PuLP model. It has an objective function, and only binary variables.
 
-    This model is also used to test a preliminary version of the CBCSolver.
+This model is also used to test a preliminary version of the CBCSolver.
 
 ## Dependencies
 
