@@ -122,7 +122,7 @@ struct MPSWriter {
         let variables = model.variables
         let variableNames = (0 ..< variables.count).map { i in String(format: "X%07d", i) }
         let constraintNames = (0 ..< model.constraints.count).map { i in String(format: "C%07d", i) }
-        let one = String(format: "%.12e", 1.0) // Factor 1 is often used in several unit test models.
+        let one = String(format: "% .12e", 1.0) // Factor 1 is often used in several unit test models.
 
         // Writes the model's optimization.  This is not suffient for CBC.
         // The CBC executable requires an explicit argument reflecting the model's optimization.
@@ -159,7 +159,7 @@ struct MPSWriter {
                     for (i, factor) in factors {
                         let name = i >= 0 ? constraintNames[i] : "OBJ     "
                         
-                        writer.append("    \(variableNames[v])  \(name)   \(toMPS(factor))\n")
+                        writer.append("    \(variableNames[v])  \(name)  \(toMPS(factor))\n")
                     }
                     if variable.domain != .continuous {
                         writer.append("    MARK      'MARKER'                 'INTEND'\n")
@@ -176,7 +176,7 @@ struct MPSWriter {
             for (i, (constraint, _)) in model.constraints.enumerated() {
                 let constant = constraint.constant - constraint.function.constant
                 
-                writer.append("    RHS       \(constraintNames[i])   \(toMPS(constant))\n")
+                writer.append("    RHS       \(constraintNames[i])  \(toMPS(constant))\n")
             }
         }
         
@@ -237,7 +237,7 @@ struct MPSWriter {
         
         // Converts the double to MPS format.
        func toMPS(_ double: Double) -> String {
-            double == 1 ? one : String(format: "%.12e", double)
+            double == 1 ? one : String(format: "% .12e", double)
         }
         
         // Converts the optimization to MPS format.

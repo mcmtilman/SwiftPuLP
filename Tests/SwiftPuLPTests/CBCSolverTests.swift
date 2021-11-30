@@ -45,8 +45,10 @@ final class CBCSolverTests: XCTestCase {
         let (x, y) = (Variable("x", domain: .binary), Variable("y", domain: .integer, minimum: 0, maximum: 1))
         let objective = x + y + 2
         let constraints = [
-            (x + 2 * y - 2 <= 8, ""),
-            (2 * x + y >= 2, "")
+            (2 * x + y <= 20, "C1"),
+            (4 * x - 5 * y >= -10, "C2"),
+            (-x + 2 * y >= -2, "C3"),
+            (-x + 5 * y == 15, "C4")
         ]
         let model = Model("Empty", objective: objective, optimization: .maximize, constraints: constraints)
         guard MPSWriter().writeModel(model, toFile: url.path) else { return XCTFail("Error writing MPS file") }
@@ -58,20 +60,28 @@ final class CBCSolverTests: XCTestCase {
              N  OBJ
              L  C0000000
              G  C0000001
+             G  C0000002
+             E  C0000003
             COLUMNS
                 MARK      'MARKER'                 'INTORG'
-                X0000000  C0000000   1.000000000000e+00
-                X0000000  C0000001   2.000000000000e+00
+                X0000000  C0000000   2.000000000000e+00
+                X0000000  C0000001   4.000000000000e+00
+                X0000000  C0000002  -1.000000000000e+00
+                X0000000  C0000003  -1.000000000000e+00
                 X0000000  OBJ        1.000000000000e+00
                 MARK      'MARKER'                 'INTEND'
                 MARK      'MARKER'                 'INTORG'
-                X0000001  C0000000   2.000000000000e+00
-                X0000001  C0000001   1.000000000000e+00
+                X0000001  C0000000   1.000000000000e+00
+                X0000001  C0000001  -5.000000000000e+00
+                X0000001  C0000002   2.000000000000e+00
+                X0000001  C0000003   5.000000000000e+00
                 X0000001  OBJ        1.000000000000e+00
                 MARK      'MARKER'                 'INTEND'
             RHS
-                RHS       C0000000   1.000000000000e+01
-                RHS       C0000001   2.000000000000e+00
+                RHS       C0000000   2.000000000000e+01
+                RHS       C0000001  -1.000000000000e+01
+                RHS       C0000002  -2.000000000000e+00
+                RHS       C0000003   1.500000000000e+01
             BOUNDS
              BV BND       X0000000
              BV BND       X0000001
@@ -119,13 +129,13 @@ final class CBCSolverTests: XCTestCase {
                 X0000006  OBJ        1.000000000000e+00
             RHS
             BOUNDS
-             FX BND       X0000000  2.000000000000e+00
+             FX BND       X0000000   2.000000000000e+00
              BV BND       X0000001
              BV BND       X0000002
              LO BND       X0000003  -2.000000000000e+00
-             LO BND       X0000004  0.000000000000e+00
+             LO BND       X0000004   0.000000000000e+00
              MI BND       X0000005
-             UP BND       X0000005  1.000000000000e+01
+             UP BND       X0000005   1.000000000000e+01
              FR BND       X0000006
             ENDATA
             """
