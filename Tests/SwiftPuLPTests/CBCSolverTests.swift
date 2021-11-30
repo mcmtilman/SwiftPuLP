@@ -226,7 +226,7 @@ final class CBCSolverTests: XCTestCase {
 
     // MARK: CBBSolver tests
 
-    func testSolveBasicModel() {
+    func testSolveOptimalModel() {
         guard let path = ProcessInfo.processInfo.environment["CBC_PATH"] else { return }
 
         let solver = CBCSolver(commandPath: path)
@@ -238,7 +238,7 @@ final class CBCSolverTests: XCTestCase {
             (-x + 2 * y >= -2, "yellow"),
             (-x + 5 * y == 15, "green")
         ]
-        let model = Model("Basic", objective: objective, optimization: .maximize, constraints: constraints)
+        let model = Model("Optimal", objective: objective, optimization: .maximize, constraints: constraints)
         guard let result = solver.solve(model) else { return XCTFail("Nil result") }
         
         XCTAssertEqual(result.status, .optimal)
@@ -260,7 +260,7 @@ final class CBCSolverTests: XCTestCase {
             (-x + 2 * y >= -2, "yellow"),
             (-x + 5 * y == 15, "green")
         ]
-        let model = Model("Basic", objective: objective, optimization: .maximize, constraints: constraints)
+        let model = Model("Infeasible", objective: objective, optimization: .maximize, constraints: constraints)
         guard let result = solver.solve(model) else { return XCTFail("Nil result") }
         
         XCTAssertEqual(result.status, .infeasible)
@@ -268,6 +268,22 @@ final class CBCSolverTests: XCTestCase {
         XCTAssertEqual(result.variables["x"], 7.7272727)
         XCTAssertEqual(result.variables["y"], 4.5454545)
         XCTAssertEqual(objective(result.variables), 16.8181817)
+    }
+    
+    func testSolveUnboundedModel() {
+        guard let path = ProcessInfo.processInfo.environment["CBC_PATH"] else { return }
+
+        let solver = CBCSolver(commandPath: path)
+        let (x, y) = (Variable("x", domain: .integer), Variable("y"))
+        let objective = x + 2 * y
+        let model = Model("Unbounded", objective: objective, optimization: .maximize)
+        guard let result = solver.solve(model) else { return XCTFail("Nil result") }
+        
+        XCTAssertEqual(result.status, .unbounded)
+        XCTAssertEqual(result.variables.count, 2)
+        XCTAssertEqual(result.variables["x"], 0)
+        XCTAssertEqual(result.variables["y"], 0)
+        XCTAssertEqual(objective(result.variables), 0)
     }
     
 }
