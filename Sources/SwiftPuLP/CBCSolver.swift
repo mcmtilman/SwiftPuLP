@@ -183,8 +183,30 @@ struct MPSWriter {
         // Writes the (implicitly) binary variables, i.e. integer variables with (min, max) == (0, 1) are also considered to be binary.
         func writeBoundsLines() {
             writer.append("BOUNDS\n")
-            for (v, variable) in variables.enumerated() where isBinary(variable) {
-                writer.append(" BV BND       \(variableNames[v])\n")
+            for (v, variable) in variables.enumerated() {
+                writeVariableBoundsLines(variable, variableNames[v])
+            }
+        }
+
+        func writeVariableBoundsLines(_ variable: Variable, _ name: String) {
+            let (domain, minimum, maximum) = (variable.domain, variable.minimum, variable.maximum)
+            
+            if let minimum = minimum, minimum == maximum {
+                return writer.append(" FX BND       \(name)  \(toMPS(minimum))\n")
+            } else if domain != .continuous, minimum == 0, maximum == 1 {
+                return writer.append(" BV BND       \(name)\n")
+            }
+            if let minimum = minimum {
+                if minimum != 0 || domain == .integer && maximum == nil {
+                    writer.append(" LO BND       \(name)  \(toMPS(minimum))\n")
+                }
+            } else if maximum != nil {
+                writer.append(" MI BND       \(name)\n")
+            } else {
+                writer.append(" FR BND       \(name)\n")
+            }
+            if let maximum = maximum {
+                writer.append(" UP BND       \(name)  \(toMPS(maximum))\n")
             }
         }
 
@@ -240,11 +262,6 @@ struct MPSWriter {
             }
         }
         
-        // Answers if the variable behaves like a binary.
-        func isBinary(_ variable: Variable) -> Bool {
-            variable.domain != .continuous && (variable.minimum, variable.maximum) == (0, 1)
-        }
-
         writeOptimizationLine()
         writeNameLine()
         writeRowLines()
