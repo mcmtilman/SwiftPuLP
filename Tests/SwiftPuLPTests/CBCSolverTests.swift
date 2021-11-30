@@ -170,7 +170,6 @@ final class CBCSolverTests: XCTestCase {
         XCTAssertEqual(result.variables.count, 2)
         XCTAssertEqual(result.variables["x"], 7)
         XCTAssertEqual(result.variables["y"], 4.4)
-        XCTAssertEqual(objective(result.variables), 15.8)
     }
     
     func testReadAllSolution() {
@@ -191,8 +190,28 @@ final class CBCSolverTests: XCTestCase {
         XCTAssertEqual(result.variables.count, 2)
         XCTAssertEqual(result.variables["x"], 7)
         XCTAssertEqual(result.variables["y"], 4.4)
-        XCTAssertEqual(objective(result.variables), 15.8)
     }
+
+    func testReadInfeasibleSolution() {
+        guard let url = Bundle.module.url(forResource: "InfeasibleSolution", withExtension: "sol", subdirectory: "Resources")  else { return XCTFail("Nil resource file") }
+        
+        let (x, y) = (Variable("x", domain: .integer, minimum: 8), Variable("y"))
+        let objective = x + 2 * y
+        let constraints = [
+            (2 * x + y <= 20, "red"),
+            (4 * x - 5 * y >= -10, "blue"),
+            (-x + 2 * y >= -2, "yellow"),
+            (-x + 5 * y == 15, "green")
+        ]
+        let model = Model("Basic", objective: objective, optimization: .maximize, constraints: constraints)
+        guard let result = SolutionReader().readResultFromFile(atPath: url.path, model: model) else { return XCTFail("Nil result") }
+
+        XCTAssertEqual(result.status, .infeasible)
+        XCTAssertEqual(result.variables.count, 2)
+        XCTAssertEqual(result.variables["x"], 7.7272727)
+        XCTAssertEqual(result.variables["y"], 4.5454545)
+    }
+    
 #endif
 
     // MARK: CBBSolver tests
@@ -201,7 +220,7 @@ final class CBCSolverTests: XCTestCase {
         guard let path = ProcessInfo.processInfo.environment["CBC_PATH"] else { return }
 
         let solver = CBCSolver(commandPath: path)
-        let (x, y) = (Variable("x", domain: .integer), Variable("y"))
+        let (x, y) = (Variable("x", domain: .integer, minimum: 0), Variable("y"))
         let objective = x + 2 * y
         let constraints = [
             (2 * x + y <= 20, "red"),
@@ -217,6 +236,28 @@ final class CBCSolverTests: XCTestCase {
         XCTAssertEqual(result.variables["x"], 7)
         XCTAssertEqual(result.variables["y"], 4.4)
         XCTAssertEqual(objective(result.variables), 15.8)
+    }
+    
+    func testSolveInfeasibleModel() {
+        guard let path = ProcessInfo.processInfo.environment["CBC_PATH"] else { return }
+
+        let solver = CBCSolver(commandPath: path)
+        let (x, y) = (Variable("x", domain: .integer, minimum: 8), Variable("y"))
+        let objective = x + 2 * y
+        let constraints = [
+            (2 * x + y <= 20, "red"),
+            (4 * x - 5 * y >= -10, "blue"),
+            (-x + 2 * y >= -2, "yellow"),
+            (-x + 5 * y == 15, "green")
+        ]
+        let model = Model("Basic", objective: objective, optimization: .maximize, constraints: constraints)
+        guard let result = solver.solve(model) else { return XCTFail("Nil result") }
+        
+        XCTAssertEqual(result.status, .infeasible)
+        XCTAssertEqual(result.variables.count, 2)
+        XCTAssertEqual(result.variables["x"], 7.7272727)
+        XCTAssertEqual(result.variables["y"], 4.5454545)
+        XCTAssertEqual(objective(result.variables), 16.8181817)
     }
     
 }

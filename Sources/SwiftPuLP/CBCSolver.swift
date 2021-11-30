@@ -372,8 +372,10 @@ struct SolutionReader {
         let variables = model.variables
         let bindings = lines.dropFirst().dropLast().compactMap { (line) -> (String, Double)? in
             let tokens = line.split(separator: " ")
+            guard tokens.count > 2 else { return nil }
+            let i = tokens[0] == "**" ? 1 : 0
             
-            switch (Int(tokens[0]), tokens[1], Double(tokens[2])) {
+            switch (Int(tokens[i]), tokens[i + 1], Double(tokens[i + 2])) {
             case (let id?, let name, let value?) where name.starts(with: "X"):
                 return (variables[id].name, value)
             default:
