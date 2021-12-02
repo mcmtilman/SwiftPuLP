@@ -118,7 +118,7 @@ final class ProductionPlanningTests: XCTestCase {
         }) - steelPrice * purchaseVar
     }
         
-    // Constraints making sure not to exceed available capacities, demand and purchase price.
+    // Constraints making sure not to exceed available capacities and demand.
     private func constraints() -> [(LinearConstraint, String)] {
         var constraints = [(LinearConstraint, String)]()
         
