@@ -26,7 +26,7 @@ The building blocks of the core model are:
     
     See: [Using linear constraints](Sources/SwiftPuLP/Documentation.docc/UsingLinearConstraints.md)
 
-* A **Model** has an optional **Objective**, which is a linear function, and an **Optimization** goal. A model may also specify zero or more linear constraints.
+* A **Model** has an optional **Objective**, which is a linear function, and an **Optimization** goal. A model may also specify zero or more linear **constraints**.
 
     The optimization goals include: minimize and maximize.
 
@@ -147,7 +147,7 @@ Based on [A Two Stage Production Planning Problem](https://coin-or.github.io/pul
 
     Authors: Louis Luangkesorn 2019
 
-The Swift model can be found in [ProductionPlanningTests](Tests/SwiftPuLPTests/Examples/ProductionPlanningTests.swift)
+The Swift model can be found in [ProductionPlanningTests](Tests/SwiftPuLPTests/Examples/ProductionPlanningTests.swift).
 
 ## Dependencies
 

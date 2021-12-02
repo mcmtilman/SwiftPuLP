@@ -65,12 +65,12 @@ final class ProductionPlanningTests: XCTestCase {
     // Product variables per scenario.
     lazy var productVars = scenarios.map { scenario in
         products.map { product in
-            Variable("Production_\(scenario)_\(product)", minimum: 0)
+            Variable("production_\(scenario)_\(product)", minimum: 0)
         }
     }
     
     // Purchase-related variable.
-    lazy var purchaseVar = Variable("Purchase", minimum: 0)
+    lazy var purchaseVar = Variable("purchase", minimum: 0)
     
     // MARK: - Solver tests
     
@@ -81,10 +81,10 @@ final class ProductionPlanningTests: XCTestCase {
         let expected = [[15, 4.75], [15, 4.75], [12.5, 8.5], [5, 16]]
 
         XCTAssertEqual(result.status, .optimal)
-        XCTAssertEqual(result.variables["Purchase"], 27.25)
+        XCTAssertEqual(result.variables["purchase"], 27.25)
         for s in scenarios {
             for p in productIds {
-                XCTAssertEqual(result.variables["Production_\(s)_\(products[p])"], expected[s][p])
+                XCTAssertEqual(result.variables["production_\(s)_\(products[p])"], expected[s][p])
             }
         }
         XCTAssertEqual(objective(result.variables), 863.25)
@@ -100,10 +100,10 @@ final class ProductionPlanningTests: XCTestCase {
         let expected = [[15, 4.75], [15, 4.75], [12.5, 8.5], [5, 16]]
 
         XCTAssertEqual(result.status, .optimal)
-        XCTAssertEqual(result.variables["Purchase"], 27.25)
+        XCTAssertEqual(result.variables["purchase"], 27.25)
         for s in scenarios {
             for p in productIds {
-                XCTAssertEqual(result.variables["Production_\(s)_\(products[p])"], expected[s][p])
+                XCTAssertEqual(result.variables["production_\(s)_\(products[p])"], expected[s][p])
             }
         }
         XCTAssertEqual(objective(result.variables), 863.25)
