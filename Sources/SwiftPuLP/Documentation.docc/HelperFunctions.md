@@ -17,10 +17,8 @@ The helper functions are available as static methods in the Function enum.
     let constraint = Function.sum(x) == 1
     ```
 
-* The ``Function/sum(_:)-4nffd`` function converts a sequence of linear functions into a linear function summing the variables.
+* The ``Function/sum(_:)-4nffd`` function converts a sequence of linear functions into a linear function summing the functions.
     
-    The following example creates the constraint that one and only one of 100 binary variables should have value 1.
-
 ### Iterating over pairs of sequences
 
 * The ``Pairs`` struct combines two sequences, and implements an iterator that generates all pairwise combinations of elements from each sequence.

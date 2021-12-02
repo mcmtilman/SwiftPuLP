@@ -37,6 +37,8 @@ The building blocks of the core model are:
     The solver returns an optional **Result** with a **Status** and a dictionary of variable name - value pairs.
 
     See: [Using solvers](Sources/SwiftPuLP/Documentation.docc/UsingSolvers.md)
+    
+    The **CBCSolver** bypasses conversion to and from Python, and directly calls the CBC executable, communicating via files for model and solution.
 
 ### Type overview
 
@@ -137,9 +139,15 @@ Based on [A set partitioning model of a wedding seating problem](https://coin-or
 
     Authors: Stuart Mitchell 2009
 
-The Swift model can be found in [WeddingSeatingTests](Tests/SwiftPuLPTests/Examples/WeddingSeatingTests.swift). It mirrors the PuLP model. It has an objective function, and only binary variables.
+The Swift model can be found in [WeddingSeatingTests](Tests/SwiftPuLPTests/Examples/WeddingSeatingTests.swift). It mirrors the PuLP model. It has an objective function, and uses only binary variables.
 
-This model is also used to test a preliminary version of the CBCSolver.
+### Example 3: Production planning
+
+Based on [A Two Stage Production Planning Problem](https://coin-or.github.io/pulp/CaseStudies/a_two_stage_production_planning_problem.html).
+
+    Authors: Louis Luangkesorn 2019
+
+The Swift model can be found in [ProductionPlanningTests](Tests/SwiftPuLPTests/Examples/ProductionPlanningTests.swift)
 
 ## Dependencies
 
