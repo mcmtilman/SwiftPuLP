@@ -24,6 +24,8 @@ a * x + b * y == d
 a * x + b * y - d >= 0
 ```
 
+The weight factors a and b are the *coefficients*, and c and d represent constants. The left-hand side may contain a constant, while the right-hand side must be a (single) constant.
+
 ### Creating linear constraints
 
 To create a constraint use one of the following public initializers.
