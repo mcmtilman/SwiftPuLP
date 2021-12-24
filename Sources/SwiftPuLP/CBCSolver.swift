@@ -170,7 +170,7 @@ struct MPSWriter {
         }
         
         // Writes the constants of the various constraints.
-        // Each constant is the constraint's constant - its function constant.
+        // Each constant is the constraint's constant minus its function constant.
         func writeRHSLines() {
             writer.append("RHS\n")
             for (i, (constraint, _)) in model.constraints.enumerated() {
@@ -180,7 +180,7 @@ struct MPSWriter {
             }
         }
         
-        // Writes the (implicitly) binary variables, i.e. integer variables with (min, max) == (0, 1) are also considered to be binary.
+        // Writes the variable bounds.
         func writeBoundsLines() {
             writer.append("BOUNDS\n")
             for (v, variable) in variables.enumerated() {
@@ -188,6 +188,7 @@ struct MPSWriter {
             }
         }
 
+        // Integer variables with (min, max) == (0, 1) are implicitly considered to be binary.
         func writeVariableBoundsLines(_ variable: Variable, _ name: String) {
             let (domain, minimum, maximum) = (variable.domain, variable.minimum, variable.maximum)
             
