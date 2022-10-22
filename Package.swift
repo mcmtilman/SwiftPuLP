@@ -11,9 +11,9 @@ let package = Package(
             targets: ["SwiftPuLP"]),
     ],
     dependencies: [
-        .package(url: "https://github.com/pvieito/PythonKit.git", .branch("master")),
-        .package(url: "https://github.com/apple/swift-collections.git", .upToNextMajor(from: "1.0.0")),
-        .package(url: "https://github.com/apple/swift-algorithms.git", .upToNextMajor(from: "1.0.0")),
+        .package(url: "https://github.com/pvieito/PythonKit.git", branch: "master"),
+        .package(url: "https://github.com/apple/swift-collections.git", from: "1.0.0"),
+        .package(url: "https://github.com/apple/swift-algorithms.git", from: "1.0.0"),
     ],
     targets: [
         .target(
@@ -26,6 +26,6 @@ let package = Package(
             dependencies: ["SwiftPuLP",
                            .product(name: "Algorithms", package: "swift-algorithms")],
             resources: [
-              .copy("Resources")]),
+              .copy("Resources")])
     ]
 )
